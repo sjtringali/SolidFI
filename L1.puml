@@ -1,7 +1,9 @@
 @startuml SolidFI_Level1
 
+' !include _L0.puml
+' skinparam strictuml
+
 top to bottom direction
-' skinparam style strictuml
 
 together {
   interface Inverter<T, U> {}
@@ -19,11 +21,11 @@ together {
     + apply() : T
   }
 
-  interface Chain<T, U> {
-    .. inherited ..
+  class Chain<T, U> {
+    -- inherited --
     + accepts(input: T) : boolean
     + fetch() : U
-    .. own ..
+    -- own --
     + resolve() : U
     + add(converter: Converter<?, ?>) : void
     + remove(index: int) : void
@@ -33,11 +35,11 @@ together {
     resolve() is the friendly alias for fetch().
   }
 
-  interface Pipeline<T> {
-    .. inherited ..
+  class Pipeline<T> {
+    -- inherited --
     + accepts(input: T) : boolean
     + apply() : T
-    .. own ..
+    -- own --
     + run() : T
     + add(transform: Transform<T>) : void
     + remove(index: int) : void
@@ -50,11 +52,10 @@ together {
 legend top right
   SolidFI Level 1
   Scott Tringali
-  5/16/2026
 end legend
 
-Converter <|-- Chain : "is a\nConverter<T,U>"
-Transform <|-- Pipeline : "is a\nTransform<T>"
+Converter <|.. Chain : "implements\nConverter<T,U>"
+Transform <|.. Pipeline : "implements\nTransform<T>"
 
 Converter <|-- Inverter
 Converter <|-- Provider
