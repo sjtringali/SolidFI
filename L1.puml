@@ -1,7 +1,11 @@
 @startuml SolidFI_Level1
 
+legend top right
+  SolidFI Level 1
+  Scott Tringali
+end legend
+
 ' !include _L0.puml
-' skinparam strictuml
 
 top to bottom direction
 
@@ -13,23 +17,26 @@ together {
 together {
   interface Converter<T, U> {
     + accepts(input: T) : boolean
+    + rejects(input: T) : boolean
     + fetch() : U
   }
 
   interface Transform<T> {
     + accepts(input: T) : boolean
+    + rejects(input: T) : boolean
     + apply() : T
   }
 
   class Chain<T, U> {
     -- inherited --
     + accepts(input: T) : boolean
+    + rejects(input: T) : boolean
     + fetch() : U
     -- own --
     + resolve() : U
-    + add(converter: Converter<?, ?>) : void
+    + add(converter: Converter<T, U>) : void
     + remove(index: int) : void
-    + replace(index: int, converter: Converter<?, ?>) : void
+    + replace(index: int, converter: Converter<T, U>) : void
     .. note ..
     T→U only; internal links are impl detail.
     resolve() is the friendly alias for fetch().
@@ -38,6 +45,7 @@ together {
   class Pipeline<T> {
     -- inherited --
     + accepts(input: T) : boolean
+    + rejects(input: T) : boolean
     + apply() : T
     -- own --
     + run() : T
@@ -48,11 +56,6 @@ together {
     run() is the friendly alias for apply().
   }
 }
-
-legend top right
-  SolidFI Level 1
-  Scott Tringali
-end legend
 
 Converter <|.. Chain : "implements\nConverter<T,U>"
 Transform <|.. Pipeline : "implements\nTransform<T>"
