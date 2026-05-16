@@ -1,8 +1,7 @@
 @startuml SolidFI_Level1
 
-skinparam classAttributeIconSize 0
-skinparam style strictuml
 top to bottom direction
+' skinparam style strictuml
 
 together {
   interface Inverter<T, U> {}
@@ -48,9 +47,10 @@ together {
   }
 }
 
-legend bottom right
+legend top right
   SolidFI Level 1
   Scott Tringali
+  5/16/2026
 end legend
 
 Converter <|-- Chain : "is a\nConverter<T,U>"
