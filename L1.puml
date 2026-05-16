@@ -5,7 +5,7 @@ legend top right
   Scott Tringali
 end legend
 
-' !include _L0.puml
+' !include L0.puml
 
 top to bottom direction
 

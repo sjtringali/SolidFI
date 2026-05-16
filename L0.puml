@@ -1,0 +1,28 @@
+@startuml SolidFI_Level0
+
+legend top center
+  SolidFI Level 0
+  Scott Tringali
+end legend
+
+interface Operation<T> {
+  ' The raw "do the thing" substrate.
+  ' Converter and Transform are semantic wrappers.
+}
+
+interface Predicate<T> {
+  ' Substrate for accepts() and rejects() slots.
+  ' Stateless by contract; mechanism is impl-defined.
+}
+
+interface Composite<T> {
+  ' Container substrate for Chain and Pipeline.
+  ' Manages ordered collections of Operations.
+}
+
+interface Filter<T> {
+  ' Predicate pair: accepts + rejects.
+  ' Orthogonal composition seam.
+}
+
+@enduml
