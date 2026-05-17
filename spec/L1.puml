@@ -16,42 +16,41 @@ together {
 
 together {
   interface Converter<T, U> {
-    + accepts(input: T) : boolean
-    + rejects(input: T) : boolean
-    + fetch() : U
+    + {abstract} accepts(T) : boolean
+    + {abstract} rejects(T) : boolean
+    + {abstract} fetch(T) : U
   }
 
   interface Transform<T> {
-    + accepts(input: T) : boolean
-    + rejects(input: T) : boolean
-    + apply() : T
+    + {abstract} accepts(T) : boolean
+    + {abstract} rejects(T) : boolean
+    + {abstract} apply(T) : T
   }
 
   class Chain<T, U> {
-    -- inherited --
-    + accepts(input: T) : boolean
-    + rejects(input: T) : boolean
-    + fetch() : U
-    -- own --
-    + resolve() : U
-    + add(converter: Converter<T, U>) : void
-    + remove(index: int) : void
-    + replace(index: int, converter: Converter<T, U>) : void
+    + accepts(T) : boolean
+    + rejects(T) : boolean
+    + fetch(T) : U
+    .. own ..
+    + resolve(T) : U
+    -- Composite --
+    + install(priorty: int, name: string, Converter<T, U>)
+    + remove(name: string)
+    + replace(name: string: Converter<T, U>)
     .. note ..
-    T→U only; internal links are impl detail.
     resolve() is the friendly alias for fetch().
   }
 
   class Pipeline<T> {
-    -- inherited --
-    + accepts(input: T) : boolean
-    + rejects(input: T) : boolean
-    + apply() : T
-    -- own --
-    + run() : T
-    + add(transform: Transform<T>) : void
-    + remove(index: int) : void
-    + replace(index: int, transform: Transform<T>) : void
+    + accepts(T) : boolean
+    + rejects(T) : boolean
+    + apply(T) : T
+    .. own ..
+    + run(T) : T
+    -- Composite --
+    + install(priorty: int, name: string, Converter<T, U>)
+    + remove(name: string)
+    + replace(name: string: Converter<T, U>)
     .. note ..
     run() is the friendly alias for apply().
   }
@@ -63,7 +62,7 @@ Transform <|.. Pipeline : "implements\nTransform<T>"
 Converter <|-- Inverter
 Converter <|-- Provider
 
-Converter --o Chain : contains
-Transform --o Pipeline : contains
+Converter --o Chain : strategies
+Transform --o Pipeline : strategies
 
 @enduml
