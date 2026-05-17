@@ -41,6 +41,10 @@ together {
     resolve() is the friendly alias for fetch().
   }
 
+  ' Generally does not own transforms
+  Chain "0..1" o--left-- Transform : "inputTransformer<T>"
+  Chain "0..1" o--left-- Transform : "outputTransformer<U>"
+
   class Pipeline<T> {
     + accepts(T) : boolean
     + rejects(T) : boolean
@@ -56,13 +60,14 @@ together {
   }
 }
 
-Converter <|.. Chain : "implements\nConverter<T,U>"
-Transform <|.. Pipeline : "implements\nTransform<T>"
+Converter <|.. Chain
+Transform <|.. Pipeline
 
 Converter <|-- Inverter
 Converter <|-- Provider
 
-Converter --o Chain : strategies
-Transform --o Pipeline : strategies
+' Generally owns strategies, but doesn't have to
+Chain "0..n" *-- Converter : strategies
+Pipeline "0..n" *-- Transform : strategies
 
 @enduml
