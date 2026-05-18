@@ -6,23 +6,33 @@ legend top center
 end legend
 
 interface Operation<T> {
-  ' The raw "do the thing" substrate.
-  ' Converter and Transform are semantic wrappers.
+  execute();
 }
 
 interface Predicate<T> {
-  ' Substrate for accepts() and rejects() slots.
-  ' Stateless by contract; mechanism is impl-defined.
+  {abstract} decide(T): boolean;
 }
 
-interface Composite<T> {
-  ' Container substrate for Chain and Pipeline.
-  ' Manages ordered collections of Operations.
+interface Composite<T, U> {
+  {abstract} dispatch(T): U;
 }
 
 interface Filter<T> {
-  ' Predicate pair: accepts + rejects.
-  ' Orthogonal composition seam.
+  {abstract} accepts(T);
+  {abstract} rejects(T);
 }
+
+class Strategy<T, U> {
+  name: string;
+  priority: int;
+  impl: Operation;
+  ' Storage of each chain or transform link (operation)
+}
+
+' Composite <|-- Filter
+Composite o-- Strategy : entries
+Strategy o-- Operation : impl
+Filter *-- Predicate
+Filter *-- Predicate
 
 @enduml
