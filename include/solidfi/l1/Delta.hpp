@@ -22,7 +22,6 @@ namespace solidfi {
 template<typename T>
 class Delta {
 public:
-    virtual ~Delta() = default;
 };
 
 } // namespace solidfi

@@ -45,7 +45,6 @@ public:
     template<typename T>
     void install(Transform<T> transform);
 
-    virtual ~Graph() = default;
 };
 
 } // namespace solidfi

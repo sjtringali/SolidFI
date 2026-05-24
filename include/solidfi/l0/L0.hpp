@@ -27,7 +27,6 @@ template<typename T>
 class Operation {
 public:
     virtual void execute() = 0;
-    virtual ~Operation() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -39,7 +38,6 @@ template<typename T>
 class Predicate {
 public:
     virtual bool decide(T value) = 0;
-    virtual ~Predicate() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -52,7 +50,6 @@ class Filter {
 public:
     virtual bool accepts(T value) = 0;
     virtual bool rejects(T value) = 0;
-    virtual ~Filter() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -64,7 +61,6 @@ template<typename T, typename U>
 class Composite {
 public:
     virtual U dispatch(T value) = 0;
-    virtual ~Composite() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -100,7 +96,6 @@ template<typename T>
 class Delegate {
 public:
     virtual T& target() = 0;
-    virtual ~Delegate() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -112,7 +107,6 @@ public:
 template<typename T, typename U>
 class Goto {
 public:
-    virtual ~Goto() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -125,7 +119,6 @@ class Closed {
 public:
     explicit Closed(const T& value);
     virtual T get() const = 0;
-    virtual ~Closed() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -135,7 +128,6 @@ public:
 template<typename T>
 class Optional {
 public:
-    virtual ~Optional() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -147,7 +139,6 @@ template<typename T>
 class Shared {
 public:
     virtual T& get() = 0;
-    virtual ~Shared() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -156,7 +147,6 @@ public:
 ///   for all parameterized types.
 class Parameters {
 public:
-    virtual ~Parameters() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -170,7 +160,6 @@ public:
 /// @note L2 mapping: Runtime — a Graph assembled for a specific deployment context.
 class Category {
 public:
-    virtual ~Category() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -181,7 +170,6 @@ template<typename T>
 class Reduce {
 public:
     virtual T reduce(std::vector<T> values) = 0;
-    virtual ~Reduce() = default;
 };
 
 /// @ingroup solidfi_l0
@@ -192,7 +180,6 @@ template<typename T>
 class Expand {
 public:
     virtual std::vector<T> expand(T value) = 0;
-    virtual ~Expand() = default;
 };
 
 } // namespace solidfi

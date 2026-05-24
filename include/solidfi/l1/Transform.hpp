@@ -43,7 +43,6 @@ public:
     /// If this transform does not accept the input, MUST return the original value unchanged.
     virtual T apply(T value) = 0;
 
-    virtual ~Transform() = default;
 };
 
 } // namespace solidfi

@@ -59,7 +59,6 @@ public:
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     virtual Optional<U> fetch(T value, P params) = 0;
 
-    virtual ~Converter() = default;
 };
 
 } // namespace solidfi
