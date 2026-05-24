@@ -96,6 +96,6 @@ class Roundtrip {};
 /// (environment-driven) when you want to name, compose, or parameterize it.
 ///
 /// @todo Specification pending.
-class Runtime {};
+class Runtime : public Graph {};
 
 } // namespace solidfi

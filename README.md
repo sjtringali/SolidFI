@@ -58,22 +58,22 @@ If something matters, it has a name.
 
 Foundational concepts that inform L1. For implementers. L0 and L1 are independent.
 
-| Concept          | Shape                      | Notes                                                           |
-| ------------------| ----------------------------| -----------------------------------------------------------------|
-| `Operation<T>`   | `execute()`                | Unit of executable work over T                                  |
-| `Predicate<T>`   | `decide(T) -> bool`        | Single binary decision                                          |
-| `Filter<T>`      | `accepts(T)`, `rejects(T)` | Accept/reject pair                                              |
-| `Composite<T,U>` | `dispatch(T) -> U`         | Ordered composition substrate                                   |
-| `Strategy<T,U>`  | name + priority            | Named, prioritized entry in a Composite                         |
+| Concept          | Shape                      | Notes                                                                    |
+| ------------------| ----------------------------| --------------------------------------------------------------------------|
+| `Operation<T>`   | `execute()`                | Unit of executable work over T                                           |
+| `Predicate<T>`   | `decide(T) -> bool`        | Single binary decision                                                   |
+| `Filter<T>`      | `accepts(T)`, `rejects(T)` | Accept/reject pair                                                       |
+| `Composite<T,U>` | `dispatch(T) -> U`         | Ordered composition substrate                                            |
+| `Strategy<T,U>`  | name + priority            | Named, prioritized entry in a Composite                                  |
 | `Delegate<T>`    | `target() -> T&`           | Object indirection: refers to another T and delegates to it. L2: `Proxy` |
-| `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD |
-| `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>` |
-| `Optional<T>`    | —                          | May or may not hold a T. L1: `std::optional<T>`                 |
-| `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                         |
-| `Parameters`     | —                          | Marker for user-defined contextual data                         |
-| `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime` |
-| `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection → single value                                 |
-| `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value → collection                               |
+| `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                         |
+| `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`          |
+| `Optional<T>`    | —                          | May or may not hold a T. L1: `std::optional<T>`                          |
+| `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                  |
+| `Parameters`     | —                          | Marker for user-defined contextual data                                  |
+| `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
+| `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection → single value                                          |
+| `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value → collection                                        |
 
 ### L1 — Primitives
 
@@ -81,13 +81,13 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 
 #### Core
 
-| Concept            | Shape              | Notes                                                              |
-| --------------------| --------------------| --------------------------------------------------------------------|
-| `Transform<T>`     | `apply(T) -> T`    | Takes T, produces T. Cannot fail; degrades to identity             |
-| `Pipeline<T>`      | `Transform<T>`     | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`  |
-| `Converter<T,U,P>` | `fetch(T,P) -> U?` | Takes T, produces U. May fail. P for routing                       |
-| `Chain<T,U,P>`     | `Converter<T,U,P>` | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>` |
-| `Parameters`       | empty              | Default P across all parameterized types                           |
+| Concept            | Shape                | Notes                                                              |
+| --------------------| ----------------------| --------------------------------------------------------------------|
+| `Transform<T>`     | `apply(T) -> T`      | Takes T, produces T. Cannot fail; degrades to identity             |
+| `Pipeline<T>`      | `run(T) -> T`        | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`  |
+| `Converter<T,U,P>` | `fetch(T,P) -> U?`   | Takes T, produces U. May fail. P for routing                       |
+| `Chain<T,U,P>`     | `resolve(T,P) -> U?` | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>` |
+| `Parameters`       | empty                | Default P across all parameterized types                           |
 
 ##### Extras
 
@@ -112,7 +112,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | ------------------| ---------------------------| ------------------------------------------------------------|
 | `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act |
 | `Traversal<U,P>` | `Converter<Graph,U,P>`    | Algorithm over a Graph; Graph is the input                 |
-| `Solver<T,U,P>`  | `Converter<T,U,P>`        | Graph bound at construction; finds and executes T→U path   |
+| `Solver<T,U,P>`  | `solve(T,P) -> U?`        | Graph bound at construction; finds and executes T→U path   |
 
 ### L2 — Domain Patterns
 

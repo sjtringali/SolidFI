@@ -57,6 +57,9 @@ public:
     /// Returns absent value if no path exists or if execution of the found path fails.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
+    Optional<U> solve(T value, P params);
+
+    /// @brief Satisfies Converter<T,U,P>. Delegates to solve().
     Optional<U> fetch(T value, P params) override;
 };
 

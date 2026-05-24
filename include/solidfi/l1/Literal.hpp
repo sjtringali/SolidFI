@@ -45,12 +45,12 @@ public:
     bool rejects(T value) const override { return false; }
 
     /// @brief Return the captured value. The input is ignored.
-    T apply(T value) override;
+    T apply(T) override;
 
     /// @brief Return the captured value. The input and parameters are ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<T> fetch(InputT value, Parameters params) override;
+    Optional<T> fetch(InputT, Parameters) override;
 };
 
 } // namespace solidfi
