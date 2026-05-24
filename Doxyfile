@@ -21,7 +21,7 @@ STRIP_FROM_PATH        = include/
 EXTRACT_ALL            = NO
 EXTRACT_STATIC         = YES
 ALWAYS_DETAILED_SEC    = YES
-REPEAT_BRIEF           = NO
+REPEAT_BRIEF           = YES
 INHERIT_DOCS           = YES
 HIDE_SCOPE_NAMES       = YES
 HIDE_COMPOUND_REFERENCE = YES
@@ -29,6 +29,7 @@ HIDE_COMPOUND_REFERENCE = YES
 #---------------------------------------------------------------------------
 # Content display — Qt style: declaration order, no file noise
 #---------------------------------------------------------------------------
+BRIEF_MEMBER_DESC      = NO
 SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO

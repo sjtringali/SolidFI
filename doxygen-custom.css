@@ -1,3 +1,49 @@
+/* Tight Qt-style member summary list — remove doxygen-awesome card boxes */
+tr[class^="memitem:"],
+tr[class*=" memitem:"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+tr[class^="memitem:"] td,
+tr[class*=" memitem:"] td {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+tr[class^="separator:"] td,
+tr[class*=" separator:"] td {
+    display: none !important;
+}
+
+/* Proportional font everywhere except actual code blocks */
+table.memberdecls tr[class^='memitem'],
+table.memberdecls tr[class*=' memitem'],
+h2.memtitle,
+div.memproto table.memname,
+div.memproto div.memtemplate,
+table.params .paramname {
+    font-family: var(--font-family) !important;
+    font-size: var(--page-font-size) !important;
+}
+
+/* Tighter line spacing and paragraph margins */
+:root {
+    --content-line-height: 1.45;
+}
+
+.textblock p {
+    margin-top: 0.4em !important;
+    margin-bottom: 0.4em !important;
+}
+
+dl {
+    line-height: 1.45 !important;
+}
+
 /* Hide Class Members tab and its dropdown from top navigation */
 li:has(> a[href="functions.html"]),
 li:has(> a[href="functions_func.html"]) {

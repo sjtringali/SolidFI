@@ -11,6 +11,8 @@ check:
 
 doc:
 	doxygen Doxyfile
+	find docs/html -name "*.html" -exec sed -i \
+		's/&lt; \([A-Za-z0-9_]\)/\&lt;\1/g; s/\([A-Za-z0-9_]\) &gt;/\1\&gt;/g' {} \;
 
 clean:
 	rm -rf docs/
