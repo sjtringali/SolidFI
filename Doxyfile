@@ -1,0 +1,74 @@
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "SolidFI"
+PROJECT_BRIEF          = "Functional Interfaces for Composition"
+PROJECT_NUMBER         = "L1 Draft"
+OUTPUT_DIRECTORY       = docs
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+INPUT                  = include/solidfi README.md
+FILE_PATTERNS          = *.hpp *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+STRIP_FROM_PATH        = include/
+
+#---------------------------------------------------------------------------
+# Extraction — document everything, spec is the source of truth
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+ALWAYS_DETAILED_SEC    = YES
+INHERIT_DOCS           = YES
+
+#---------------------------------------------------------------------------
+# Content display — Qt style: declaration order, no file noise
+#---------------------------------------------------------------------------
+SORT_MEMBER_DOCS       = NO
+SORT_BRIEF_DOCS        = NO
+SORT_BY_SCOPE_NAME     = NO
+SHOW_INCLUDE_FILES     = NO
+SHOW_GROUPED_MEMB_INC  = NO
+INLINE_INHERITED_MEMB  = NO
+FULL_PATH_NAMES        = NO
+ALPHABETICAL_INDEX     = YES
+BUILTIN_STL_SUPPORT    = YES
+
+#---------------------------------------------------------------------------
+# HTML — flat, light, Qt-like sidebar
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+CREATE_SUBDIRS         = NO
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+TREEVIEW_WIDTH         = 250
+ENUM_VALUES_PER_LINE   = 1
+
+#---------------------------------------------------------------------------
+# No LaTeX, no other formats
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+
+#---------------------------------------------------------------------------
+# Diagrams — class hierarchy without graphviz
+# Set HAVE_DOT = YES and install graphviz for richer diagrams
+#---------------------------------------------------------------------------
+HAVE_DOT               = NO
+
+#---------------------------------------------------------------------------
+# Warnings
+#---------------------------------------------------------------------------
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES

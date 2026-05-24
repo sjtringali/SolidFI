@@ -1,0 +1,59 @@
+#pragma once
+
+/// @file Literal.hpp
+/// @ingroup solidfi_l1_structural
+
+#include "solidfi/l1/Transform.hpp"
+#include "solidfi/l1/Converter.hpp"
+
+namespace solidfi {
+
+/// @ingroup solidfi_l1_structural
+/// @brief Captures a value of type T and produces it regardless of input.
+///
+/// Literal simultaneously satisfies both Transform<T> and Converter<InputT,T> — it is
+/// injectable wherever either is expected without the caller needing to choose.
+///
+/// Also known as Closed<T> at L0.
+///
+/// Common uses:
+/// - Inject a constant or variable into a Chain or Pipeline without changing the type contract.
+/// - Adapt an existing value into a composition that expects a transform or converter.
+/// - Stand-in during development before a real implementation exists.
+///
+/// **Invariants:**
+/// - MUST always produce a T.
+/// - fetch() and apply() MUST NOT depend on the input value.
+/// - accepts() returns true, rejects() returns false.
+///
+/// @tparam T The captured and produced type; free generic, owned by the user.
+/// @tparam InputT The input type for the Converter interface. Defaults to T.
+/// @note L0 mapping: Closed<T>
+template<typename T, typename InputT = T>
+class Literal : public Transform<T>, public Converter<InputT, T> {
+public:
+    /// @brief Capture an initial value.
+    explicit Literal(const T& value);
+
+    /// @brief Retrieve the captured value.
+    T get() const;
+
+    /// @brief Update the captured value.
+    void set(const T& value);
+
+    bool accepts(const T& value) const override { return true; }
+    bool rejects(const T& value) const override { return false; }
+
+    /// @brief Return the captured value. The input is ignored.
+    T apply(const T& value) override;
+
+    /// @brief Return the captured value. The input and parameters are ignored.
+    ///
+    /// @note Async-capable. Concrete implementations may execute asynchronously.
+    Optional<T> fetch(const InputT& value, const Parameters& params) override;
+
+    std::type_index sourceType() const override { return typeid(InputT); }
+    std::type_index targetType() const override { return typeid(T); }
+};
+
+} // namespace solidfi
