@@ -15,6 +15,14 @@ namespace solidfi {
 /// transformation. Because T and U are distinct, failure is possible: there is no
 /// identity fallback. Failure is represented by an absent `Optional<U>`.
 ///
+/// @note Failure representation is an open design question. `Optional<U>` conflates
+///   abstention ("I didn't try") with failure ("I tried and got nothing") — both look
+///   like absent. P offers an alternative: if P is bidirectional (e.g. a
+///   RequestResponse shape), a converter can write failure detail into P and return a
+///   present U, keeping the error channel separate from the value channel. The right
+///   answer depends on whether failure is a value concern (return type) or a traversal
+///   concern (P). TBD.
+///
 /// P is an optional user-defined parameter type for routing and dispatch. The framework
 /// never inspects P — it only passes it through to fetch(). Defaults to Parameters.
 ///

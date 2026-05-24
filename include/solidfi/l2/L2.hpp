@@ -5,6 +5,12 @@
 ///
 /// L2 concepts are built on L1 primitives. Each is a stub marking a named concept
 /// whose full definition will be elaborated in a future revision.
+///
+/// @note P conventions: at L2, P can carry both inbound and outbound data — e.g.
+///   `RequestResponse { in: Req, out: Res }` or `InOut<I,O>`. Converters along the path
+///   read from `in` and write to `out` as traversal proceeds. This means round-trip and
+///   request/response patterns require no new framework primitives — they are shaped P
+///   values. The framework remains unchanged; the contract lives in P.
 
 namespace solidfi {
 
@@ -39,18 +45,32 @@ class Transport {};
 class Serialization {};
 
 /// @ingroup solidfi_l2
-/// @brief Optional interception on a Converter — opt-in, default-off.
+/// @brief Dynamic interception on a Converter — the detour on the road.
 ///
-/// Proxy allows a Converter to be intercepted before or instead of its own fetch(),
-/// enabling network marshaling, caching, retry, logging, or rerouting without
-/// modifying the converter or the graph structure.
+/// A Proxy intercepts a Converter's traversal without modifying the Graph. The graph
+/// structure is unchanged; the Solver follows the route it found; but when it reaches
+/// a proxied converter, the proxy intercepts before fetch() is called. The Solver does
+/// not need to know. This is level 3 of Parameterized Traversal.
 ///
-/// Inspired by Qt's intrusive proxy and event-filter patterns: each Converter is aware
-/// it might be proxied, but the proxy is data — a field you set, not a method you override.
-/// Dormant by default; awakened by installation.
+/// Two attachment modes:
+/// - **Creation-bound**: the converter declares its own proxy at construction, defined
+///   elsewhere. The converter knows it may be proxied; the proxy is part of its identity.
+/// - **Injected**: a proxy is attached from outside after the fact — full hoisting. The
+///   converter has no knowledge of it at creation time. Any holder of a converter reference
+///   can install a proxy.
 ///
-/// @todo Specification pending. Design open: embed on Converter (Qt intrusive style) vs.
-///   delegate object.
+/// Both modes are valid. Full hoisting (injected) is the more powerful form.
+///
+/// Inspired by Qt's focusProxy (creation-bound) and installEventFilter (injected).
+/// The proxy is data on the converter, not a subclass or wrapper. Dormant by default.
+///
+/// The abstract indirection concept lives at L0 as `Goto<T>`. Proxy is its
+/// network-transparency specialization: a live service directory, remote redirection,
+/// marshaling across process or network boundaries.
+///
+/// @todo Specification pending network transparency work, which will determine the final
+///   structure. Both attachment modes are expected to survive; the API shape is TBD.
+/// @note L0 root: Delegate<T> — pure object indirection, no network assumptions.
 class Proxy {};
 
 /// @ingroup solidfi_l2
@@ -65,11 +85,15 @@ class Proxy {};
 class Roundtrip {};
 
 /// @ingroup solidfi_l2
-/// @brief Graph extended with dynamic plugin-loading machinery.
+/// @brief A Graph populated with the edges valid for a specific deployment context.
 ///
-/// Runtime is an L1 Graph extended with the capability to dynamically install and remove
-/// converters at runtime, enabling plugin architectures. A plugin is just a Converter —
-/// it has type signatures and predicates, and the Solver routes through it like any other edge.
+/// Different deployment contexts (browser vs. Node, client vs. server) require different
+/// edge sets — some converters cannot load or execute in a given environment. A Runtime
+/// is the Graph for one such context: same converter vocabulary, only the edges that work here.
+///
+/// Assembly is direct: install the edges your environment supports. That assembly
+/// generalizes into a `Transform<Graph>` (unconditional) or `Converter<Graph,Graph,P>`
+/// (environment-driven) when you want to name, compose, or parameterize it.
 ///
 /// @todo Specification pending.
 class Runtime {};

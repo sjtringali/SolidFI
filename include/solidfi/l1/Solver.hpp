@@ -11,12 +11,21 @@ namespace solidfi {
 /// @ingroup solidfi_l1_runtime
 /// @brief A Converter<T,U,P> backed by a Graph. Finds and executes a path from T to U.
 ///
+/// Solver is the engine of Parameterized Traversal (level 2 of 3).
+///
+/// Level 1 — static reachability — asks whether any path T→U exists in the Graph at all.
+/// That is a structural property of the installed converters, independent of runtime data.
+///
+/// Level 2 — this — asks: given a specific value of T and parameters P, which path leads
+/// to U, and what does executing it produce? P is a routing signal: the same Graph may
+/// offer multiple T→U paths, and P selects among them. A converter's accepts/rejects
+/// methods participate by declining specific values, causing Solver to try the next edge.
+///
+/// Level 3 — Proxy (L2) — extends level 2 with proxy objects attached to converters from
+/// outside, intercepting traversal without modifying the Graph.
+///
 /// To any caller holding a Converter<T,U,P> reference, a Solver is indistinguishable from
 /// a single converter — the Composite rule.
-///
-/// Given a value of type T and parameters P, Solver uses the bound Graph to find a path
-/// T → ... → U through the installed converters and executes it. The path discovery and
-/// the execution are both internal to Solver.
 ///
 /// The Graph is bound at construction time. Solver MUST NOT modify the Graph it holds.
 ///

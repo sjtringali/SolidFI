@@ -31,6 +31,15 @@ namespace solidfi {
 /// and a finalize `Transform<U>` applied after a successful fetch(). Either may be a Pipeline<T>
 /// or `Pipeline<U>` — the composite rule ensures any Transform<T> satisfies the slot.
 ///
+/// prepare and finalize are normalization: they condition the input before dispatch and
+/// the output after a successful fetch, unconditionally. They are not routing — the Solver
+/// does not see them, P does not select them, and they apply on every traversal of this
+/// Chain regardless of path. Normalization that belongs to this Chain lives here;
+/// normalization that should be visible across the Graph goes in via Graph::install(Transform<T>).
+///
+/// For dynamic interception of a converter from the outside — injecting behavior without
+/// modifying the Graph — see Proxy (L2).
+///
 /// **Invariants:**
 /// - Priority determines execution order. Duplicate priorities result in undefined ordering.
 /// - Names are group keys: multiple entries may share a name. remove(name) removes all.
@@ -40,9 +49,6 @@ namespace solidfi {
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
-///
-/// @note Future: prepare and finalize may be hoisted to Graph as `Converter<T,T,P>` / `Converter<U,U,P>`
-///   edges once P-driven selection is needed. Until then they live here.
 template<typename T, typename U, typename P = Parameters>
 class Chain : public Converter<T, U, P> {
 public:

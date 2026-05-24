@@ -24,6 +24,24 @@ Registries and discovery are real problems, and SolidFI doesn't pretend otherwis
 
 Bring your existing code. The interfaces are thin by design.
 
+## Parameterized Traversal
+
+**The Graph is your road network. The Solver is your GPS. A Proxy is a detour.**
+
+The road network exists independently of any trip. You can ask whether a route between two points exists at all — that is a structural question about the roads, not about you or your destination. The Graph is that network: an unordered registry of converters, each one a segment connecting one type to another.
+
+When you want to get somewhere, you ask the GPS. You tell it where you are (T), where you want to go (U), and optionally your preferences (P): fastest route, avoid highways, toll-free. The Solver finds a path through the Graph and drives it. P is the routing signal — same network, different preferences, different route. If a road is closed for your specific vehicle (`rejects`), the GPS routes around it.
+
+Now imagine you are following the GPS route and you hit a road closure. A detour sign redirects you — not the GPS, not the map, just a sign on that specific road. Usually you follow it and rejoin the route; the GPS never had to recalculate. That is a Proxy. But a detour can also send you somewhere else entirely — a Proxy is not required to rejoin. It intercepts based on local conditions and can fully reroute, short-circuit, substitute a cached result, or redirect across a network boundary. The GPS had a plan; the road had other ideas.
+
+Three levels:
+
+1. **Static reachability** — is there any road at all between T and U? *(Graph structure; API not yet specified.)*
+2. **Parameterized path finding** — given this T and these preferences P, find and drive the route. *(Solver)*
+3. **Proxy traversal** — same route, but a detour sign on one road redirects you without touching the map. *(L2 Proxy)*
+
+`prepare` and `finalize` on Chain are a normalization concern — the on-ramp and off-ramp of a specific segment, not a detour. They condition input before dispatch and output after fetch, unconditionally, every time that edge is used.
+
 ## Names for Important Things
 
 SolidFI uses named marker types and named primitives so that every important concept has an identity. Anonymous types, functions, and compositions can make readability, debuggability, and reasoning challenging.
@@ -47,10 +65,13 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Filter<T>`      | `accepts(T)`, `rejects(T)` | Accept/reject pair                                              |
 | `Composite<T,U>` | `dispatch(T) -> U`         | Ordered composition substrate                                   |
 | `Strategy<T,U>`  | name + priority            | Named, prioritized entry in a Composite                         |
+| `Delegate<T>`    | `target() -> T&`           | Object indirection: refers to another T and delegates to it. L2: `Proxy` |
+| `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD |
 | `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>` |
 | `Optional<T>`    | —                          | May or may not hold a T. L1: `std::optional<T>`                 |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                         |
 | `Parameters`     | —                          | Marker for user-defined contextual data                         |
+| `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime` |
 | `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection → single value                                 |
 | `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value → collection                               |
 

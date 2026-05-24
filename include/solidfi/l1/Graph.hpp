@@ -4,6 +4,7 @@
 /// @ingroup solidfi_l1_runtime
 
 #include "solidfi/l1/Converter.hpp"
+#include "solidfi/l1/Transform.hpp"
 
 namespace solidfi {
 
@@ -24,16 +25,25 @@ namespace solidfi {
 ///   high-frequency mutation. Plugin loading is an L2 concern (see Runtime).
 /// - Graph MUST NOT execute any converter.
 ///
-/// @note L2: Runtime extends Graph with dynamic plugin-loading machinery.
+/// @note L0 mapping: Category — objects are types, arrows are Converter edges.
+/// @note L2 mapping: Runtime — a Graph assembled for a specific deployment context.
 class Graph {
 public:
     /// @brief Add a converter edge to the graph.
     template<typename T, typename U, typename P = Parameters>
-    void install(Converter<T, U, P>& converter);
+    void install(Converter<T, U, P> converter);
 
     /// @brief Remove a converter edge from the graph.
     template<typename T, typename U, typename P = Parameters>
-    void remove(Converter<T, U, P>& converter);
+    void remove(Converter<T, U, P> converter);
+
+    /// @brief Add a transform as a T→T edge.
+    ///
+    /// The Transform is adapted to a `Converter<T,T,Parameters>` at this boundary.
+    /// The transform itself remains parameter-free; P-driven selection among T→T
+    /// edges is handled by Solver during traversal.
+    template<typename T>
+    void install(Transform<T> transform);
 
     virtual ~Graph() = default;
 };
