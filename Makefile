@@ -6,8 +6,8 @@ CXXFLAGS  = -fsyntax-only -std=c++17 -I include
 all: check doc
 
 check:
-	$(CXX) $(CXXFLAGS) include/solidfi/solidfi.hpp
-	$(CXX) $(CXXFLAGS) include/solidfi/l0/L0.hpp
+	$(CXX) $(CXXFLAGS) check/l1.cpp
+	$(CXX) $(CXXFLAGS) check/l0.cpp
 
 doc:
 	doxygen Doxyfile
