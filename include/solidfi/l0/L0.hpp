@@ -12,10 +12,11 @@
 #include <vector>
 
 /// @defgroup solidfi_l0 L0
-/// @brief Level 0 — substrate concepts that inform L1.
-///
-/// Named stubs only. Each concept notes its L1 mapping. L0 and L1 are independent
-/// and cannot be included together; names intentionally overlap.
+/// @brief The substrate — named abstract concepts that underlie L1.
+/// L0 defines the vocabulary of the spec without prescribing implementation. Each concept
+/// is a stub: it claims an identity and notes its relationship to L1, but imposes no
+/// structure on how it is realized. L0 is for implementers — a reference layer that names
+/// what L1 concretizes. L0 and L1 are independent; names overlap intentionally.
 
 namespace solidfi {  // NOLINT: intentional overlap with L1; include L0 standalone only
 

@@ -15,7 +15,13 @@
 namespace solidfi {
 
 /// @defgroup solidfi_l2 L2
-/// @brief Level 2 — higher-level patterns built on L1 primitives.
+/// @brief Domain patterns — higher-level concepts built on L1 primitives.
+/// L2 names the patterns that emerge when L1 compositions cross network or process
+/// boundaries: Protocol and Transport (encoding and channel), Serialization (wire
+/// representation), Proxy (runtime interception without modifying the Graph), Roundtrip
+/// (bidirectional guarantee at the protocol level), and Runtime (a Graph assembled for a
+/// specific deployment context). Currently stubs; full specification follows network
+/// transparency work.
 
 /// @ingroup solidfi_l2
 /// @brief Defines the encoding and framing contract for a communication exchange.

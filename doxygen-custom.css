@@ -1,0 +1,5 @@
+/* Hide Class Members tab and its dropdown from top navigation */
+li:has(> a[href="functions.html"]),
+li:has(> a[href="functions_func.html"]) {
+    display: none !important;
+}

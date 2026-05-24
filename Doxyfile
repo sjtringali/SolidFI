@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "SolidFI"
 PROJECT_BRIEF          = "Functional Interfaces for Composition"
-PROJECT_NUMBER         = "L1 Draft"
+PROJECT_NUMBER         = "Draft"
 OUTPUT_DIRECTORY       = docs
 
 #---------------------------------------------------------------------------
@@ -18,10 +18,13 @@ STRIP_FROM_PATH        = include/
 #---------------------------------------------------------------------------
 # Extraction — document everything, spec is the source of truth
 #---------------------------------------------------------------------------
-EXTRACT_ALL            = YES
+EXTRACT_ALL            = NO
 EXTRACT_STATIC         = YES
 ALWAYS_DETAILED_SEC    = YES
+REPEAT_BRIEF           = NO
 INHERIT_DOCS           = YES
+HIDE_SCOPE_NAMES       = YES
+HIDE_COMPOUND_REFERENCE = YES
 
 #---------------------------------------------------------------------------
 # Content display — Qt style: declaration order, no file noise
@@ -33,8 +36,11 @@ SHOW_INCLUDE_FILES     = NO
 SHOW_GROUPED_MEMB_INC  = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = NO
-ALPHABETICAL_INDEX     = YES
+ALPHABETICAL_INDEX     = NO
+SHOW_FILES             = NO
+SHOW_NAMESPACES        = NO
 BUILTIN_STL_SUPPORT    = YES
+INLINE_INHERITED_MEMB  = YES
 
 #---------------------------------------------------------------------------
 # HTML — doxygen-awesome-css theme
@@ -42,9 +48,9 @@ BUILTIN_STL_SUPPORT    = YES
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 CREATE_SUBDIRS         = NO
-GENERATE_TREEVIEW      = YES
+GENERATE_TREEVIEW      = NO
 DISABLE_INDEX          = NO
-HTML_EXTRA_STYLESHEET  = doxygen-awesome.css
+HTML_EXTRA_STYLESHEET  = doxygen-awesome.css doxygen-custom.css
 HTML_COLORSTYLE        = LIGHT
 TREEVIEW_WIDTH         = 300
 ENUM_VALUES_PER_LINE   = 1
