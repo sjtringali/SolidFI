@@ -30,19 +30,19 @@ namespace solidfi {
 template<typename T>
 class Pipeline : public Transform<T> {
 public:
-    bool accepts(const T& value) const override;
-    bool rejects(const T& value) const override;
+    bool accepts(T value) const override;
+    bool rejects(T value) const override;
 
     /// @brief Run the pipeline. Friendly alias for apply().
     ///
     /// Prefer run() when calling a known Pipeline directly.
-    T run(const T& value);
+    T run(T value);
 
     /// @brief Run all installed transforms in priority order.
     ///
     /// Rejected transforms are skipped; their input passes through unchanged.
     /// Degrades to identity if no transform accepts.
-    T apply(const T& value) override;
+    T apply(T value) override;
 
     /// @brief Install a transform at the given priority under the given name.
     ///

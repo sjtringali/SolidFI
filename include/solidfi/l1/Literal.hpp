@@ -33,27 +33,24 @@ template<typename T, typename InputT = T>
 class Literal : public Transform<T>, public Converter<InputT, T> {
 public:
     /// @brief Capture an initial value.
-    explicit Literal(const T& value);
+    explicit Literal(T value);
 
     /// @brief Retrieve the captured value.
     T get() const;
 
     /// @brief Update the captured value.
-    void set(const T& value);
+    void set(T value);
 
-    bool accepts(const T& value) const override { return true; }
-    bool rejects(const T& value) const override { return false; }
+    bool accepts(T value) const override { return true; }
+    bool rejects(T value) const override { return false; }
 
     /// @brief Return the captured value. The input is ignored.
-    T apply(const T& value) override;
+    T apply(T value) override;
 
     /// @brief Return the captured value. The input and parameters are ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<T> fetch(const InputT& value, const Parameters& params) override;
-
-    std::type_index sourceType() const override { return typeid(InputT); }
-    std::type_index targetType() const override { return typeid(T); }
+    Optional<T> fetch(InputT value, Parameters params) override;
 };
 
 } // namespace solidfi

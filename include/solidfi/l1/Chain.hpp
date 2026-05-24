@@ -5,7 +5,6 @@
 
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Transform.hpp"
-#include <memory>
 #include <string>
 
 namespace solidfi {
@@ -42,33 +41,44 @@ namespace solidfi {
 /// @tparam U destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
 ///
-/// @note Future: prepare and finalize may be hoisted to Graph as Converter<T,T,P> / Converter<U,U,P>
+/// @note Future: prepare and finalize may be hoisted to Graph as `Converter<T,T,P>` / `Converter<U,U,P>`
 ///   edges once P-driven selection is needed. Until then they live here.
 template<typename T, typename U, typename P = Parameters>
 class Chain : public Converter<T, U, P> {
 public:
+    /// @brief Construct an empty Chain with no prepare or finalize transform.
+    Chain() = default;
+
+    /// @brief Construct a Chain with optional prepare and finalize transforms.
+    ///
+    /// @param prepare  Transform applied to the input before dispatching to fetch(). May be nullptr.
+    /// @param finalize Transform applied to the result after a successful fetch(). May be nullptr.
+    explicit Chain(Transform<T>* prepare, Transform<U>* finalize = nullptr);
+
     /// @brief Optional transform applied to the input before dispatching to fetch().
     ///
     /// May be a Pipeline<T> — the composite rule ensures any Transform<T> satisfies this slot.
-    std::shared_ptr<Transform<T>> prepare;
+    /// Null means no prepare transform is applied.
+    Transform<T>* prepare = nullptr;
 
     /// @brief Optional transform applied to the result after a successful fetch().
     ///
     /// May be a `Pipeline<U>` — the composite rule ensures any `Transform<U>` satisfies this slot.
-    std::shared_ptr<`Transform<U>`> finalize;
+    /// Null means no finalize transform is applied.
+    Transform<U>* finalize = nullptr;
 
-    bool accepts(const T& value) const override;
-    bool rejects(const T& value) const override;
+    bool accepts(T value) const override;
+    bool rejects(T value) const override;
 
     /// @brief Execute the chain. Friendly alias for fetch().
     ///
     /// Prefer resolve() when calling a known Chain directly.
-    `Optional<U>` resolve(const T& value, const P& params);
+    Optional<U> resolve(T value, P params);
 
     /// @brief Try each installed converter in priority order until one succeeds.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    `Optional<U>` fetch(const T& value, const P& params) override;
+    Optional<U> fetch(T value, P params) override;
 
     /// @brief Install a converter at the given priority under the given name.
     ///

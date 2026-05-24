@@ -6,10 +6,8 @@
 /// Provides the building blocks needed for L1 headers to compile:
 /// - Optional<T>: L0 concept aliased to std::optional<T>
 /// - NoInput: tag type for Generator<T> (Converter<void,T> workaround)
-/// - ConverterBase: non-template base for heterogeneous Graph storage
 
 #include <optional>
-#include <typeindex>
 
 namespace solidfi {
 
@@ -29,18 +27,5 @@ using Optional = std::optional<T>;
 /// C++ does not permit void as a template type argument, so NoInput serves as the
 /// equivalent empty placeholder.
 struct NoInput {};
-
-/// @brief Non-template type-erased base for heterogeneous Graph storage.
-///
-/// All Converter<T,U,P> specializations inherit from ConverterBase, allowing Graph
-/// to hold a heterogeneous collection of converters without template parameters.
-///
-/// Not a named L1 concept; implementation infrastructure only.
-class ConverterBase {
-public:
-    virtual std::type_index sourceType() const = 0;
-    virtual std::type_index targetType() const = 0;
-    virtual ~ConverterBase() = default;
-};
 
 } // namespace solidfi

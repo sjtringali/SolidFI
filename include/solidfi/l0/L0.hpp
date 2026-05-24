@@ -30,7 +30,7 @@ public:
 template<typename T>
 class Predicate {
 public:
-    virtual bool decide(const T& value) = 0;
+    virtual bool decide(T value) = 0;
     virtual ~Predicate() = default;
 };
 
@@ -41,8 +41,8 @@ public:
 template<typename T>
 class Filter {
 public:
-    virtual bool accepts(const T& value) = 0;
-    virtual bool rejects(const T& value) = 0;
+    virtual bool accepts(T value) = 0;
+    virtual bool rejects(T value) = 0;
     virtual ~Filter() = default;
 };
 
@@ -53,7 +53,7 @@ public:
 template<typename T, typename U>
 class Composite {
 public:
-    virtual U dispatch(const T& value) = 0;
+    virtual U dispatch(T value) = 0;
     virtual ~Composite() = default;
 };
 
@@ -77,6 +77,7 @@ public:
 template<typename T>
 class Closed {
 public:
+    explicit Closed(const T& value);
     virtual T get() const = 0;
     virtual ~Closed() = default;
 };
@@ -88,6 +89,17 @@ template<typename T>
 class Optional {
 public:
     virtual ~Optional() = default;
+};
+
+/// @brief Shared ownership of a value of type T.
+/// @tparam T the owned type; free generic, owned by the user.
+/// @note L1 mapping: — L1 implementations may use std::shared_ptr<T> or equivalent.
+///   Use Shared<T> in the spec to express that multiple holders own the same instance.
+template<typename T>
+class Shared {
+public:
+    virtual T& get() = 0;
+    virtual ~Shared() = default;
 };
 
 /// @brief Marker type for user-defined contextual data passed into Converter::fetch.
@@ -104,7 +116,7 @@ public:
 template<typename T>
 class Reduce {
 public:
-    virtual T reduce(const std::vector<T>& values) = 0;
+    virtual T reduce(std::vector<T> values) = 0;
     virtual ~Reduce() = default;
 };
 
@@ -114,7 +126,7 @@ public:
 template<typename T>
 class Expand {
 public:
-    virtual std::vector<T> expand(const T& value) = 0;
+    virtual std::vector<T> expand(T value) = 0;
     virtual ~Expand() = default;
 };
 

@@ -30,18 +30,18 @@ public:
     ///
     /// Callers are NOT required to call accepts() — it is a fast-path optimization to
     /// avoid calling apply() when the outcome is already known.
-    virtual bool accepts(const T& value) const { return true; }
+    virtual bool accepts(T value) const { return true; }
 
     /// @brief Returns true if this transform explicitly refuses the input. Default: false.
     ///
     /// Evaluated before accepts(). A transform that rejects is skipped entirely and
     /// its apply() is never called. Rejection is not failure; it is abstention.
-    virtual bool rejects(const T& value) const { return false; }
+    virtual bool rejects(T value) const { return false; }
 
     /// @brief Perform the transformation. MUST return a T.
     ///
     /// If this transform does not accept the input, MUST return the original value unchanged.
-    virtual T apply(const T& value) = 0;
+    virtual T apply(T value) = 0;
 
     virtual ~Transform() = default;
 };

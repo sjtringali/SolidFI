@@ -18,7 +18,10 @@ namespace solidfi {
 /// traversal at every level: which converter the chain selects, how predicates filter,
 /// which path a Solver takes through the Graph.
 ///
-/// @tparam P parameters type; named marker, mostly user-owned. This is the default.
+/// P is always passed by value. If shared ownership is needed, make P itself a pointer or
+/// a shared-ownership wrapper — e.g. `P = MyParams*` or `P = Shared<MyParams>` (see L0).
+/// The framework copies P as-is; pointer semantics transfer naturally.
+///
 /// @note L0 mapping: Parameters — named at L0 as the routing concept; concretized here.
 struct Parameters {};
 

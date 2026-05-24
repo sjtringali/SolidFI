@@ -27,12 +27,12 @@ public:
     /// @brief Convert in the forward direction: T to U.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<U> fetch(const T& value, const Parameters& params) override = 0;
+    Optional<U> fetch(T value, Parameters params) override = 0;
 
     /// @brief Convert in the reverse direction: U to T.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    virtual Optional<T> invert(const U& value, const Parameters& params) = 0;
+    virtual Optional<T> invert(U value, Parameters params) = 0;
 };
 
 } // namespace solidfi

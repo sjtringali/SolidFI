@@ -40,15 +40,15 @@ public:
     /// @brief Bind this Solver to a specific Graph.
     explicit Solver(Graph& graph);
 
-    bool accepts(const T& value) const override;
-    bool rejects(const T& value) const override;
+    bool accepts(T value) const override;
+    bool rejects(T value) const override;
 
     /// @brief Find a path T→U through the bound Graph and execute it with the given parameters.
     ///
     /// Returns absent value if no path exists or if execution of the found path fails.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    `Optional<U>` fetch(const T& value, const P& params) override;
+    Optional<U> fetch(T value, P params) override;
 };
 
 } // namespace solidfi

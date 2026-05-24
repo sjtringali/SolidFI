@@ -19,13 +19,13 @@ namespace solidfi {
 template<typename T, typename P = Parameters>
 class Generator : public Converter<NoInput, T, P> {
 public:
-    bool accepts(const NoInput&) const override { return true; }
-    bool rejects(const NoInput&) const override { return false; }
+    bool accepts(NoInput) const override { return true; }
+    bool rejects(NoInput) const override { return false; }
 
     /// @brief Produce a T. The NoInput argument carries no data and should be ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<T> fetch(const NoInput& input, const P& params) override = 0;
+    Optional<T> fetch(NoInput input, P params) override = 0;
 };
 
 } // namespace solidfi

@@ -3,8 +3,7 @@
 /// @file Graph.hpp
 /// @ingroup solidfi_l1_runtime
 
-#include "solidfi/l1/forward.hpp"
-#include <memory>
+#include "solidfi/l1/Converter.hpp"
 
 namespace solidfi {
 
@@ -29,10 +28,12 @@ namespace solidfi {
 class Graph {
 public:
     /// @brief Add a converter edge to the graph.
-    void install(std::shared_ptr<ConverterBase> converter);
+    template<typename T, typename U, typename P = Parameters>
+    void install(Converter<T, U, P>& converter);
 
     /// @brief Remove a converter edge from the graph.
-    void remove(std::shared_ptr<ConverterBase> converter);
+    template<typename T, typename U, typename P = Parameters>
+    void remove(Converter<T, U, P>& converter);
 
     virtual ~Graph() = default;
 };

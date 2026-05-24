@@ -34,24 +34,22 @@ namespace solidfi {
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
+///   Passed by value — use `P = MyParams*` or `P = Shared<MyParams>` (L0) if sharing is needed.
 template<typename T, typename U, typename P = Parameters>
-class Converter : public ConverterBase {
+class Converter {
 public:
     /// @brief Returns true if this converter claims the input. Default: true.
-    virtual bool accepts(const T& value) const { return true; }
+    virtual bool accepts(T value) const { return true; }
 
     /// @brief Returns true if this converter explicitly refuses the input. Default: false.
     ///
     /// Evaluated before accepts(). A converter that rejects is never attempted via fetch().
-    virtual bool rejects(const T& value) const { return false; }
+    virtual bool rejects(T value) const { return false; }
 
     /// @brief Perform the conversion. Returns absent value on failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    virtual `Optional<U>` fetch(const T& value, const P& params) = 0;
-
-    std::type_index sourceType() const override { return typeid(T); }
-    std::type_index targetType() const override { return typeid(U); }
+    virtual Optional<U> fetch(T value, P params) = 0;
 
     virtual ~Converter() = default;
 };

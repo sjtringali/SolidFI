@@ -23,7 +23,7 @@ public:
     /// @brief Perform the lookup. Returns absent value if the lookup fails or produces nothing.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<U> fetch(const T& value, const Parameters& params) override = 0;
+    Optional<U> fetch(T value, Parameters params) override = 0;
 };
 
 } // namespace solidfi

@@ -26,16 +26,13 @@ namespace solidfi {
 template<typename U, typename P = Parameters>
 class Traversal : public Converter<Graph, U, P> {
 public:
-    bool accepts(const Graph& graph) const override { return true; }
-    bool rejects(const Graph& graph) const override { return false; }
+    bool accepts(Graph graph) const override { return true; }
+    bool rejects(Graph graph) const override { return false; }
 
     /// @brief Execute the traversal over the given graph with the given parameters.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<U> fetch(const Graph& graph, const P& params) override = 0;
-
-    std::type_index sourceType() const override { return typeid(Graph); }
-    std::type_index targetType() const override { return typeid(U); }
+    Optional<U> fetch(Graph graph, P params) override = 0;
 };
 
 } // namespace solidfi
