@@ -37,18 +37,16 @@ ALPHABETICAL_INDEX     = YES
 BUILTIN_STL_SUPPORT    = YES
 
 #---------------------------------------------------------------------------
-# HTML — flat, light, Qt-like sidebar
+# HTML — doxygen-awesome-css theme
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 CREATE_SUBDIRS         = NO
 GENERATE_TREEVIEW      = YES
 DISABLE_INDEX          = NO
+HTML_EXTRA_STYLESHEET  = doxygen-awesome.css
 HTML_COLORSTYLE        = LIGHT
-HTML_COLORSTYLE_HUE    = 220
-HTML_COLORSTYLE_SAT    = 100
-HTML_COLORSTYLE_GAMMA  = 80
-TREEVIEW_WIDTH         = 250
+TREEVIEW_WIDTH         = 300
 ENUM_VALUES_PER_LINE   = 1
 
 #---------------------------------------------------------------------------

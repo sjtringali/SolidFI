@@ -11,8 +11,15 @@
 #include <string>
 #include <vector>
 
+/// @defgroup solidfi_l0 L0
+/// @brief Level 0 — substrate concepts that inform L1.
+///
+/// Named stubs only. Each concept notes its L1 mapping. L0 and L1 are independent
+/// and cannot be included together; names intentionally overlap.
+
 namespace solidfi {  // NOLINT: intentional overlap with L1; include L0 standalone only
 
+/// @ingroup solidfi_l0
 /// @brief A unit of executable work over a value of type T.
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: Operation<T> — the core of Transform::apply and Converter::fetch.
@@ -23,6 +30,7 @@ public:
     virtual ~Operation() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief A single binary decision over a value of type T.
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: Predicate<T> — splits into accepts() and rejects() in L1, each
@@ -34,6 +42,7 @@ public:
     virtual ~Predicate() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief A pair of filtering decisions over T: acceptance and explicit rejection.
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: Filter<T> — becomes the inline accepts()/rejects() methods declared
@@ -46,6 +55,7 @@ public:
     virtual ~Filter() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief An ordered composition mechanism that dispatches T to produce U.
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -57,6 +67,7 @@ public:
     virtual ~Composite() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief A named, prioritized entry held inside a Composite.
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -70,6 +81,7 @@ public:
     // impl: Operation<T> -- type TBD
 };
 
+/// @ingroup solidfi_l0
 /// @brief Captures a value of type T and produces it regardless of input.
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: Closed<T> — L1 names this Literal<T>. The alias Closed<T> is preserved
@@ -82,6 +94,7 @@ public:
     virtual ~Closed() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief May or may not hold a value of type T.
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: Optional<T> — L1 aliases this to std::optional<T> in forward.hpp.
@@ -91,6 +104,7 @@ public:
     virtual ~Optional() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief Shared ownership of a value of type T.
 /// @tparam T the owned type; free generic, owned by the user.
 /// @note L1 mapping: — L1 implementations may use std::shared_ptr<T> or equivalent.
@@ -102,6 +116,7 @@ public:
     virtual ~Shared() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief Marker type for user-defined contextual data passed into Converter::fetch.
 /// @note L1 mapping: Parameters — L1 concretizes this as a named empty struct, the default P
 ///   for all parameterized types.
@@ -110,6 +125,7 @@ public:
     virtual ~Parameters() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief Reduces a collection of T to a single T (fold).
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: — no direct L1 counterpart yet.
@@ -120,6 +136,7 @@ public:
     virtual ~Reduce() = default;
 };
 
+/// @ingroup solidfi_l0
 /// @brief Expands a single T to a collection of T (unfold).
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: — no direct L1 counterpart yet.
