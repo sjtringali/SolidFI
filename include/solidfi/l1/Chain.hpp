@@ -83,15 +83,15 @@ public:
     /// @brief Install a converter at the given priority under the given name.
     ///
     /// Accepts any Converter<T,U,P>, including another Chain, an Inverter, or a Solver.
-    void install(int priority, const std::string& name, Converter<T, U, P>& converter);
+    void install(int priority, std::string name, Converter<T, U, P> converter);
 
     /// @brief Remove all converters with the given name.
-    void remove(const std::string& name);
+    void remove(std::string name);
 
     /// @brief Replace the converter(s) with the given name, preserving priority.
     ///
     /// Equivalent to remove(name) followed by install() at the original priority.
-    void replace(const std::string& name, Converter<T, U, P>& converter);
+    void replace(std::string name, Converter<T, U, P> converter);
 };
 
 } // namespace solidfi

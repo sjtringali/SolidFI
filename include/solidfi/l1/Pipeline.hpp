@@ -50,15 +50,15 @@ public:
     ///   Duplicate priorities result in undefined ordering within that level.
     /// @param name Group key. Multiple entries may share a name.
     /// @param transform The transform to install. May itself be a Pipeline<T>.
-    void install(int priority, const std::string& name, Transform<T>& transform);
+    void install(int priority, std::string name, Transform<T> transform);
 
     /// @brief Remove all transforms with the given name.
-    void remove(const std::string& name);
+    void remove(std::string name);
 
     /// @brief Replace the transform(s) with the given name, preserving priority.
     ///
     /// Equivalent to remove(name) followed by install() at the original priority.
-    void replace(const std::string& name, Transform<T>& transform);
+    void replace(std::string name, Transform<T> transform);
 };
 
 } // namespace solidfi

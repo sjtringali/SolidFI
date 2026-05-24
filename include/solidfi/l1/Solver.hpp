@@ -38,7 +38,7 @@ template<typename T, typename U, typename P = Parameters>
 class Solver : public Converter<T, U, P> {
 public:
     /// @brief Bind this Solver to a specific Graph.
-    explicit Solver(Graph& graph);
+    explicit Solver(Graph graph);
 
     bool accepts(T value) const override;
     bool rejects(T value) const override;
