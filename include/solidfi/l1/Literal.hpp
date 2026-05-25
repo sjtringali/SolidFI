@@ -50,7 +50,7 @@ public:
     /// @brief Return the captured value. The input and parameters are ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<T> fetch(InputT, Parameters) override;
+    T fetch(InputT, Parameters) override;
 };
 
 } // namespace solidfi

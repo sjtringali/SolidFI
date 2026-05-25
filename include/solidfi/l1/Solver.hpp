@@ -30,8 +30,8 @@ namespace solidfi {
 /// The Graph is bound at construction time. Solver MUST NOT modify the Graph it holds.
 ///
 /// **Invariants:**
-/// - If no path exists, fetch() MUST return an absent `Optional<U>`.
-/// - If a path exists but execution fails at any step, fetch() MUST return an absent `Optional<U>`.
+/// - If no path exists, fetch() MUST return Failure<U>::value().
+/// - If a path exists but execution fails at any step, fetch() MUST return Failure<U>::value().
 /// - Solver is responsible for cycle avoidance during traversal.
 /// - P flows into individual converters along the path, consistent with Converter semantics.
 ///   The Graph itself is not inspected with P.
@@ -54,13 +54,13 @@ public:
 
     /// @brief Find a path T→U through the bound Graph and execute it with the given parameters.
     ///
-    /// Returns absent value if no path exists or if execution of the found path fails.
+    /// Returns Failure<U>::value() if no path exists or if execution of the found path fails.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<U> solve(T value, P params);
+    U solve(T value, P params);
 
     /// @brief Satisfies Converter<T,U,P>. Delegates to solve().
-    Optional<U> fetch(T value, P params) override;
+    U fetch(T value, P params) override;
 };
 
 } // namespace solidfi

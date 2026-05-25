@@ -9,6 +9,7 @@
 #include "solidfi/l1/groups.hpp"
 
 // Structural
+#include "solidfi/l1/Failure.hpp"
 #include "solidfi/l1/Transform.hpp"
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Pipeline.hpp"

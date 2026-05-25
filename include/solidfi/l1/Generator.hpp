@@ -25,7 +25,7 @@ public:
     /// @brief Produce a T. The NoInput argument carries no data and should be ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<T> fetch(NoInput input, P params) override = 0;
+    T fetch(NoInput input, P params) override = 0;
 };
 
 } // namespace solidfi

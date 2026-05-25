@@ -43,7 +43,7 @@ namespace solidfi {
 /// **Invariants:**
 /// - Priority determines execution order. Duplicate priorities result in undefined ordering.
 /// - Names are group keys: multiple entries may share a name. remove(name) removes all.
-/// - If no converter succeeds, the chain fails (returns absent `Optional<U>`).
+/// - If no converter succeeds, the chain fails (returns Failure<U>::value()).
 /// - prepare and finalize are optional; absent means no transform applied.
 ///
 /// @tparam T source type; free generic, owned by the user.
@@ -79,12 +79,12 @@ public:
     /// @brief Execute the chain. Friendly alias for fetch().
     ///
     /// Prefer resolve() when calling a known Chain directly.
-    Optional<U> resolve(T value, P params);
+    U resolve(T value, P params);
 
     /// @brief Try each installed converter in priority order until one succeeds.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<U> fetch(T value, P params) override;
+    U fetch(T value, P params) override;
 
     /// @brief Install a converter at the given priority under the given name.
     ///

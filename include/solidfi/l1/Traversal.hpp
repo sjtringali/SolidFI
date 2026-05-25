@@ -32,7 +32,7 @@ public:
     /// @brief Execute the traversal over the given graph with the given parameters.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Optional<U> fetch(Graph graph, P params) override = 0;
+    U fetch(Graph graph, P params) override = 0;
 };
 
 } // namespace solidfi

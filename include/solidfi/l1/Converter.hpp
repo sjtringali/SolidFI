@@ -3,7 +3,6 @@
 /// @file Converter.hpp
 /// @ingroup solidfi_l1_structural
 
-#include "solidfi/l1/forward.hpp"
 #include "solidfi/l1/Parameters.hpp"
 
 namespace solidfi {
@@ -15,13 +14,10 @@ namespace solidfi {
 /// transformation. Because T and U are distinct, failure is possible: there is no
 /// identity fallback. Failure is represented by an absent `Optional<U>`.
 ///
-/// @note Failure representation is an open design question. `Optional<U>` conflates
-///   abstention ("I didn't try") with failure ("I tried and got nothing") — both look
-///   like absent. P offers an alternative: if P is bidirectional (e.g. a
-///   RequestResponse shape), a converter can write failure detail into P and return a
-///   present U, keeping the error channel separate from the value channel. The right
-///   answer depends on whether failure is a value concern (return type) or a traversal
-///   concern (P). TBD.
+/// Failure is represented as a sentinel value of U declared via Failure<U> — a
+/// non-intrusive specialization (see Failure.hpp). Converter itself does not require
+/// Failure<U>; that contract belongs to Chain, which uses it to test fetch() results
+/// during traversal. Failure is state, not control flow — fetch() never throws.
 ///
 /// P is an optional user-defined parameter type for routing and dispatch. The framework
 /// never inspects P — it only passes it through to fetch(). Defaults to Parameters.
@@ -37,7 +33,7 @@ namespace solidfi {
 /// **Invariants:**
 /// - accepts() and rejects() MUST be stateless and synchronous.
 /// - accepts() and rejects() MUST NOT depend on P.
-/// - fetch() MAY fail; returns absent `Optional<U>` on failure.
+/// - fetch() MAY fail; returns Failure<U>::value() on failure. MUST NOT throw.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -54,10 +50,11 @@ public:
     /// Evaluated before accepts(). A converter that rejects is never attempted via fetch().
     virtual bool rejects(T value) const { return false; }
 
-    /// @brief Perform the conversion. Returns absent value on failure.
+    /// @brief Perform the conversion. Returns Failure<U>::value() on failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    virtual Optional<U> fetch(T value, P params) = 0;
+    /// @note Never throws. Failure is a returned value, not a control flow path.
+    virtual U fetch(T value, P params) = 0;
 
 };
 
