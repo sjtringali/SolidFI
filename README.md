@@ -68,7 +68,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Delegate<T>`    | `target() -> T&`           | Object indirection: refers to another T and delegates to it. L2: `Proxy` |
 | `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                         |
 | `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`          |
-| `Optional<T>`    | —                          | May or may not hold a T. L1: `std::optional<T>`                          |
+| `Failure<U>`     | `value() -> U`             | Sentinel value for U; non-intrusive specialization. L1: `Failure<U>`     |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                  |
 | `Parameters`     | —                          | Marker for user-defined contextual data                                  |
 | `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
@@ -85,15 +85,16 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | --------------------| ----------------------| --------------------------------------------------------------------|
 | `Transform<T>`     | `apply(T) -> T`      | Takes T, produces T. Cannot fail; degrades to identity             |
 | `Pipeline<T>`      | `run(T) -> T`        | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`  |
-| `Converter<T,U,P>` | `fetch(T,P) -> U?`   | Takes T, produces U. May fail. P for routing                       |
-| `Chain<T,U,P>`     | `resolve(T,P) -> U?` | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>` |
+| `Converter<T,U,P>` | `fetch(T,P) -> U`    | Takes T, produces U. Failure is `Failure<U>::value()`. P for routing |
+| `Chain<T,U,P>`     | `resolve(T,P) -> U`  | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>`  |
 | `Parameters`       | empty                | Default P across all parameterized types                           |
+| `Failure<U>`       | `value() -> U`       | Sentinel for failed fetch(). Non-intrusive; specialize to opt in   |
 
 ##### Extras
 
 | Concept             | Shape                                  | Notes                                                     |
 | ---------------------| ----------------------------------------| -----------------------------------------------------------|
-| `Generator<T,P>`    | `Converter<NoInput,T,P>`               | Produces T from nothing                                   |
+| `Generator<T,P>`    | `Converter<Void,T,P>`               | Produces T from nothing                                   |
 | `Inverter<T,U>`     | `Converter<T,U>`                       | Guarantees bidirectional T↔U                              |
 | `Provider<T,U>`     | `Converter<T,U>`                       | One-way lookup; I/O oriented                              |
 | `Literal<T,InputT>` | `Transform<T>` + `Converter<InputT,T>` | Captures a T; satisfies both hierarchies. L0: `Closed<T>` |
@@ -112,7 +113,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | ------------------| ---------------------------| ------------------------------------------------------------|
 | `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act |
 | `Traversal<U,P>` | `Converter<Graph,U,P>`    | Algorithm over a Graph; Graph is the input                 |
-| `Solver<T,U,P>`  | `solve(T,P) -> U?`        | Graph bound at construction; finds and executes T→U path   |
+| `Solver<T,U,P>`  | `solve(T,P) -> U`         | Graph bound at construction; finds and executes T→U path   |
 
 ### L2 — Domain Patterns
 

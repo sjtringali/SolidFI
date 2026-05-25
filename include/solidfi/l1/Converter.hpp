@@ -12,9 +12,7 @@ namespace solidfi {
 ///
 /// T and U are typically different types — this is a genuine conversion, not a
 /// transformation. Because T and U are distinct, failure is possible: there is no
-/// identity fallback. Failure is represented by an absent `Optional<U>`.
-///
-/// Failure is represented as a sentinel value of U declared via Failure<U> — a
+/// identity fallback. Failure is represented as a sentinel value of U declared via Failure<U> — a
 /// non-intrusive specialization (see Failure.hpp). Converter itself does not require
 /// Failure<U>; that contract belongs to Chain, which uses it to test fetch() results
 /// during traversal. Failure is state, not control flow — fetch() never throws.

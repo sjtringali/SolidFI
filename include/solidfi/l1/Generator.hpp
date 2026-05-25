@@ -12,20 +12,20 @@ namespace solidfi {
 ///
 /// Generator is conceptually Converter<void, T, P> — a conversion with no meaningful input.
 /// Because void is not a valid C++ template type argument, the input type is modeled as
-/// NoInput, a tag type carrying no data. Callers pass NoInput{} as the input value.
+/// Void, a tag type carrying no data. Callers pass Void{} as the input value.
 ///
 /// @tparam T destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
 template<typename T, typename P = Parameters>
-class Generator : public Converter<NoInput, T, P> {
+class Generator : public Converter<Void, T, P> {
 public:
-    bool accepts(NoInput) const override { return true; }
-    bool rejects(NoInput) const override { return false; }
+    bool accepts(Void) const override { return true; }
+    bool rejects(Void) const override { return false; }
 
-    /// @brief Produce a T. The NoInput argument carries no data and should be ignored.
+    /// @brief Produce a T. The Void argument carries no data and should be ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T fetch(NoInput input, P params) override = 0;
+    T fetch(Void input, P params) override = 0;
 };
 
 } // namespace solidfi
