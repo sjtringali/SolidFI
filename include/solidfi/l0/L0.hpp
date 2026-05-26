@@ -151,6 +151,19 @@ public:
 };
 
 /// @ingroup solidfi_l0
+/// @brief A value of type T that cannot be modified after construction.
+///
+/// Named alias so the concept has an identity in the spec. In C++ this is `const T`.
+/// In TypeScript this maps to `Readonly<T>`. Compatibility shims for each target
+/// language live in their respective adapter layers.
+///
+/// @tparam T the underlying type; free generic, owned by the user.
+/// @note L2 usage: Handshake::request is Readonly<R> — the original caller intent,
+///   frozen at call time and never modified during traversal.
+template<typename T>
+using Readonly = const T;
+
+/// @ingroup solidfi_l0
 /// @brief A collection of objects (types) and arrows (converters) between them.
 ///
 /// In SolidFI, objects are types and arrows are `Converter<T,U>` instances —

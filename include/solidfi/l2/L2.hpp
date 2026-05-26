@@ -5,12 +5,10 @@
 ///
 /// L2 concepts are built on L1 primitives. Each is a stub marking a named concept
 /// whose full definition will be elaborated in a future revision.
-///
-/// @note P conventions: at L2, P can carry both inbound and outbound data — e.g.
-///   `RequestResponse { in: Req, out: Res }` or `InOut<I,O>`. Converters along the path
-///   read from `in` and write to `out` as traversal proceeds. This means round-trip and
-///   request/response patterns require no new framework primitives — they are shaped P
-///   values. The framework remains unchanged; the contract lives in P.
+
+#include <any>
+#include "solidfi/l1/Graph.hpp"
+#include "solidfi/l1/Parameters.hpp"
 
 namespace solidfi {
 
@@ -20,8 +18,35 @@ namespace solidfi {
 /// boundaries: Protocol and Transport (encoding and channel), Serialization (wire
 /// representation), Proxy (runtime interception without modifying the Graph), Roundtrip
 /// (bidirectional guarantee at the protocol level), and Runtime (a Graph assembled for a
-/// specific deployment context). Currently stubs; full specification follows network
-/// transparency work.
+/// specific deployment context). Handshake is the standard L2 P type, covering the common
+/// request/response case. Currently stubs; full specification follows network transparency work.
+
+/// @ingroup solidfi_l2
+/// @brief Named parameter bag covering the common request/response case.
+///
+/// Handshake is the standard L2 P type — a concrete subtype of Parameters that carries
+/// enough structure to express almost all common traversal patterns:
+/// - `request`: the original caller intent; const, set at call time, never modified
+/// - `input`: mutable inbound context; converters along the path may read and enrich it
+/// - `output`: mutable outbound channel; converters write results back toward the caller
+///
+/// P remains unconstrained at L1 — any Parameters subtype is valid. Handshake is
+/// the L2 answer to "what should P look like in practice?" Other L2 concepts
+/// (Protocol, Transport, Roundtrip) express their parameter contracts in terms of
+/// Handshake rather than inventing their own P shapes.
+///
+/// @tparam R the type of the original request; mandatory, set at the call site
+/// @tparam In  inbound context type; defaults to std::any
+/// @tparam Out outbound result type; defaults to std::any
+///
+/// @note In C++, const will disable useful value semantics for operator=, so an 
+/// an alternate representation might be needed. See L0::Readonly<>.
+template<typename R, typename In = std::any, typename Out = std::any>
+struct Handshake : public Parameters {
+    const R request;
+    In input;
+    Out output;
+};
 
 /// @ingroup solidfi_l2
 /// @brief Defines the encoding and framing contract for a communication exchange.
