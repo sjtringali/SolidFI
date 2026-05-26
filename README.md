@@ -1,14 +1,190 @@
 # SolidFI
 
-**Functional Interfaces for Composition**
+SolidFI (**SOLID Functional Interfaces**) is a design specification for building composable systems out of small, strongly-typed, pluggable pieces.
 
-SolidFI is a design spec for building composable systems out of small, typed, pluggable pieces. Determinism is a first-class value... because flexibility that makes behavior unpredictable isn't flexibility, so much as chaos with a nicer name.
+## Getting Started
+
+Let's start with an example of using SolidFI in a top-down matter to decompose a problem. We want to build an online reader for OpenDocument files. So what if it was magic? The dream would be something like:
+
+```
+  const magic = new OpenDocumentReader();
+  const html = magic.convert('document.odf');
+```
+
+Hey, that looks pretty good! Except we are all out of magic. Nothing happens yet. Lets get something working, even if it's wrong.
+
+```
+  class TempOpenDocumentReader implements OpenDocumentReader {
+    convert(filename: string): string {
+      // TODO: open the file, read the bits, parse something and then:
+      return "<html>I am an ODF document " + string + "</html>";
+    }    
+  }
+```
+
+Well, thats kind of vague. A string to a string can be anything. Pass in a JPG, and what do you get?
+
+## A Different Approach
+
+Let's add a little more intention and use a TypeScript implementation of SolidFI. First thing we do is *name* what we did with `Converter`. Converter requires one method called `fetch`, otherwise it won't compile. 
+
+```
+  type HTML = string;
+  type Filename = string;
+
+  class TempOpenDocumentReader implements Converter<Filename, HTML> {
+    fetch(filename: Filename): HTML { /* same */ }
+  }
+```
+
+Not bad. Here we might be tempted to open the file right inside fetch - but here's where we a take detour and start to think in types. A filename is just a string. You get bytes out of it. Then bytes turn into the HTML. The obvious solution split it into two, and compose them externally, so they don't know about each other. Standard structured programming.
+
+```
+  class FileReader implements Converter<Filename, Blob> {
+    fetch(filename: Filename): Blob {
+      return fs.readFileSync(filename);
+    }    
+  }
+
+  class TempOpenDocumentReader implements Converter<Blob, HTML> {
+    fetch(blob: Blob): HTML {
+      // TODO: parse the bits from Blob something and then:
+      return "<html>I am an ODF document that is " + blob.size() + " bytes long</html>";
+    }    
+  }
+
+  const blob = new FileReader().fetch('document.odf');
+  const html = new TempOpenDocumentReader().fetch('blob');
+```
+  
+Now iterate. Let's say we write a container parser (it's a ZIP), then an XML parser (to find the document inside), some intermediate representation (call it a Page), and then HTML. So you write a few things that go through each intermediate representation.
+
+```
+  class FileReader implements Converter<Filename, Blob>;
+  class Unzipper implements Converter<Blob, XML>;
+  class Parser implements Converter<XML, Page>;
+  class Renderer implements Converter<Page, HTML>;
+```
+
+Now each write one can test independently, because they are structured from the beginning as separate concerns. And because the all follow the same interface, they can be handed off to other code that's unaware of lies beneath.
+
+## From static composition to dynamic
+
+But the top-level glue code is kind of annoying. It just a more verbose way of writing functions chained together, so why not just do `loadFile().then().unzip().then().parse().then().render()`? Why have objects that wrap these functions?
+
+That's one way of looking at it. But step back a bit and ask another question: why do we have to tell which types fit together *at all*? Doesn't the type system already know which ones fit? 
+
+It does. So let's add more magic. Here we introduce `Runtime`, which is an *unordered* list of Converters, and `Solver`, which looks at a runtime, and finds a path through them. 
+```
+  // Setup the list of known conversions. Uses typescript constructor syntax.
+  const allConverters = new Runtime();
+  allConverters.installNew(Parser, FileReader, HtmlReader, Unzipper); // Unordered!
+
+  // Find a way to convert from Filename to HTML
+  solver = new Solver<Filename, HTML>(runtime);
+  const html = solver.solve('document.odt' as Filename);
+```
+
+That's not magic, it's a graph traversal. And this is dynamic composition of all these function calls, replacing static composition. You don't write the glue code; the system found it and calls it for you.
+
+## Keep going!
+
+That code right there can split be split into two pieces. 
+
+1. Startup: only the startup sequence knows the acutal types of what is there.
+2. Runtime: doesn't know about any of that. It calls `solver` to get the HTML.
+
+Bet this is starting to get familiar. Even though the code is tight, it still is just static composition again and can be expressed as type conversions. Startup is just converting nothing into a Runtime. We now have a Factory.
+
+```
+  class Startup implements Converter<null, Runtime> { ... }
+  const runtime = new Startup();
+```
+
+In other words: you've already written the code, just label what it does with the right types.
+
+### Bringing it back home
+
+Here's the magic trick revealed. Look carefully: Solver<T,U> itself *really is* is a Converter<T,U>. It's the same thing as the test object we first wrong. Since they are both Converters via the Composite pattern, they can be subsituted at runtime.
+
+```
+  function displayODF(filename: string, magic: Converter<Filename, HTML>) {
+    const html: HTML = magic.fetch('filename');
+    document.setHTML(html);
+  }
+
+  // Use the old stub we started with
+  render('document.odt', new TempOpenDocumentReader);
+
+  // ...or use the working code.
+  render('document.dot', new Solver<Filename, HTML>);
+```
+
+Whoever writes displayODF doesn't know or care that you just handed them a graph traversal in disguise, hidden behind a tiny "fetch". You can swap a temporary thing for the real thing. But this also works in reverse, you can swap the real thing for a test stub, making *testing* composoble.
+
+## Extending the system at runtime
+
+Since Converter and Transformer work on free types T and U, Runtimes themselves can be transformed. Earlier we converted nothing into a Runtime and called it "startup", so it's no big leap to convert one runtime into another. Now you have a plugin loading system, and it has a natural home in the Factory part of the system.
+
+```
+  class PluginLoader implements Converter<Runtime, Runtime>
+```
+
+## Parameterized Traversal, Level 1 - Choosing from multiple handlers
+
+TODO: Just placeholder text
+
+We already have the vocabulary to express this built into Converter. Chain<T,U>: 
+1. accepts() and rejects() form the selection criteria that is stateless based on the request (can this handler ever handle this request?)
+2. fetch() returns Failed<T> to indicate that it couldn't be handled at runtime (did the handler succeed handling this request?)
+
+## Parameterized Traversal, Level 2 - Routing by request
+
+TODO: Just placeholder text
+
+While this works, it's missing still something: what specfically do we want to get out the document? Wouldn't it be useful to just grab page 36, so we don't have to transfer the entire thing? Back to the magic drawing board. Start with what you wish worked, and then make it so. Building off our previous example:
+
+```
+// 1. Create runtime of types
+// 2. Bind solver to that runtime
+const html: HTML = solver.fetch('document.odt', { page: 35 });
+```
+
+All this time, we really have been using Converter<T, U, P = void>, P just being empty. Everywhere. Each Converter, when called will be given both the input (T) plus the parameters (P). `fetch` really looks like. But in this example, not everyone cares about any given parameter. A 'page' doesn't exist inside a Blob or ZIP. So we only have to change one:
+
+```
+type P = {};
+class FileReader implements Converter<Filename, Blob, Parameters>;
+class Unzipper implements Converter<Blob, XML, P>;
+class Parser implements Converter<XML, Page, P>;
+class Renderer implements Converter<Page, HTML, P>;
+
+class Parser implements Converter<XML, Page, P> {
+  fetch(xml: XML, options: P): Page {
+    return options.page ? doParse(options.page) : doParse('all');
+  }
+}
+```
+
+## Parameterized Traversal, Level 3 - Proxying and Alternate Routes
+
+TODO: (1) Proxy objects can be built by simply adding to the chain before something else (non-intrusive)
+TODO: (2) But converters can have their own local knowledge of a delegate (intrusive)
+TODO: (3) This isn't duplicated effort: the caller always controls things in the first place, so it can always proxy things without a Converter's consent.
+
+# END EXAMPLE
 
 ## The Problem
 
 Object-oriented design gives you names and structure, but usually locks composition in at design time. Pure functional design gives you fluid composition, but usually the cost of types, names, and the sense of where one thing ends and another begins.
 
+Determinism is a first-class value... because flexibility that makes behavior unpredictable isn't flexibility, so much as chaos with a nicer name.
+
 Neither is wrong. But neither is complete.
+
+## This Spec
+
+While this spec is implemeted in C++, it's only done so as a specification language to validate the concepts formally and produce the documentation. A full implementation in C++ or TypeScript is possible.
 
 ## The Idea
 
