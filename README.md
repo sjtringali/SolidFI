@@ -105,7 +105,7 @@ In other words: you've already written the code, just label what it does with th
 
 ### Bringing it back home
 
-Here's the magic trick revealed. Look carefully: Solver<T,U> itself *really is* is a Converter<T,U>. It's the same thing as the test object we first wrong. Since they are both Converters via the Composite pattern, they can be subsituted at runtime.
+Here's the magic trick revealed. Look carefully: Solver<T,U> itself *really is* is a Converter<T,U>. It's the same thing as the test object we first wrote. Since they are both Converters via the Composite pattern, they can be substituted at runtime.
 
 ```
   function displayODF(filename: string, magic: Converter<Filename, HTML>) {

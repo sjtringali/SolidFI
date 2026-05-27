@@ -56,7 +56,7 @@ html {
     --title-font-size: 22px;
 
     /* content text properties. These only affect the page content, not the navigation or any other ui elements */
-    --content-line-height: 27px;
+    --content-line-height: 1.45;
     /* The content is centered and constraint in it's width. To make the content fill the whole page, set the variable to auto.*/
     --content-maxwidth: 1050px;
     --table-line-height: 24px;
@@ -1720,7 +1720,7 @@ div.memproto, h2.memtitle {
 h2.memtitle {
     font-weight: 500;
     font-size: var(--memtitle-font-size);
-    font-family: var(--font-family-monospace);
+    font-family: var(--font-family);
     border-bottom: none;
     border-top-left-radius: var(--border-radius-medium);
     border-top-right-radius: var(--border-radius-medium);
@@ -1788,14 +1788,14 @@ div.memtitle {
 }
 
 div.memproto table.memname {
-    font-family: var(--font-family-monospace);
+    font-family: var(--font-family);
     color: var(--page-foreground-color);
     font-size: var(--memname-font-size);
     text-shadow: none;
 }
 
 div.memproto div.memtemplate {
-    font-family: var(--font-family-monospace);
+    font-family: var(--font-family);
     color: var(--primary-dark-color);
     font-size: var(--memname-font-size);
     margin-left: 2px;
@@ -2021,13 +2021,16 @@ table.memberdecls {
 }
 
 table.memberdecls tr[class^='memitem'] {
-    font-family: var(--font-family-monospace);
-    font-size: var(--code-font-size);
+    font-family: var(--font-family);
+    font-size: var(--page-font-size);
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 table.memberdecls tr[class^='memitem'] .memTemplParams {
-    font-family: var(--font-family-monospace);
-    font-size: var(--code-font-size);
+    font-family: var(--font-family);
+    font-size: var(--page-font-size);
     color: var(--primary-dark-color);
     white-space: normal;
 }
@@ -2040,31 +2043,14 @@ table.memberdecls .memTemplItemLeft,
 table.memberdecls .memTemplItemRight,
 table.memberdecls .memTemplParams {
     transition: none;
-    padding-top: var(--spacing-small);
-    padding-bottom: var(--spacing-small);
-    border-top: 1px solid var(--separator-color);
-    border-bottom: 1px solid var(--separator-color);
-    background-color: var(--fragment-background);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: none;
+    background: transparent;
 }
 
 @media screen and (min-width: 768px) {
-
-    tr.heading + tr[class^='memitem'] td.memItemRight, tr.groupHeader + tr[class^='memitem'] td.memItemRight, tr.inherit_header + tr[class^='memitem'] td.memItemRight {
-        border-top-right-radius: var(--border-radius-small);
-    }
-
-    table.memberdecls tr:last-child td.memItemRight, table.memberdecls tr:last-child td.mdescRight, table.memberdecls tr[class^='memitem']:has(+ tr.groupHeader) td.memItemRight, table.memberdecls tr[class^='memitem']:has(+ tr.inherit_header) td.memItemRight, table.memberdecls tr[class^='memdesc']:has(+ tr.groupHeader) td.mdescRight, table.memberdecls tr[class^='memdesc']:has(+ tr.inherit_header) td.mdescRight {
-        border-bottom-right-radius: var(--border-radius-small);
-    }
-
-    table.memberdecls tr:last-child td.memItemLeft, table.memberdecls tr:last-child td.mdescLeft, table.memberdecls tr[class^='memitem']:has(+ tr.groupHeader) td.memItemLeft, table.memberdecls tr[class^='memitem']:has(+ tr.inherit_header) td.memItemLeft, table.memberdecls tr[class^='memdesc']:has(+ tr.groupHeader) td.mdescLeft, table.memberdecls tr[class^='memdesc']:has(+ tr.inherit_header) td.mdescLeft {
-        border-bottom-left-radius: var(--border-radius-small);
-    }
-
-    tr.heading + tr[class^='memitem'] td.memItemLeft, tr.groupHeader + tr[class^='memitem'] td.memItemLeft, tr.inherit_header + tr[class^='memitem'] td.memItemLeft {
-        border-top-left-radius: var(--border-radius-small);
-    }
-
+    /* card border-radius removed — Qt-style flat list */
 }
 
 table.memname td.memname {
@@ -2079,24 +2065,17 @@ table.memberdecls .template .memItemRight {
 }
 
 table.memberdecls .memTemplParams {
-    border-bottom: 0;
-    border-left: 1px solid var(--separator-color);
-    border-right: 1px solid var(--separator-color);
-    border-radius: var(--border-radius-small) var(--border-radius-small) 0 0;
-    padding-bottom: var(--spacing-small);
+    border: none;
+    padding-bottom: 2px;
 }
 
 table.memberdecls .memTemplItemLeft, table.memberdecls .template .memItemLeft {
-    border-radius: 0 0 0 var(--border-radius-small);
-    border-left: 1px solid var(--separator-color);
-    border-top: 0;
+    border: none;
 }
 
 table.memberdecls .memTemplItemRight, table.memberdecls .template .memItemRight {
-    border-radius: 0 0 var(--border-radius-small) 0;
-    border-right: 1px solid var(--separator-color);
+    border: none;
     padding-left: 0;
-    border-top: 0;
 }
 
 table.memberdecls .memItemLeft {
@@ -3051,4 +3030,25 @@ html.dark-mode .bordered_image object[type="image/svg+xml"] /* doxygen 1.9.3 */ 
 
 .primary-button:hover {
     background: var(--primary-dark-color);
+}
+
+/* SolidFI customizations */
+
+.textblock p {
+    margin-top: 0.4em;
+    margin-bottom: 0.4em;
+}
+
+dl {
+    line-height: 1.45;
+}
+
+tr[class^="separator:"] td,
+tr[class*=" separator:"] td {
+    display: none;
+}
+
+li:has(> a[href="functions.html"]),
+li:has(> a[href="functions_func.html"]) {
+    display: none;
 }
