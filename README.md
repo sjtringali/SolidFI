@@ -247,9 +247,11 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Failure<U>`     | `value() -> U`             | Sentinel value for U; non-intrusive specialization. L1: `Failure<U>`     |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                  |
 | `Parameters`     | —                          | Marker for user-defined contextual data                                  |
-| `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
-| `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection → single value                                          |
-| `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value → collection                                        |
+| `Category`       | -                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
+| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category; produces U. L1: `Solver`                      |
+| `FoundPath`      | -                          | Reserved. A found path through a Category; name TBD (Trail? Track?)      |
+| `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection -> single value                                          |
+| `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value -> collection                                        |
 
 ### L1 — Primitives
 
@@ -287,9 +289,9 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 
 | Concept          | Shape                     | Notes                                                      |
 | ------------------| ---------------------------| ------------------------------------------------------------|
-| `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act |
-| `Traversal<U,P>` | `Converter<Graph,U,P>`    | Algorithm over a Graph; Graph is the input                 |
-| `Solver<T,U,P>`  | `solve(T,P) -> U`         | Graph bound at construction; finds and executes T→U path   |
+| `Graph`         | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act        |
+| `Solver`        | `solve<T,U>(T,P) -> U`    | Graph bound at construction; untyped; one instance, any T->U path |
+| `Router<T,U,P>` | `Converter<T,U,P>`        | Graph bound at construction; T,U fixed; enables the Composite rule |
 
 ### L2 — Domain Patterns
 

@@ -26,5 +26,5 @@
 
 // Runtime
 #include "solidfi/l1/Graph.hpp"
-#include "solidfi/l1/Traversal.hpp"
 #include "solidfi/l1/Solver.hpp"
+#include "solidfi/l1/Router.hpp"

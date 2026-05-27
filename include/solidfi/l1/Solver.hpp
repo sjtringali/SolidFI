@@ -9,58 +9,48 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_runtime
-/// @brief A Converter<T,U,P> backed by a Graph. Finds and executes a path from T to U.
+/// @brief Graph-bound path finder. Untyped: T and U are deduced at each call site.
 ///
 /// Solver is the engine of Parameterized Traversal (level 2 of 3).
 ///
-/// Level 1 — static reachability — asks whether any path T→U exists in the Graph at all.
+/// Level 1 - static reachability - asks whether any path T->U exists in the Graph at all.
 /// That is a structural property of the installed converters, independent of runtime data.
 ///
-/// Level 2 — this — asks: given a specific value of T and parameters P, which path leads
+/// Level 2 - this - asks: given a specific value of T and parameters P, which path leads
 /// to U, and what does executing it produce? P is a routing signal: the same Graph may
-/// offer multiple T→U paths, and P selects among them. A converter's accepts/rejects
+/// offer multiple T->U paths, and P selects among them. A converter's accepts/rejects
 /// methods participate by declining specific values, causing Solver to try the next edge.
 ///
-/// Level 3 — Proxy (L2) — extends level 2 with proxy objects attached to converters from
+/// Level 3 - Proxy (L2) - extends level 2 with proxy objects attached to converters from
 /// outside, intercepting traversal without modifying the Graph.
 ///
-/// To any caller holding a Converter<T,U,P> reference, a Solver is indistinguishable from
-/// a single converter — the Composite rule.
+/// Solver is untyped: T and U are resolved at each call site via template deduction.
+/// One Solver instance can answer any T->U query against its bound Graph.
+/// To expose a specific T->U path as a Converter<T,U,P>, use Router<T,U,P>.
 ///
 /// The Graph is bound at construction time. Solver MUST NOT modify the Graph it holds.
 ///
 /// **Invariants:**
-/// - If no path exists, fetch() MUST return Failure<U>::value().
-/// - If a path exists but execution fails at any step, fetch() MUST return Failure<U>::value().
 /// - Solver is responsible for cycle avoidance during traversal.
 /// - P flows into individual converters along the path, consistent with Converter semantics.
 ///   The Graph itself is not inspected with P.
 ///
-/// @tparam T source type; free generic, owned by the user.
-/// @tparam U destination type; free generic, owned by the user.
-/// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
-///
-/// @note Relationship to Traversal: Solver's public interface is Converter<T,U,P> (input is T).
-///   Traversal's interface is Converter<Graph,U,P> (input is Graph). These are related concepts
-///   with different shapes; Solver holds the Graph internally rather than accepting it as input.
-template<typename T, typename U, typename P = Parameters>
-class Solver : public Converter<T, U, P> {
+/// @note Relationship to Traversal: Solver's public interface takes T directly (via solve()).
+///   Traversal's interface is Converter<Graph,U,P> - it accepts Graph as input.
+///   These are related concepts with different shapes; Solver holds the Graph internally.
+class Solver {
 public:
     /// @brief Bind this Solver to a specific Graph.
     explicit Solver(Graph graph);
 
-    bool accepts(T value) const override;
-    bool rejects(T value) const override;
-
-    /// @brief Find a path T→U through the bound Graph and execute it with the given parameters.
+    /// @brief Find a path T->U through the bound Graph and execute it.
     ///
-    /// Returns Failure<U>::value() if no path exists or if execution of the found path fails.
+    /// T and U are deduced at the call site. One Solver handles any T->U query.
+    /// Returns Failure<U>::value() if no path exists or execution of the found path fails.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
+    template<typename T, typename U, typename P = Parameters>
     U solve(T value, P params);
-
-    /// @brief Satisfies Converter<T,U,P>. Delegates to solve().
-    U fetch(T value, P params) override;
 };
 
 } // namespace solidfi
