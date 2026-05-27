@@ -46,7 +46,7 @@ public:
     /// @brief Find a path T->U through the bound Graph and execute it.
     ///
     /// T and U are deduced at the call site. One Solver handles any T->U query.
-    /// Returns Failure<U>::value() if no path exists or execution of the found path fails.
+    /// Returns Sentinel<U>::value() if no path exists or execution of the found path fails.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     template<typename T, typename U, typename P = Parameters>

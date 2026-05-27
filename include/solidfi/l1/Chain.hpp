@@ -43,7 +43,7 @@ namespace solidfi {
 /// **Invariants:**
 /// - Priority determines execution order. Duplicate priorities result in undefined ordering.
 /// - Names are group keys: multiple entries may share a name. remove(name) removes all.
-/// - If no converter succeeds, the chain fails (returns Failure<U>::value()).
+/// - If no converter succeeds, the chain fails (returns Sentinel<U>::value()).
 /// - prepare and finalize are optional; absent means no transform applied.
 ///
 /// @tparam T source type; free generic, owned by the user.

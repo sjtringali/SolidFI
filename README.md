@@ -244,7 +244,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Delegate<T>`    | `target() -> T&`           | Object indirection: refers to another T and delegates to it. L2: `Proxy` |
 | `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                         |
 | `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`          |
-| `Failure<U>`     | `value() -> U`             | Sentinel value for U; non-intrusive specialization. L1: `Failure<U>`     |
+| `Sentinel<U>`    | `value() -> U`             | Sentinel value for U; non-intrusive specialization. L1: `Sentinel<U>`    |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                  |
 | `Parameters`     | —                          | Marker for user-defined contextual data                                  |
 | `Category`       | -                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
@@ -263,10 +263,10 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | --------------------| ----------------------| --------------------------------------------------------------------|
 | `Transform<T>`     | `apply(T) -> T`      | Takes T, produces T. Cannot fail; degrades to identity             |
 | `Pipeline<T>`      | `run(T) -> T`        | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`  |
-| `Converter<T,U,P>` | `fetch(T,P) -> U`    | Takes T, produces U. Failure is `Failure<U>::value()`. P for routing |
+| `Converter<T,U,P>` | `fetch(T,P) -> U`    | Takes T, produces U. Failure is `Sentinel<U>::value()`. P for routing |
 | `Chain<T,U,P>`     | `resolve(T,P) -> U`  | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>`  |
 | `Parameters`       | empty                | Default P across all parameterized types                           |
-| `Failure<U>`       | `value() -> U`       | Sentinel for failed fetch(). Non-intrusive; specialize to opt in   |
+| `Sentinel<U>`      | `value() -> U`       | Sentinel for failed fetch(). Non-intrusive; specialize to opt in   |
 
 ##### Extras
 

@@ -23,7 +23,7 @@ namespace solidfi {
 ///
 /// **Invariants:**
 /// - Router MUST NOT modify the Graph it holds.
-/// - Returns Failure<U>::value() if no path exists or execution fails.
+/// - Returns Sentinel<U>::value() if no path exists or execution fails.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
