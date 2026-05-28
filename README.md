@@ -68,27 +68,27 @@ Now iterate. Let's say we write a container parser (it's a ZIP), then an XML par
 
 Now each write one can test independently, because they are structured from the beginning as separate concerns. And because the all follow the same interface, they can be handed off to other code that's unaware of lies beneath.
 
-## Declarative static composition
+## Static composition with Path
 
 The four converters above still need glue code to connect them. You could call each `fetch()` manually in sequence, but SolidFI has a better answer: `Path`. You wire the path explicitly at construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
 
 ```typescript
   const path = new Path<Filename>()
-    .via(new FileReader())                      // Filename -> Blob
-    .via(new Unzipper())                        // Blob -> XML
-    .via(new TextParser(), new ImageParser())   // XML -> Page or Chain: each declares what it handles
-    .via(new Renderer());                       // Page -> HTML
+    .to(new FileReader())                               // Filename -> Blob
+    .to(new Unzipper())                                 // Blob -> XML
+    .toEither(new TextParser(), new ImageParser())      // XML -> Page: each declares what it handles
+    .to(new Renderer());                                // Page -> HTML
 
   const html = path.traverse('document.odt');
 ```
 
-All the interesting work is in construction — `via()` threads the types together, `through()` applies transforms that hold the type. The external shape is always `Converter<Start, End>`.
+All the interesting work is in construction — `to()` advances the type, `toEither()` declares a Chain at that step, `through()` applies transforms that hold the type. The external shape is always `Converter<Start, End>`.
 
-Passing multiple converters to a single `via()` declares a `Chain` at that step. Each converter uses `accepts()` and `rejects()` to say what it handles; the chain tries them in order until one succeeds. Here, page 34 turns out not to be text at all — it's one big embedded image. `TextParser` rejects it; `ImageParser` accepts it. Both produce a `Page`, so `Renderer` never knows the difference.
+`toEither()` with multiple converters declares a `Chain` at that step. Each converter uses `accepts()` and `rejects()` to say what it handles; the chain tries them in order until one succeeds. Here, page 34 turns out not to be text at all — it's one big embedded image. `TextParser` rejects it; `ImageParser` accepts it. Both produce a `Page`, so `Renderer` never knows the difference.
 
 Path is the static answer: the path is known, fixed, and declared. When you don't know the path in advance, read on.
 
-But Path and Solver aren't opposites — a Path can seed a Runtime. The path is disassembled, and each converter and transform is installed into the Graph individually. Duplicates are silently discarded. This means you can build an explicit path, use it directly, and hand it to the dynamic system — no rewriting, no duplication. Path can be the thing that builds the Graph that Solver also traverses.
+But Path and Solver aren't opposites — a Path can seed a Runtime. The path is disassembled, and each converter and transform is installed into the Graph individually. Duplicates are silently discarded. This means you can build an explicit path with Path, use it directly, and hand the same Path to the dynamic system — no rewriting, no duplication. Path can be the thing that builds the Graph that Solver traverses.
 
 ## From static composition to dynamic
 
@@ -207,7 +207,11 @@ Neither is wrong. But neither is complete.
 
 ## This Spec
 
-While this spec is implemeted in C++, it's only done so as a specification language to validate the concepts formally and produce the documentation. A full implementation in C++ or TypeScript is possible.
+While this spec is implemented in C++, it's only done so as a specification language to validate the concepts formally and produce the documentation. A full implementation in C++ or TypeScript is possible.
+
+The spec and examples are currently written in an object-oriented style: classes, inheritance, explicit interfaces. This is intentional as a middle ground: it is readable in both C++ and TypeScript, and maps directly to working implementations in either language.
+
+The OO style is not the end goal. The ideas map cleanly C++ concepts and TypeScript's structural typing, where the inheritance hierarchy is replaced by `requires` constraints and duck typing respectively. Both are valid implementations of the same spec, so the names, contracts, and composition rules stay identical. What changes is the mechanism: `implements Converter<T,U>` becomes `requires Converter<T,U>`, and the vtable disappears. The spec is written in OO to be concrete; it should be read as defining contracts, not mandating inheritance.
 
 ## The Idea
 
@@ -310,7 +314,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | ------------------| ---------------------------| -------------------------------------------------------------------------------------------------------------------------------------------|
 | `Pipeline<T>`    | `run(T) -> T`             | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`                                                                          |
 | `Chain<T,U,P>`   | `resolve(T,P) -> U`       | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>`                                                                         |
-| `Blazer<T,U,P>`  | `fetch(T,P) -> U`         | Explicitly-wired T→...→U path. IS-A `Converter<T,U,P>`. Consecutive converters collapse to `Chain`; transforms to `Pipeline`. Can seed a `Graph`. |
+| `Path<T,U,P>`   | `traverse(T,P) -> U`      | Explicitly-wired T->...->U path. IS-A `Converter<T,U,P>`. `to()` adds a step; `toEither()` adds a Chain; `through()` adds a Pipeline. Can seed a `Graph`. |
 | `Registry<T>`    | —                         | Runtime complement to Extensible. Shape TBD.                                                                                               |
 | `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act                                                                                 |
 | `Solver`         | `solve<T,U>(T,P) -> U`    | Graph bound at construction; untyped; one instance, any T→U path                                                                          |

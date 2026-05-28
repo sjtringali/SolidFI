@@ -26,7 +26,7 @@
 /// @defgroup solidfi_l1_compositions Compositions
 /// @ingroup solidfi_l1
 /// @brief Static and dynamic composition — how primitives are combined into larger wholes.
-/// Pipeline and Chain are the composite forms of Transform and Converter. Blazer wires
+/// Pipeline and Chain are the composite forms of Transform and Converter. Path wires
 /// an explicit multi-stage path at construction. Graph is the dynamic registry of edges;
 /// Solver traverses it at runtime; Router pins a specific T→U path as a Converter.
 /// Registry is the general-purpose runtime complement to Extensible.

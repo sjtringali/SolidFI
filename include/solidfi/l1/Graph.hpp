@@ -3,7 +3,7 @@
 /// @file Graph.hpp
 /// @ingroup solidfi_l1_compositions
 
-#include "solidfi/l1/Blazer.hpp"
+#include "solidfi/l1/Path.hpp"
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Transform.hpp"
 
@@ -46,17 +46,17 @@ public:
     template<typename T>
     void install(Transform<T> transform);
 
-    /// @brief Decompose a Blazer and install each step as an individual edge.
+    /// @brief Decompose a Path and install each step as an individual edge.
     ///
-    /// The Blazer's explicit path is disassembled: each Converter and Transform is
+    /// The Path's explicit path is disassembled: each Converter and Transform is
     /// extracted and installed as if passed to install() directly. Steps whose identity
-    /// already exists in the Graph are silently skipped. The Blazer itself is not
+    /// already exists in the Graph are silently skipped. The Path itself is not
     /// installed as a single edge.
     ///
-    /// This allows a statically-declared Blazer to seed the dynamic Graph without
-    /// duplication. The Blazer may continue to be used directly alongside Solver.
+    /// This allows a statically-declared Path to seed the dynamic Graph without
+    /// duplication. The Path may continue to be used directly alongside Solver.
     template<typename T, typename U, typename P = Parameters>
-    void install(Blazer<T, U, P> blazer);
+    void install(Path<T, U, P> blazer);
 
 };
 
