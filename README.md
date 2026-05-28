@@ -68,31 +68,31 @@ Now iterate. Let's say we write a container parser (it's a ZIP), then an XML par
 
 Now each write one can test independently, because they are structured from the beginning as separate concerns. And because the all follow the same interface, they can be handed off to other code that's unaware of lies beneath.
 
-## Static composition with Blazer
+## Declarative static composition
 
-The four converters above still need glue code to connect them. You could call each `fetch()` manually in sequence, but SolidFI has a better answer: `Blazer`. You wire the path explicitly at construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
+The four converters above still need glue code to connect them. You could call each `fetch()` manually in sequence, but SolidFI has a better answer: `Path`. You wire the path explicitly at construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
 
 ```typescript
-  const path = new Blazer<Filename>()
+  const path = new Path<Filename>()
     .via(new FileReader())                      // Filename -> Blob
     .via(new Unzipper())                        // Blob -> XML
     .via(new TextParser(), new ImageParser())   // XML -> Page or Chain: each declares what it handles
     .via(new Renderer());                       // Page -> HTML
 
-  const html = path.fetch('document.odt');
+  const html = path.traverse('document.odt');
 ```
 
 All the interesting work is in construction — `via()` threads the types together, `through()` applies transforms that hold the type. The external shape is always `Converter<Start, End>`.
 
 Passing multiple converters to a single `via()` declares a `Chain` at that step. Each converter uses `accepts()` and `rejects()` to say what it handles; the chain tries them in order until one succeeds. Here, page 34 turns out not to be text at all — it's one big embedded image. `TextParser` rejects it; `ImageParser` accepts it. Both produce a `Page`, so `Renderer` never knows the difference.
 
-Blazer is the static answer: the path is known, fixed, and declared. When you don't know the path in advance, read on.
+Path is the static answer: the path is known, fixed, and declared. When you don't know the path in advance, read on.
 
-But Blazer and Solver aren't opposites — a Blazer can seed a Runtime. The path is disassembled, and each converter and transform is installed into the Graph individually. Duplicates are silently discarded. This means you can build an explicit path with Blazer, use it directly, and hand the same Blazer to the dynamic system — no rewriting, no duplication. Blazer can be the thing that builds the Graph that Solver traverses.
+But Path and Solver aren't opposites — a Path can seed a Runtime. The path is disassembled, and each converter and transform is installed into the Graph individually. Duplicates are silently discarded. This means you can build an explicit path, use it directly, and hand it to the dynamic system — no rewriting, no duplication. Path can be the thing that builds the Graph that Solver also traverses.
 
 ## From static composition to dynamic
 
-But the top-level glue code, as clear as it is, is still kind of annoying. It just a more verbose way of writing functions chained together, even though you gain the compactness of a declarative technique.
+But the top-level glue code, as clear as it is, is still kind of annoying. It just a more verbose way of writing functions chained together, what does it gain you other than the compactness of a declarative technique?
 
 That's one way of looking at it. But step back a bit and ask another question: why do we have to tell which types fit together *at all*? Doesn't the type system already know which ones fit? 
 
@@ -104,7 +104,7 @@ It does. So let's add more magic. Here we introduce `Runtime`, which is an *unor
   allConverters.installNew(TextParser, ImageParser, FileReader, HtmlReader, Unzipper); // Unordered!
 
   // Find a way to convert from Filename to HTML
-  solver = new Solver<Filename, HTML>(runtime);
+  solver = new Solver<Filename, HTML>(allConverters);
   const html = solver.solve('document.odt' as Filename);
 ```
 
@@ -112,7 +112,7 @@ That's not magic, it's a graph traversal. And this is dynamic composition of all
 
 ## Keep going!
 
-That code right there can split be split into two pieces. 
+That code right there can still be split into two pieces. 
 
 1. Startup: only the startup sequence knows the acutal types of what is there.
 2. Runtime: doesn't know about any of that. It calls `solver` to get the HTML.
