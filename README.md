@@ -68,17 +68,40 @@ Now iterate. Let's say we write a container parser (it's a ZIP), then an XML par
 
 Now each write one can test independently, because they are structured from the beginning as separate concerns. And because the all follow the same interface, they can be handed off to other code that's unaware of lies beneath.
 
+## Static composition with Blazer
+
+The four converters above still need glue code to connect them. You could call each `fetch()` manually in sequence, but SolidFI has a better answer: `Blazer`. You wire the path explicitly at construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
+
+```typescript
+  const path = new Blazer<Filename>()
+    .via(new FileReader())                      // Filename -> Blob
+    .via(new Unzipper())                        // Blob -> XML
+    .via(new TextParser(), new ImageParser())   // XML -> Page or Chain: each declares what it handles
+    .via(new Renderer());                       // Page -> HTML
+
+  const html = path.fetch('document.odt');
+```
+
+All the interesting work is in construction — `via()` threads the types together, `through()` applies transforms that hold the type. The external shape is always `Converter<Start, End>`.
+
+Passing multiple converters to a single `via()` declares a `Chain` at that step. Each converter uses `accepts()` and `rejects()` to say what it handles; the chain tries them in order until one succeeds. Here, page 34 turns out not to be text at all — it's one big embedded image. `TextParser` rejects it; `ImageParser` accepts it. Both produce a `Page`, so `Renderer` never knows the difference.
+
+Blazer is the static answer: the path is known, fixed, and declared. When you don't know the path in advance, read on.
+
+But Blazer and Solver aren't opposites — a Blazer can seed a Runtime. The path is disassembled, and each converter and transform is installed into the Graph individually. Duplicates are silently discarded. This means you can build an explicit path with Blazer, use it directly, and hand the same Blazer to the dynamic system — no rewriting, no duplication. Blazer can be the thing that builds the Graph that Solver traverses.
+
 ## From static composition to dynamic
 
-But the top-level glue code is kind of annoying. It just a more verbose way of writing functions chained together, so why not just do `loadFile().then().unzip().then().parse().then().render()`? Why have objects that wrap these functions?
+But the top-level glue code, as clear as it is, is still kind of annoying. It just a more verbose way of writing functions chained together, even though you gain the compactness of a declarative technique.
 
 That's one way of looking at it. But step back a bit and ask another question: why do we have to tell which types fit together *at all*? Doesn't the type system already know which ones fit? 
 
-It does. So let's add more magic. Here we introduce `Runtime`, which is an *unordered* list of Converters, and `Solver`, which looks at a runtime, and finds a path through them. 
+It does. So let's add more magic. Here we introduce `Runtime`, which is an *unordered* list of Converters, and `Solver`, which looks at a runtime, and finds a path through them.
+ 
 ```
   // Setup the list of known conversions. Uses typescript constructor syntax.
   const allConverters = new Runtime();
-  allConverters.installNew(Parser, FileReader, HtmlReader, Unzipper); // Unordered!
+  allConverters.installNew(TextParser, ImageParser, FileReader, HtmlReader, Unzipper); // Unordered!
 
   // Find a way to convert from Filename to HTML
   solver = new Solver<Filename, HTML>(runtime);
@@ -120,7 +143,7 @@ Here's the magic trick revealed. Look carefully: Solver<T,U> itself *really is* 
   render('document.dot', new Solver<Filename, HTML>);
 ```
 
-Whoever writes displayODF doesn't know or care that you just handed them a graph traversal in disguise, hidden behind a tiny "fetch". You can swap a temporary thing for the real thing. But this also works in reverse, you can swap the real thing for a test stub, making *testing* composoble.
+Whoever writes displayODF doesn't know or care that you just handed them a graph traversal in disguise, hidden behind a tiny "fetch". You can swap a temporary thing for the real thing. But this also works in reverse, you can swap the real thing for a test stub, making *testing* composible.
 
 ## Extending the system at runtime
 
@@ -159,7 +182,7 @@ class Unzipper implements Converter<Blob, XML, P>;
 class Parser implements Converter<XML, Page, P>;
 class Renderer implements Converter<Page, HTML, P>;
 
-class Parser implements Converter<XML, Page, P> {
+class TextParser implements Converter<XML, Page, P> {
   fetch(xml: XML, options: P): Page {
     return options.page ? doParse(options.page) : doParse('all');
   }
@@ -255,24 +278,20 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 
 ### L1 — Primitives
 
-#### Structural Concerns
-
 #### Core
 
-| Concept            | Shape                | Notes                                                              |
-| --------------------| ----------------------| --------------------------------------------------------------------|
-| `Transform<T>`     | `apply(T) -> T`      | Takes T, produces T. Cannot fail; degrades to identity             |
-| `Pipeline<T>`      | `run(T) -> T`        | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`  |
+| Concept            | Shape                | Notes                                                                 |
+| --------------------| ----------------------| ----------------------------------------------------------------------|
+| `Transform<T>`     | `apply(T) -> T`      | Takes T, produces T. Cannot fail; degrades to identity                |
 | `Converter<T,U,P>` | `fetch(T,P) -> U`    | Takes T, produces U. Failure is `Sentinel<U>::value()`. P for routing |
-| `Chain<T,U,P>`     | `resolve(T,P) -> U`  | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>`  |
-| `Parameters`       | empty                | Default P across all parameterized types                           |
-| `Sentinel<U>`      | `value() -> U`       | Sentinel for failed fetch(). Non-intrusive; specialize to opt in   |
+| `Parameters`       | empty                | Default P across all parameterized types                              |
+| `Sentinel<U>`      | `value() -> U`       | Sentinel for failed fetch(). Non-intrusive; specialize to opt in      |
 
-##### Extras
+#### Extras
 
 | Concept             | Shape                                  | Notes                                                     |
 | ---------------------| ----------------------------------------| -----------------------------------------------------------|
-| `Generator<T,P>`    | `Converter<Void,T,P>`               | Produces T from nothing                                   |
+| `Generator<T,P>`    | `Converter<Void,T,P>`                  | Produces T from nothing                                   |
 | `Inverter<T,U>`     | `Converter<T,U>`                       | Guarantees bidirectional T↔U                              |
 | `Provider<T,U>`     | `Converter<T,U>`                       | One-way lookup; I/O oriented                              |
 | `Literal<T,InputT>` | `Transform<T>` + `Converter<InputT,T>` | Captures a T; satisfies both hierarchies. L0: `Closed<T>` |
@@ -285,13 +304,17 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Differencer<T>` | `Converter<T, Delta<T>, T>` | Current + previous state → delta                          |
 | `Applicator<T>`  | `Converter<T, T, Delta<T>>` | Current state + delta → next state                        |
 
-#### Runtime Concerns
+#### Compositions
 
-| Concept          | Shape                     | Notes                                                      |
-| ------------------| ---------------------------| ------------------------------------------------------------|
-| `Graph`         | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act        |
-| `Solver`        | `solve<T,U>(T,P) -> U`    | Graph bound at construction; untyped; one instance, any T->U path |
-| `Router<T,U,P>` | `Converter<T,U,P>`        | Graph bound at construction; T,U fixed; enables the Composite rule |
+| Concept          | Shape                     | Notes                                                                                                                                      |
+| ------------------| ---------------------------| -------------------------------------------------------------------------------------------------------------------------------------------|
+| `Pipeline<T>`    | `run(T) -> T`             | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`                                                                          |
+| `Chain<T,U,P>`   | `resolve(T,P) -> U`       | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>`                                                                         |
+| `Blazer<T,U,P>`  | `fetch(T,P) -> U`         | Explicitly-wired T→...→U path. IS-A `Converter<T,U,P>`. Consecutive converters collapse to `Chain`; transforms to `Pipeline`. Can seed a `Graph`. |
+| `Registry<T>`    | —                         | Runtime complement to Extensible. Shape TBD.                                                                                               |
+| `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act                                                                                 |
+| `Solver`         | `solve<T,U>(T,P) -> U`    | Graph bound at construction; untyped; one instance, any T→U path                                                                          |
+| `Router<T,U,P>`  | `Converter<T,U,P>`        | Graph bound at construction; T,U fixed; enables the Composite rule                                                                         |
 
 ### L2 — Domain Patterns
 

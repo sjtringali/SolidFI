@@ -1,14 +1,14 @@
 #pragma once
 
 /// @file Pipeline.hpp
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Transform.hpp"
 #include <string>
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_compositions
 /// @brief An ordered composition of Transform<T> instances. Is itself a Transform<T>.
 ///
 /// To any caller holding a Transform<T> reference, a Pipeline is indistinguishable from

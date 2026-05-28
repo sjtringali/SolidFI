@@ -1,14 +1,15 @@
 #pragma once
 
 /// @file Graph.hpp
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 
+#include "solidfi/l1/Blazer.hpp"
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Transform.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 /// @brief An unordered, potentially cyclic registry of Converter edges.
 ///
 /// Graph is a passive data structure — a bag of converter edges. Nodes are implied by
@@ -44,6 +45,18 @@ public:
     /// edges is handled by Solver during traversal.
     template<typename T>
     void install(Transform<T> transform);
+
+    /// @brief Decompose a Blazer and install each step as an individual edge.
+    ///
+    /// The Blazer's explicit path is disassembled: each Converter and Transform is
+    /// extracted and installed as if passed to install() directly. Steps whose identity
+    /// already exists in the Graph are silently skipped. The Blazer itself is not
+    /// installed as a single edge.
+    ///
+    /// This allows a statically-declared Blazer to seed the dynamic Graph without
+    /// duplication. The Blazer may continue to be used directly alongside Solver.
+    template<typename T, typename U, typename P = Parameters>
+    void install(Blazer<T, U, P> blazer);
 
 };
 

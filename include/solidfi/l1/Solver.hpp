@@ -1,14 +1,14 @@
 #pragma once
 
 /// @file Solver.hpp
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Graph.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 /// @brief Graph-bound path finder. Untyped: T and U are deduced at each call site.
 ///
 /// Solver is the engine of Parameterized Traversal (level 2 of 3).

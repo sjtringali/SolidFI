@@ -1,14 +1,14 @@
 #pragma once
 
 /// @file Router.hpp
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Graph.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 /// @brief A Converter<T,U,P> backed by a Graph. Pins T and U; enables the Composite rule.
 ///
 /// Router is the typed projection of path-finding onto a specific T->U pair. Where Solver

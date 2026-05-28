@@ -1,7 +1,7 @@
 #pragma once
 
 /// @file Chain.hpp
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Transform.hpp"
@@ -9,7 +9,7 @@
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_compositions
 /// @brief An ordered composition of Converter instances. Is itself a Converter<T,U,P>.
 ///
 /// To any caller holding a Converter<T,U,P> reference, a Chain is indistinguishable from

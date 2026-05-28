@@ -14,6 +14,8 @@
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Pipeline.hpp"
 #include "solidfi/l1/Chain.hpp"
+#include "solidfi/l1/Blazer.hpp"
+#include "solidfi/l1/Registry.hpp"
 #include "solidfi/l1/Generator.hpp"
 #include "solidfi/l1/Inverter.hpp"
 #include "solidfi/l1/Provider.hpp"

@@ -1,14 +1,14 @@
 #pragma once
 
 /// @file Traversal.hpp
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Graph.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_runtime
+/// @ingroup solidfi_l1_compositions
 /// @brief An algorithm that accepts a Graph and produces a result of type U.
 ///
 /// Traversal is Converter<Graph, U, P> — the Graph is the input type, and the
