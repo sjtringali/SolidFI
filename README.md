@@ -1,6 +1,20 @@
 # SolidFI
 
-SolidFI (**SOLID Functional Interfaces**) is a design specification for building composable systems out of small, strongly-typed, pluggable pieces.
+SolidFI (**SOLID Functional Interfaces**) is a typed interface specification for composable systems. It defines a small set of interfaces, derived from SOLID principles, that give explicit names and contracts to the transitions between data: the conversions, transformations, and paths that most systems leave anonymous. The interfaces compile. The semantics are defined. It is not a framework, and it is not opinionated about your architecture.
+
+You don't have to use all of it. The clearest systems still have imperative code, and SolidFI doesn't replace that. What it replaces is the glue: the hand-written dispatch tables, the anonymous middleware chains, the code-generated adapters. Name a seam with the right interface and the surrounding machinery becomes available for free, without a build step.
+
+It works top-down, decomposing a problem into typed pieces from the start, or bottom-up, fitting the interfaces onto code you've already written. Either way, each piece you name makes the next one easier to see. You can stop at one interface or go deep. The system rewards depth but never requires it.
+
+### Why SOLID
+
+Each primitive takes the SOLID principles seriously, not as guidelines but as load-bearing constraints.
+
+- **S, Single Responsibility.** Every primitive has exactly one concern. Converter converts. Transform transforms. Chain selects. Pipeline sequences. None bleeds into another.
+- **O, Open/Closed.** Install a new converter and nothing existing changes. Chain, Graph, and Runtime are all open for extension by design, closed to modification by contract.
+- **L, Liskov Substitution.** Converters of matching types can be freely swapped with each other, as can Transforms. The composite rule extends this: swap one implementation for many to extend capabilities (a Converter becomes a Chain), or swap many back for one to narrow them for testing, staging, or stubbing (a Chain becomes a single Converter to any caller).
+- **I, Interface Segregation.** The interfaces are as thin as possible. `fetch()` is one method. `apply()` is one method. You implement only what you need, and no more.
+- **D, Dependency Inversion.** Chain and Pipeline are the injection mechanism. They speak `Converter` and `Transform` respectively, so any conforming implementation drops in without the caller changing. Dependency injection is structural, not configured.
 
 ## The Problem
 
