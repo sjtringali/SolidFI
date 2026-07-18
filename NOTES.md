@@ -1,0 +1,82 @@
+# SolidFI — Working Notes
+
+Primitive summary. Not authoritative — Doxygen is the reference. Use these as a quick orientation or scratch space while the spec is actively being developed.
+
+---
+
+## L0 — Substrate
+
+Foundational concepts that inform L1. For implementers. L0 and L1 are independent.
+
+| Concept          | Shape                      | Notes                                                                    |
+| ------------------| ----------------------------| --------------------------------------------------------------------------|
+| `Operation<T>`   | `execute()`                | Unit of executable work over T                                           |
+| `Predicate<T>`   | `decide(T) -> bool`        | Single binary decision                                                   |
+| `Filter<T>`      | `accepts(T)`, `rejects(T)` | Accept/reject pair                                                       |
+| `Composite<T,U>` | `dispatch(T) -> U`         | Ordered composition substrate                                            |
+| `Strategy<T,U>`  | name + priority            | Named, prioritized entry in a Composite                                  |
+| `Delegate<T>`    | `target() -> T&`           | Object indirection. L2: `Proxy`                                          |
+| `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                         |
+| `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`          |
+| `Sentinel<T>`    | —                          | Abstract signal of absence/failure. L1: `Failed<T>`                      |
+| `Optional<T>`    | —                          | May or may not hold a T                                                  |
+| `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                  |
+| `Readonly<T>`    | —                          | A T that cannot be modified after construction                           |
+| `Parameters`     | —                          | Marker for user-defined contextual data                                  |
+| `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
+| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category. L1: `Path<T,U,P>`                             |
+| `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection -> single value                                          |
+| `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value -> collection                                        |
+
+## L1 — Primitives
+
+### Core
+
+| Concept            | Shape                | Notes                                                                 |
+| --------------------| ----------------------| ----------------------------------------------------------------------|
+| `Transform<T>`     | `apply(T) -> T`      | Takes T, produces T. Cannot fail; degrades to identity                |
+| `Converter<T,U,P>` | `fetch(T,P) -> U`    | Takes T, produces U. Failure is `Failed<T>`. P for routing            |
+| `Parameters`       | empty                | Default P across all parameterized types                              |
+| `Failed<T>`        | —                    | Explicit failure signal. Non-intrusive; type-distinct from T          |
+
+### Extras
+
+| Concept             | Shape                                  | Notes                                                     |
+| ---------------------| ----------------------------------------| -----------------------------------------------------------|
+| `Generator<T,P>`    | `Converter<Void,T,P>`                  | Produces T from nothing                                   |
+| `Inverter<T,U>`     | `Converter<T,U>`                       | Guarantees bidirectional T↔U                              |
+| `Provider<T,U>`     | `Converter<T,U>`                       | One-way lookup; I/O oriented                              |
+| `Literal<T,InputT>` | `Transform<T>` + `Converter<InputT,T>` | Captures a T; satisfies both hierarchies. L0: `Closed<T>` |
+
+### State
+
+| Concept          | Shape                       | Notes                                                     |
+| ------------------| -----------------------------| -----------------------------------------------------------|
+| `Delta<T>`       | marker                      | The change between two states of T; named and first-class |
+| `Differencer<T>` | `Converter<T, Delta<T>, T>` | Current + previous state → delta                          |
+| `Applicator<T>`  | `Converter<T, T, Delta<T>>` | Current state + delta → next state                        |
+
+### Compositions
+
+| Concept          | Shape                     | Notes                                                                                                                                           |
+| ------------------| ---------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Pipeline<T>`    | `run(T) -> T`             | Ordered composition of `Transform<T>`. Is itself a `Transform<T>`                                                                               |
+| `Chain<T,U,P>`   | `resolve(T,P) -> U`       | Ordered composition of `Converter`. Is itself a `Converter<T,U,P>`                                                                              |
+| `Path<T,U,P>`    | `traverse(T,P) -> U`      | Explicitly-wired T→...→U path. IS-A `Converter<T,U,P>`. `to()` adds a step; `toEither()` adds a Chain; `through()` adds a Pipeline. Can seed a `Graph`. |
+| `Registry<T>`    | —                         | Runtime complement to Extensible. Shape TBD.                                                                                                    |
+| `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act                                                                                      |
+| `Solver`         | `solve<T,U>(T,P) -> U`    | Graph bound at construction; untyped; one instance, any T→U path                                                                               |
+| `Router<T,U,P>`  | `Converter<T,U,P>`        | Graph bound at construction; T,U fixed; enables the Composite rule                                                                              |
+
+## L2 — Domain Patterns
+
+Stubs. Built on L1 primitives. Not yet fully specified.
+
+| Concept         | Notes                                                          |
+| -----------------| ----------------------------------------------------------------|
+| `Protocol`      | Encoding and framing contract for a communication exchange     |
+| `Transport`     | Physical or logical transmission channel                       |
+| `Serialization` | Converter between in-memory representation and serialized form |
+| `Proxy`         | Optional interception on a Converter; opt-in, default-off      |
+| `Roundtrip`     | Bidirectional communication; builds on `Inverter<T,U>`         |
+| `Runtime`       | Graph with dynamic plugin-loading machinery                    |
