@@ -29,8 +29,8 @@ namespace solidfi {
 /// @tparam T The captured and produced type; free generic, owned by the user.
 /// @tparam InputT The input type for the Converter interface. Defaults to T.
 /// @note L0 mapping: Closed<T>
-template<typename T, typename InputT = T>
-class Literal : public Transform<T>, public Converter<InputT, T> {
+template<typename T, typename InputT = T, typename P = Parameters>
+class Literal : public Transform<T, P>, public Converter<InputT, T, P> {
 public:
     /// @brief Capture an initial value.
     explicit Literal(T value);
@@ -44,13 +44,13 @@ public:
     bool accepts(T value) const override { return true; }
     bool rejects(T value) const override { return false; }
 
-    /// @brief Return the captured value. The input is ignored.
-    T apply(T) override;
+    /// @brief Return the captured value. The input and parameters are ignored.
+    T apply(T, P) override;
 
     /// @brief Return the captured value. The input and parameters are ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T fetch(InputT, Parameters) override;
+    T fetch(InputT, P) override;
 };
 
 } // namespace solidfi

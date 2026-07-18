@@ -23,10 +23,11 @@ namespace solidfi {
 ///
 /// **Filtering rule:**
 /// @code
-///   if (!rejects(value) && accepts(value)) → attempt fetch()
+///   if (accepts(value) && !rejects(value) && handles(params)) → attempt fetch()
 /// @endcode
-/// accepts() and rejects() are an optimization — a converter with neither implemented is
-/// always attempted. Selection is only final when fetch() succeeds.
+/// All three must pass; evaluation order is unspecified and implementation-defined.
+/// A converter with none overridden is always attempted.
+/// Selection is only final when fetch() succeeds.
 ///
 /// A Chain may optionally have a prepare Transform<T> applied before dispatching to fetch(),
 /// and a finalize `Transform<U>` applied after a successful fetch(). Either may be a Pipeline<T>
@@ -42,9 +43,10 @@ namespace solidfi {
 /// modifying the Graph — see Proxy (L2).
 ///
 /// **Invariants:**
-/// - Priority determines execution order. Duplicate priorities result in undefined ordering.
+/// - Priority determines execution order. Duplicate priorities are rejected — install() MUST
+///   fail (throw or return an error) rather than silently produce undefined ordering.
 /// - Names are group keys: multiple entries may share a name. remove(name) removes all.
-/// - If no converter succeeds, the chain fails (returns Sentinel<U>::value()).
+/// - If no converter succeeds, the chain fails (returns Failed<T>).
 /// - prepare and finalize are optional; absent means no transform applied.
 ///
 /// @tparam T source type; free generic, owned by the user.
@@ -64,15 +66,15 @@ public:
 
     /// @brief Optional transform applied to the input before dispatching to fetch().
     ///
-    /// May be a Pipeline<T> — the composite rule ensures any Transform<T> satisfies this slot.
+    /// May be a Pipeline<T,P> — the composite rule ensures any Transform<T,P> satisfies this slot.
     /// Null means no prepare transform is applied.
-    Transform<T>* prepare = nullptr;
+    Transform<T, P>* prepare = nullptr;
 
     /// @brief Optional transform applied to the result after a successful fetch().
     ///
-    /// May be a `Pipeline<U>` — the composite rule ensures any `Transform<U>` satisfies this slot.
+    /// May be a Pipeline<U,P> — the composite rule ensures any Transform<U,P> satisfies this slot.
     /// Null means no finalize transform is applied.
-    Transform<U>* finalize = nullptr;
+    Transform<U, P>* finalize = nullptr;
 
     bool accepts(T value) const override;
     bool rejects(T value) const override;

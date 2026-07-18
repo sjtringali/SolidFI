@@ -22,16 +22,17 @@ namespace solidfi {
 ///
 /// **Filtering rule** (shared with Chain):
 /// @code
-///   if (!rejects(value) && accepts(value)) → attempt fetch()
+///   if (accepts(value) && !rejects(value) && handles(params)) → attempt fetch()
 /// @endcode
-/// accepts() and rejects() are optimizations — a converter with neither implemented is
-/// always attempted via fetch(). They MUST be stateless, synchronous, and side-effect-free.
-/// They MUST NOT depend on P; that logic belongs in fetch().
+/// All three must pass; evaluation order is unspecified and implementation-defined.
+/// A converter with none overridden is always attempted. Each method has one concern:
+/// accepts() and rejects() MUST NOT depend on P; handles() MUST NOT depend on T.
 ///
 /// **Invariants:**
-/// - accepts() and rejects() MUST be stateless and synchronous.
+/// - accepts(), rejects(), and handles() MUST be stateless and synchronous.
 /// - accepts() and rejects() MUST NOT depend on P.
-/// - fetch() MAY fail; returns Sentinel<U>::value() on failure. MUST NOT throw.
+/// - handles() MUST NOT depend on T.
+/// - fetch() MAY fail; returns Failed<T> on failure. MUST NOT throw.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -48,7 +49,13 @@ public:
     /// Evaluated before accepts(). A converter that rejects is never attempted via fetch().
     virtual bool rejects(T value) const { return false; }
 
-    /// @brief Perform the conversion. Returns Sentinel<U>::value() on failure.
+    /// @brief Returns true if this converter can handle these parameters. Default: true.
+    ///
+    /// Evaluated after accepts(). A converter that does not handle the parameters is
+    /// never attempted via fetch(). MUST NOT depend on T — that belongs in accepts().
+    virtual bool handles(P params) const { return true; }
+
+    /// @brief Perform the conversion. Returns Failed<T> on failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     /// @note Never throws. Sentinel is a returned value, not a control flow path.
