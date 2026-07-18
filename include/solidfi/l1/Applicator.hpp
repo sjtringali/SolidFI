@@ -9,6 +9,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_state
+/// @reserved
 /// @brief Given a current state T and a Delta<T> (as P), produces the next state T.
 ///
 /// Applicator is Converter<T, T, Delta<T>> — the delta flows in as the parameter P.

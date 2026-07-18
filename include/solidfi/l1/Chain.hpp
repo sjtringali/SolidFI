@@ -11,6 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @accepted
 /// @brief An ordered composition of Converter instances. Is itself a Converter<T,U,P>.
 ///
 /// To any caller holding a Converter<T,U,P> reference, a Chain is indistinguishable from

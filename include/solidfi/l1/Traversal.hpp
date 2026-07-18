@@ -9,6 +9,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @reserved
 /// @brief An algorithm that accepts a Graph and produces a result of type U.
 ///
 /// Traversal is Converter<Graph, U, P> — the Graph is the input type, and the

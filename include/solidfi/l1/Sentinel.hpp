@@ -6,6 +6,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+/// @proposed
 /// @brief Non-intrusive declaration of the failure sentinel for type U.
 ///
 /// Specialize Sentinel<U> to declare which value of U represents a failed fetch().

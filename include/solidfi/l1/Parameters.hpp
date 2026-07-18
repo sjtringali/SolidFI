@@ -3,9 +3,12 @@
 /// @file Parameters.hpp
 /// @ingroup solidfi_l1_structural
 
+
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+
+/// @accepted
 /// @brief Named marker type for user-defined contextual data passed into Converter::fetch.
 ///
 /// Parameters is the default type for the P template parameter across all SolidFI primitives

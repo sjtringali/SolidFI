@@ -10,6 +10,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @proposed
 /// @brief An unordered, potentially cyclic registry of Converter edges.
 ///
 /// Graph is a passive data structure — a bag of converter edges. Nodes are implied by

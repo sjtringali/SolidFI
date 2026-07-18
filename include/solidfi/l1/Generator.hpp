@@ -8,6 +8,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+/// @reserved
 /// @brief Produces a value of type T from nothing.
 ///
 /// Generator is conceptually Converter<void, T, P> — a conversion with no meaningful input.

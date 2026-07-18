@@ -8,6 +8,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+/// @reserved
 /// @brief A Converter that guarantees bidirectional conversion between T and U.
 ///
 /// An Inverter can convert T to U (forward) and U to T (reverse). The bidirectionality

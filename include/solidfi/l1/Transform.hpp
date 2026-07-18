@@ -3,11 +3,14 @@
 /// @file Transform.hpp
 /// @ingroup solidfi_l1_structural
 
+
 #include "solidfi/l1/Parameters.hpp"
 
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+
+/// @accepted
 /// @brief Takes a value of type T and produces a value of type T.
 ///
 /// Input and output are the same type. A Transform cannot fail — it MUST return the

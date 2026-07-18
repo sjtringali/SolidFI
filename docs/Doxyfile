@@ -57,6 +57,13 @@ TREEVIEW_WIDTH         = 300
 ENUM_VALUES_PER_LINE   = 1
 
 #---------------------------------------------------------------------------
+# Custom tags — spec lifecycle status
+#---------------------------------------------------------------------------
+ALIASES += proposed="@par Status: Proposed\n Shape is defined; under review."
+ALIASES += accepted="@par Status: Accepted\n Spec is settled and stable."
+ALIASES += reserved="@par Status: Reserved\n Name is claimed; spec deliberately deferred."
+
+#---------------------------------------------------------------------------
 # No LaTeX, no other formats
 #---------------------------------------------------------------------------
 GENERATE_LATEX         = NO

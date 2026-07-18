@@ -3,11 +3,14 @@
 /// @file Converter.hpp
 /// @ingroup solidfi_l1_structural
 
+
 #include "solidfi/l1/Parameters.hpp"
 
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+
+/// @accepted
 /// @brief Takes a value of type T and produces a value of type U.
 ///
 /// T and U are typically different types — this is a genuine conversion, not a

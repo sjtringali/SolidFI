@@ -3,9 +3,12 @@
 /// @file Failed.hpp
 /// @ingroup solidfi_l1_structural
 
+
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+
+/// @accepted
 /// @brief Explicit failure signal returned by a Converter to indicate fetch() did not succeed.
 ///
 /// Failed<T> is a type-distinct failure signal — separate from T's value space entirely.

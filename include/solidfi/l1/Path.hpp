@@ -11,6 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @proposed
 /// @brief An explicitly-wired, multi-stage conversion path. Is itself a Converter<T,U,P>.
 ///
 /// Where Solver finds a path through a Graph at runtime, Path declares one at construction.

@@ -9,6 +9,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @proposed
 /// @brief Graph-bound path finder. Untyped: T and U are deduced at each call site.
 ///
 /// Solver is the engine of Parameterized Traversal (level 2 of 3).

@@ -6,6 +6,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @proposed
 /// @brief Named collection of runtime objects. Runtime complement to Extensible.
 ///
 /// @note Not yet specified. Shape TBD pending implementation.

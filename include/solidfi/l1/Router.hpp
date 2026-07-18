@@ -9,6 +9,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
+/// @reserved
 /// @brief A Converter<T,U,P> backed by a Graph. Pins T and U; enables the Composite rule.
 ///
 /// Router is the typed projection of path-finding onto a specific T->U pair. Where Solver

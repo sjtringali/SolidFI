@@ -9,6 +9,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
+/// @proposed
 /// @brief Captures a value of type T and produces it regardless of input.
 ///
 /// Literal simultaneously satisfies both Transform<T> and Converter<InputT,T> — it is
