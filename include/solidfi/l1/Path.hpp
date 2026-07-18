@@ -20,8 +20,9 @@ namespace solidfi {
 ///
 /// Steps are added via the builder interface:
 /// - to() advances the type (T->V) by adding a single Converter.
-/// - toEither() advances the type (T->V) by adding a Chain of Converters - first to accept wins.
-/// - through() holds the type (T->T) by composing one or more Transforms into a Pipeline.
+/// - toEither() advances the type (T->V) by adding a Chain of Converters — first to succeed wins.
+/// - through() holds the type (T->T) by adding a single Transform.
+/// - throughAll() holds the type (T->T) by composing multiple Transforms into a Pipeline.
 ///
 /// Path is the static complement to Solver: prefer Path when the route is known and
 /// fixed; prefer Solver when the route is discovered or varies at runtime.
@@ -52,12 +53,18 @@ public:
     template<typename V, typename... Cs>
     Path<T, V, P> toEither(Cs... converters);
 
-    /// @brief Add one or more Transforms that hold the current end type.
+    /// @brief Add a Transform that holds the current end type.
     ///
-    /// Multiple arguments are composed into a Pipeline<U>.
+    /// Returns Path<T,U,P> so further calls can be chained.
+    /// C++ implementations may accept N transforms as a vararg overload of through().
+    Path<T, U, P> through(Transform<U, P> transform);
+
+    /// @brief Add N > 1 Transforms that hold the current end type, composed into a Pipeline.
+    ///
+    /// Requires at least two transforms — use through() for a single transform.
     /// Returns Path<T,U,P> so further calls can be chained.
     template<typename... Ts>
-    Path<T, U, P> through(Ts... transforms);
+    Path<T, U, P> throughAll(Ts... transforms);
 
     /// @brief Execute the path. Friendly alias for fetch().
     ///

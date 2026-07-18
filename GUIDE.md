@@ -2,6 +2,23 @@
 
 This guide walks through SolidFI from first principles using a running example. The code is illustrative TypeScript — close to real, but not a working program.
 
+## Contents
+
+1. [Getting Started](#getting-started)
+2. [A Different Approach](#a-different-approach)
+3. [Static Composition with Path](#static-composition-with-path)
+4. [Parameters](#parameters)
+5. [Multiple Choices at One Step](#multiple-choices-at-one-step)
+6. [Failed&lt;T&gt;](#failedt)
+7. [Transform](#transform)
+8. [Pipeline](#pipeline)
+9. [From Static Composition to Dynamic](#from-static-composition-to-dynamic)
+10. [Keep Going](#keep-going)
+11. [Extending the System at Runtime](#extending-the-system-at-runtime)
+12. [Parameterized Traversal, Level 1](#parameterized-traversal-level-1--choosing-from-multiple-handlers)
+13. [Parameterized Traversal, Level 2](#parameterized-traversal-level-2--routing-by-request)
+14. [Parameterized Traversal, Level 3](#parameterized-traversal-level-3--proxying-and-alternate-routes)
+
 ---
 
 ## Getting Started
@@ -72,25 +89,210 @@ Now each one can be tested independently, because they are structured from the b
 
 ## Static Composition with Path
 
-The four converters above still need glue code to connect them. You could call each `fetch()` manually in sequence, but SolidFI has a better answer: `Path`. You wire the path explicitly at construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
+The four converters above still need glue code to connect them. The obvious next step is to wire them by hand:
+
+```typescript
+  const blob = new FileReader().fetch(filename);
+  const xml  = new Unzipper().fetch(blob);
+  const page = new Parser().fetch(xml);
+  const html = new Renderer().fetch(page);
+```
+
+That works, but it's mechanical — just threading output to input, over and over. The types already encode exactly what connects to what. SolidFI has a better answer: `Path`. You declare the same sequence as a construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
 
 ```typescript
   const path = new Path<Filename>()
-    .to(new FileReader())                               // Filename -> Blob
-    .to(new Unzipper())                                 // Blob -> XML
-    .toEither(new TextParser(), new ImageParser())      // XML -> Page: each declares what it handles
-    .to(new Renderer());                                // Page -> HTML
+    .to(new FileReader())     // Filename -> Blob
+    .to(new Unzipper())       // Blob -> XML
+    .to(new Parser())         // XML -> Page
+    .to(new Renderer());      // Page -> HTML
 
   const html = path.traverse('document.odt');
 ```
 
-All the interesting work is in construction — `to()` advances the type, `toEither()` declares a Chain at that step, `through()` applies transforms that hold the type. The external shape is always `Converter<Start, End>`.
-
-`toEither()` with multiple converters declares a `Chain` at that step. Each converter uses `accepts()` and `rejects()` to say what it handles; the chain tries them in order until one succeeds. Here, page 34 turns out not to be text at all — it's one big embedded image. `TextParser` rejects it; `ImageParser` accepts it. Both produce a `Page`, so `Renderer` never knows the difference.
+All the interesting work is in construction — `to()` advances the type, `through()` applies transforms that hold the type. The external shape is always `Converter<Start, End>`.
 
 Path is the static answer: the path is known, fixed, and declared. When you don't know the path in advance, read on.
 
-But Path and Solver aren't opposites — a Path can seed a Runtime. The path is disassembled, and each converter and transform is installed into the Graph individually. Duplicates are silently discarded. This means you can build an explicit path with Path, use it directly, and hand the same Path to the dynamic system — no rewriting, no duplication. Path can be the thing that builds the Graph that Solver traverses.
+## Parameters
+
+The document could be five hundred pages. If someone wants to view page 34, parsing all five hundred pages first is wasteful. What we really want is to pass that intent into the conversion:
+
+```typescript
+  const html = path.traverse('document.odt', { page: 34 });
+```
+
+This is already there. `Converter<T,U,P>` has always had a third slot — it just defaulted to empty `Parameters`. The whole path has been carrying P all along, passing it to every converter in sequence. Most of them don't care and ignore it. The one that does — say, `Parser` — reads it in `fetch()` and only processes the requested page:
+
+```typescript
+  type ViewParams = { page?: number };
+
+  class Parser implements Converter<XML, Page, ViewParams> {
+    fetch(xml: XML, params: ViewParams): Page {
+      return params.page !== undefined
+        ? parseOnePage(xml, params.page)
+        : parseAll(xml);
+    }
+  }
+```
+
+`FileReader`, `Unzipper`, and `Renderer` don't change. They declare `ViewParams` as their P and simply ignore it in `fetch()`. The compiler enforces that P is consistent across the path — you can't accidentally drop it or pass the wrong type. The intent flows end-to-end, each converter taking what it needs and ignoring the rest.
+
+## Multiple Choices at One Step
+
+Now a different wrinkle. Page 34 turns out not to be text at all — it's one big embedded image. `Parser` can't handle it. We need a `TextParser` and an `ImageParser`, both producing `Page`, with the right one selected at runtime.
+
+The obvious first move is a delegate — a `PageParser` that holds both and tries them in order:
+
+```typescript
+  class PageParser implements Converter<XML, Page, ViewParams> {
+    fetch(xml: XML, params: ViewParams): Page | null {
+      if (isImagePage(xml)) return new ImageParser().fetch(xml, params);
+      return new TextParser().fetch(xml, params);
+    }
+  }
+
+  const path = new Path<Filename>()
+    .to(new FileReader())
+    .to(new Unzipper())
+    .to(new PageParser())     // XML -> Page: delegates internally
+    .to(new Renderer());
+```
+
+This works. And notice: `PageParser` is a `Converter<XML, Page, ViewParams>` — it drops straight into the path without any changes to the surrounding code. That's the composite rule: to any caller, `PageParser` is indistinguishable from `TextParser` or `ImageParser`. You can always swap one for the other.
+
+But `PageParser` is mechanical. It's just a hardcoded dispatch — the kind of code that grows a new `if` every time a new page type appears. The interesting logic is already in `TextParser` and `ImageParser` via `accepts()`. `PageParser` adds nothing except repetition.
+
+`Chain` removes the repetition. It's an ordered composition of converters, each declaring what it handles, tried in priority order until one succeeds:
+
+```typescript
+  const xmlToPage = new Chain<XML, Page, ViewParams>()
+    .install(1, 'text',  new TextParser())
+    .install(2, 'image', new ImageParser());
+
+  const path = new Path<Filename>()
+    .to(new FileReader())
+    .to(new Unzipper())
+    .to(xmlToPage)            // same slot, same interface, no PageParser
+    .to(new Renderer());
+```
+
+`Chain` IS-A `Converter<XML, Page, ViewParams>` — it slots in exactly where `PageParser` was. The path doesn't change. `Renderer` never knows. Adding a new page type is now just `xmlToPage.install(3, 'table', new TableParser())` — no delegate to update.
+
+And if this choice is local to one path, even the named `xmlToPage` is more than you need. `toEither()` builds the Chain inline:
+
+```typescript
+  const path = new Path<Filename>()
+    .to(new FileReader())
+    .to(new Unzipper())
+    .toEither(new TextParser(), new ImageParser())
+    .to(new Renderer());
+```
+
+Three steps, same result. Most of the code you needed to write was already written.
+
+## Failed&lt;T&gt;
+
+Chain needs to know when a `fetch()` didn't succeed so it can try the next converter. SolidFI uses `Failed<T>` for this — but what `Failed<T>` actually *is* is left entirely to you.
+
+`fetch()` is expected to be asynchronous. That means it can fail for reasons that have nothing to do with T or P — a network timeout, a file that disappeared, a service that's down. `accepts()`, `rejects()`, and `handles()` can't see any of that; they're fast, synchronous gates that reason only about the inputs. `Failed<T>` is what bridges the gap: it lets `fetch()` signal failure at runtime, whatever the cause, so Chain can respond — try the next converter, escalate, or give up cleanly.
+
+`null` is a perfectly valid choice, as long as your type allows it. In TypeScript that might mean `Page | null`, `Page | undefined`, a `Symbol`, or an empty sentinel object. In C++ it might be `std::optional<Page>`. There are no constraints — SolidFI just needs to be able to tell success from failure, and you define what failure looks like for your type.
+
+The reason it isn't built in is flexibility. A `Page` in one system might use `null`; in another it might be an `Optional<Page>`; in a third it might be a discriminated union. Forcing a single representation would mean either restricting which types can participate in a Chain, or wrapping every return value in a container you didn't choose. Neither is acceptable.
+
+Here's what it looks like in practice. We declare that `null` means failure for `Page`, and `TextParser` returns it when it encounters something it can't handle:
+
+```typescript
+  // Declare what failure looks like for Page
+  type Failed<Page> = null;
+
+  class TextParser implements Converter<XML, Page, ViewParams> {
+    accepts(xml: XML): boolean {
+      return !isImagePage(xml);   // fast gate: don't even try if it's an image
+    }
+
+    fetch(xml: XML, params: ViewParams): Page | null {
+      if (isImagePage(xml)) return null;  // shouldn't get here, but defensive
+      return parseText(xml, params);
+    }
+  }
+
+  class ImageParser implements Converter<XML, Page, ViewParams> {
+    accepts(xml: XML): boolean {
+      return isImagePage(xml);
+    }
+
+    fetch(xml: XML, params: ViewParams): Page | null {
+      if (!isImagePage(xml)) return null;
+      return parseImage(xml, params);
+    }
+  }
+```
+
+Chain sees `null` come back from `TextParser`, recognises it as `Failed<Page>`, and moves on to `ImageParser`. The Chain wiring doesn't change — you just told it what failure looks like for your type.
+
+## Transform
+
+Unlike converters, transforms cannot fail. A `Transform<T>` takes a T and returns a T — the same type in and out, always. If a transform can't do anything useful with its input, it returns the original value unchanged. There is no failure path, no `Failed<T>`, no sentinel. The degradation floor is identity.
+
+That constraint is what makes them composable without ceremony. Say we want the reader to support color blindness correction — adjusting the rendered HTML so the colors work for users with deuteranopia. That's a Transform<HTML>: same type in and out, never fails.
+
+```typescript
+  class DeuteranopiaFilter implements Transform<HTML> {
+    apply(html: HTML, params: Parameters): HTML {
+      return adjustColorsForDeuteranopia(html);
+    }
+  }
+```
+
+We add it to the path with `through()`:
+
+```typescript
+  const path = new Path<Filename>()
+    .to(new FileReader())
+    .to(new Unzipper())
+    .toEither(new TextParser(), new ImageParser())
+    .to(new Renderer())
+    .through(new DeuteranopiaFilter());   // HTML -> HTML
+```
+
+The caller still holds a `Converter<Filename, HTML>`. The transform is invisible behind the interface.
+
+## Pipeline
+
+Now we want to also increase font size for visual acuity. That's another `Transform<HTML>` — independent of colorblindness correction, and for a different user need. We can add it as a second `through()`:
+
+```typescript
+  const path = new Path<Filename>()
+    ...
+    .to(new Renderer())
+    .through(new DeuteranopiaFilter())
+    .through(new FontSizeTransform());
+```
+
+Or use `throughAll()` — the inline form that composes multiple transforms in one call:
+
+```typescript
+    .throughAll(new DeuteranopiaFilter(), new FontSizeTransform());
+``` But what if these two transforms belong to an accessibility module, assembled together and handed to the path as a unit? That's `Pipeline` — an ordered composition of transforms that is itself a `Transform<T>`.
+
+```typescript
+  const accessibility = new Pipeline<HTML>()
+    .install(1, 'colorblind', new DeuteranopiaFilter())
+    .install(2, 'font-size',  new FontSizeTransform());
+
+  const path = new Path<Filename>()
+    ...
+    .to(new Renderer())
+    .through(accessibility);
+```
+
+The path doesn't know or care that `accessibility` is a Pipeline. It holds a `Transform<HTML>` — and Pipeline IS-A `Transform<HTML>`. The composite rule again: to any caller, a Pipeline is indistinguishable from a single transform.
+
+A transform that rejects its input is skipped; the next one in priority order runs instead. If none run, the Pipeline returns the original value unchanged — it degrades to identity, the same floor every Transform guarantees.
+
+Transforms aren't limited to the output end of a path. A `Transform<XML>` could normalize whitespace before parsing; a `Transform<Blob>` could strip a header before unzipping. They can live at any stage — `through()` works wherever the type matches.
 
 ## From Static Composition to Dynamic
 
