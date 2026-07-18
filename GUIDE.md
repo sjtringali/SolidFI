@@ -236,15 +236,25 @@ Chain sees `null` come back from `TextParser`, recognises it as `Failed<Page>`, 
 
 Unlike converters, transforms cannot fail. A `Transform<T>` takes a T and returns a T — the same type in and out, always. If a transform can't do anything useful with its input, it returns the original value unchanged. There is no failure path, no `Failed<T>`, no sentinel. The degradation floor is identity.
 
-That constraint is what makes them composable without ceremony. Say we want the reader to support color blindness correction — adjusting the rendered HTML so the colors work for users with deuteranopia. That's a Transform<HTML>: same type in and out, never fails.
+That constraint is what makes them composable without ceremony. Say we want the reader to support color blindness correction — adjusting the rendered HTML so the colors work for users with deuteranopia. That's a `Transform<HTML>`: same type in and out, never fails.
+
+But it should only run when the user asked for it. That's what `handles(P)` is for — the same P flowing through the whole path now serves double duty: routing the document request *and* declaring which transforms should apply.
 
 ```typescript
-  class DeuteranopiaFilter implements Transform<HTML> {
-    apply(html: HTML, params: Parameters): HTML {
+  type ViewParams = { page?: number; colorBlind?: 'deuteranopia' | 'protanopia' };
+
+  class DeuteranopiaFilter implements Transform<HTML, ViewParams> {
+    handles(params: ViewParams): boolean {
+      return params.colorBlind === 'deuteranopia';
+    }
+
+    apply(html: HTML, params: ViewParams): HTML {
       return adjustColorsForDeuteranopia(html);
     }
   }
 ```
+
+If `colorBlind` isn't set, `handles()` returns false and the transform is skipped — the HTML passes through unchanged. No conditional logic in the caller, no separate code path. The transform declares its own activation condition.
 
 We add it to the path with `through()`:
 
@@ -261,7 +271,23 @@ The caller still holds a `Converter<Filename, HTML>`. The transform is invisible
 
 ## Pipeline
 
-Now we want to also increase font size for visual acuity. That's another `Transform<HTML>` — independent of colorblindness correction, and for a different user need. We can add it as a second `through()`:
+Now we want to also increase font size for visual acuity. That's another `Transform<HTML, ViewParams>` — independent of colorblindness correction, and for a different user need. It also declares its own activation condition:
+
+```typescript
+  type ViewParams = { page?: number; colorBlind?: 'deuteranopia' | 'protanopia'; largeText?: boolean };
+
+  class FontSizeTransform implements Transform<HTML, ViewParams> {
+    handles(params: ViewParams): boolean {
+      return params.largeText === true;
+    }
+
+    apply(html: HTML, params: ViewParams): HTML {
+      return increaseFontSize(html);
+    }
+  }
+```
+
+We can add it as a second `through()`:
 
 ```typescript
   const path = new Path<Filename>()
@@ -275,10 +301,12 @@ Or use `throughAll()` — the inline form that composes multiple transforms in o
 
 ```typescript
     .throughAll(new DeuteranopiaFilter(), new FontSizeTransform());
-``` But what if these two transforms belong to an accessibility module, assembled together and handed to the path as a unit? That's `Pipeline` — an ordered composition of transforms that is itself a `Transform<T>`.
+```
+
+But what if these two transforms belong to an accessibility module, assembled together and handed to the path as a unit? That's `Pipeline` — an ordered composition of transforms that is itself a `Transform<T,P>`.
 
 ```typescript
-  const accessibility = new Pipeline<HTML>()
+  const accessibility = new Pipeline<HTML, ViewParams>()
     .install(1, 'colorblind', new DeuteranopiaFilter())
     .install(2, 'font-size',  new FontSizeTransform());
 
@@ -288,7 +316,9 @@ Or use `throughAll()` — the inline form that composes multiple transforms in o
     .through(accessibility);
 ```
 
-The path doesn't know or care that `accessibility` is a Pipeline. It holds a `Transform<HTML>` — and Pipeline IS-A `Transform<HTML>`. The composite rule again: to any caller, a Pipeline is indistinguishable from a single transform.
+The path doesn't know or care that `accessibility` is a Pipeline. It holds a `Transform<HTML, ViewParams>` — and Pipeline IS-A `Transform<HTML, ViewParams>`. The composite rule again: to any caller, a Pipeline is indistinguishable from a single transform.
+
+Each transform inside the Pipeline still makes its own `handles()` decision. If the user didn't request colorblind correction, `DeuteranopiaFilter` is skipped. If they didn't request larger text, `FontSizeTransform` is skipped. If neither applies, the Pipeline degrades to identity — the HTML passes through unchanged.
 
 A transform that rejects its input is skipped; the next one in priority order runs instead. If none run, the Pipeline returns the original value unchanged — it degrades to identity, the same floor every Transform guarantees.
 
