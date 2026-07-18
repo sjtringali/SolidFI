@@ -184,23 +184,14 @@ public:
 /// by walking the graph.
 ///
 /// @tparam U destination type; the result produced by this traversal.
-/// @note L1 mapping: Solver - binds a Graph at construction rather than accepting it as input.
+/// @note L1 mapping: Path<T,U,P> — a Traversal with endpoints T and U fixed. May be
+///   constructed explicitly or returned as the result of path-finding (e.g. by Solver).
 template<typename U>
 class Traversal {
 public:
     virtual U traverse(Category graph) = 0;
 };
 
-/// @ingroup solidfi_l0
-/// @brief Reserved. A found path through a Category from one type to another.
-///
-/// Represents the concrete result of path-finding: an ordered sequence of arrows
-/// (converters) connecting one object (type) to another. Distinct from Traversal,
-/// which is the algorithm; this is what the algorithm finds.
-///
-/// @todo Name TBD. Candidates: Path, Trail, Track.
-class FoundPath {
-};
 
 /// @ingroup solidfi_l0
 /// @brief Reduces a collection of T to a single T (fold).

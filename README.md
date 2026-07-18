@@ -275,8 +275,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                  |
 | `Parameters`     | —                          | Marker for user-defined contextual data                                  |
 | `Category`       | -                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`        |
-| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category; produces U. L1: `Solver`                      |
-| `FoundPath`      | -                          | Reserved. A found path through a Category; name TBD (Trail? Track?)      |
+| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category; produces U. L1: `Path<T,U,P>`                 |
 | `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection -> single value                                          |
 | `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value -> collection                                        |
 

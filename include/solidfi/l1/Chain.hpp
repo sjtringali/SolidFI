@@ -4,6 +4,7 @@
 /// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
+#include "solidfi/l1/Failed.hpp"
 #include "solidfi/l1/Transform.hpp"
 #include <string>
 
