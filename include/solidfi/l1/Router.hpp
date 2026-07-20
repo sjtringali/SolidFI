@@ -6,6 +6,7 @@
 /// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
+#include "solidfi/l1/Graph.hpp"
 #include "solidfi/l1/Solver.hpp"
 
 namespace solidfi {
@@ -38,7 +39,10 @@ namespace solidfi {
 template<typename T, typename U, typename P = Parameters>
 class Router : public Converter<T, U, P> {
 public:
-    /// @brief Bind this Router to a Solver.
+    /// @brief Bind this Router to a Graph. Creates a default Solver internally.
+    explicit Router(Graph graph);
+
+    /// @brief Bind this Router to an explicit Solver. Use when traversal strategy matters.
     explicit Router(Solver<T, U, P> solver);
 
     bool accepts(T value) const override;
