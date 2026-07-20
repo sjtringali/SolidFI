@@ -1,10 +1,6 @@
 # SolidFI
 
-SolidFI (**SOLID Functional Interfaces**) is a typed interface specification for composable systems. It defines a small set of interfaces, derived from SOLID principles, that give explicit names and contracts to the transitions between data: the conversions, transformations, and paths that most systems leave anonymous. The interfaces compile. The semantics are defined. It is not a framework, and it is not opinionated about your architecture.
-
-You don't have to use all of it. The clearest systems still have imperative code, and SolidFI doesn't replace that. What it replaces is the glue: the hand-written dispatch tables, the anonymous middleware chains, the code-generated adapters. Name a seam with the right interface and the surrounding machinery becomes available for free, without a build step.
-
-It works top-down, decomposing a problem into typed pieces from the start, or bottom-up, fitting the interfaces onto code you've already written. Either way, each piece you name makes the next one easier to see. You can stop at one interface or go deep. The system rewards depth but never requires it.
+SolidFI (**SOLID Implmentation for Functional Interfaces**) is a typed interface specification for composable systems. It defines a small set of interfaces, derived from SOLID principles, that give explicit names and contracts to the transitions between data: the conversions, transformations, and paths that most systems leave anonymous. The interfaces compile. The semantics are defined. It is not a framework, and it is not opinionated about your architecture.
 
 ### Why SOLID
 
@@ -18,67 +14,65 @@ Each primitive takes the SOLID principles seriously, not as guidelines but as lo
 
 ## The Problem
 
-Object-oriented design gives you names and structure, but usually locks composition in at design time. Pure functional design gives you fluid composition, but usually at the cost of types, names, and the sense of where one thing ends and another begins.
-
-Determinism is a first-class value — because flexibility that makes behavior unpredictable isn't flexibility, so much as chaos with a nicer name.
-
-Neither is wrong. But neither is complete.
+Object-oriented design gives you names and structure, but usually locks composition in at design time. Pure functional design gives you fluid composition, but usually at the cost of types, names, and the sense of where one thing ends and another begins. SolidFI aims to bridge that gap by landing at the sweet spot in the middle, where you have the best parts of both.
 
 ## The Idea
 
 Data is simple. What's interesting is what happens between data: the transitions, the transformations, the paths from one form to another. Most systems treat those transitions as second-class citizens: anonymous functions, implicit middleware, tangled pipelines.
 
-SolidFI treats them as the primary thing. Transitions have names and types. Not because that's what makes composition possible, but because that's what makes it *legible*. You can read a composition and understand it. You can trace it when it breaks. You can reason about it as a typed system before anything runs. And when something goes wrong at runtime, you can see where it actually is, or at least have a better idea where to look.
+SolidFI treats the data and transitions between them as the primary thing. Transitions have names and types. Not because that's what makes composition possible, but because that's what makes it *legible*. You can read a composition and understand it, trace it when it breaks, and  about it as a typed system before anything runs. When something goes wrong at runtime, you can better see where the problem is, instead of looking at big stack filled mostly of anonymous functions and asynchronous continuations.
 
 ## Composition is the Point
 
-Small pieces that know only their own contract, assembled in explicit order, routing by self-declaration rather than external configuration. The structure is the configuration. Determinism is the default, non-determinism has to be earned.
+Small pieces that know only their own contract, are assembled in explicit order, and route by self-declaration rather than external configuration. The structure is the configuration. 
 
-Registries and discovery are real problems, and SolidFI doesn't pretend otherwise. It aims to express them in ways that are readable, typed, and composable rather than bolted on as an afterthought.
+Determinism is also a first-class value. Because flexibility that makes behavior unpredictable isn't flexibility, so much as chaos with a nicer name. So, determinism is the default, non-determinism has to be earned.
+
+Registries and discovery are real problems though, and SolidFI doesn't pretend otherwise. It aims to express them in ways that are readable, typed, and composable rather than bolted on as an afterthought.
 
 Bring your existing code. The interfaces are thin by design.
 
-## Levels
-
-**L1 is the primary surface.** Users write against L1. It defines the complete set of typed, named primitives for building compositions: how data flows, how it is converted, how change is represented, and how paths through a graph are found and executed.
-
-**L0 is the theoretical substrate.** It names the foundational concepts that inform L1 — the mathematical and structural ideas that underlie the design. Implementers may find L0 useful as a reference layer; users generally don't need to. L0 and L1 are independent: L1 does not depend on L0, and names overlap intentionally where L1 concretizes an L0 concept.
-
-**L2 is domain patterns.** Built on L1 primitives, not yet fully specified. Proxy, Runtime, Protocol, Transport, and others live here — concepts that are real and useful but need more definition before they belong in the core.
-
-## Parameterized Traversal
-
-**The Graph is your road network. The Solver is your GPS. A Proxy is a detour.**
-
-The road network exists independently of any trip. You can ask whether a route between two points exists at all — that is a structural question about the roads, not about you or your destination. The Graph is that network: an unordered registry of converters, each one a segment connecting one type to another.
-
-When you want to get somewhere, you ask the GPS. You tell it where you are (T), where you want to go (U), and optionally your preferences (P): fastest route, avoid highways, toll-free. The Solver finds a path through the Graph and drives it. P is the routing signal — same network, different preferences, different route. If a road is closed for your specific vehicle (`rejects`), the GPS routes around it.
-
-Now imagine you are following the GPS route and you hit a road closure. A detour sign redirects you — not the GPS, not the map, just a sign on that specific road. Usually you follow it and rejoin the route; the GPS never had to recalculate. That is a Proxy. But a detour can also send you somewhere else entirely — a Proxy is not required to rejoin. It intercepts based on local conditions and can fully reroute, short-circuit, substitute a cached result, or redirect across a network boundary. The GPS had a plan; the road had other ideas.
-
-Three levels:
-
-1. **Static reachability** — is there any road at all between T and U? *(Graph structure; API not yet specified.)*
-2. **Parameterized path finding** — given this T and these preferences P, find and drive the route. *(Solver)*
-3. **Proxy traversal** — same route, but a detour sign on one road redirects you without touching the map. *(L2 Proxy)*
-
-`prepare` and `finalize` on Chain are a normalization concern — the on-ramp and off-ramp of a specific segment, not a detour. They condition input before dispatch and output after fetch, unconditionally, every time that edge is used.
-
 ## Names for Important Things
 
-SolidFI uses named marker types and named primitives so that every important concept has an identity. Anonymous types, functions, and compositions can make readability, debuggability, and reasoning challenging.
+SolidFI uses named marker types and named primitives so that every important concept has an identity, even if it represents a fairly simply concept that could be used in-place each time. Anonymous types, functions, and compositions can make readability, debuggability, and reasoning challenging.
 
-A name is not just a label — it is a place to attach relationships, invariants, and meaning. `Parameters` exists as a named marker so that the concept of "contextual data flowing into a conversion" has a home in the spec, even before its internal structure is defined.
+A name is not just a label, it is a place to attach relationships, invariants, and meaning. For example, `Parameters` exists as a named marker so that the concept of "contextual data flowing into a conversion" has a home in the spec, even before its internal structure is defined.
 
 If something matters, it has a name.
 
+## Incremental Adoption
+
+SolidFI is designed for incremental adoption, instead of a big-bang rewrite. You can get started quickly by wrapping existing code inside of adapters that conform to SolidFI's core abstractions: Converter and Transform, often with zero modifications to any of the code you are working with. Since interfaces are very thin, there's not much to write. 
+
+As you progress, each type added to the system can be reused by core implementation patterns (Chain and Pipeline) for free, which can sequence complex behaviors without adding new imperative code. Later on, you can replace the adapters and have your implementation conform to the interfaces directly, and delete unnecessary code. You'll also find that a lot of the boring glue code is obselete and can be removed.
+
+The clearest systems still have some imperative code, and SolidFI doesn't replace that. What it replaces is the glue: the hand-written dispatch tables, the anonymous middleware chains, and the code-generated adapters.
+
+You can also use SolidFI top-down to solve problem by decomposing a problem into typed pieces from the start, creating stub implementations early, and then replacing the hard-code temporary pieces with real code as you go.
+
+Even better you don't have to pick between the two. Add new capabilities top-down and refactor things botom-up in the same code base. 
+
+Either way, each piece you name unlocks more and more power by pieces that now compose naturally, just without the combinatoric explosion of imperative code.
+
+## Levels
+
+SolidFI is organized into three levels.
+
+**L1 is the primary surface.** Users write primarily against L1. It defines the complete set of typed, named primitives for building compositions: how data flows, how it is converted, how change is represented, and how paths through a graph are found and executed.
+
+**L0 is the theoretical substrate.** L0 names the foundational concepts that inform L1, the mathematical and structural ideas that underlie the design. Implementers may find L0 useful as a reference layer; users generally don't need to. L0 and L1 are independent: L1 does not necessarily depend on L0.
+
+**L2 is domain patterns.** L2 has higher-level concepts the recur in the real world (Proxy, Protocol, Transport, etc.) so often that they deserve a name and implementation that can be reused. These are built on the L1 primitives.
+
 ## Implementation Notes
 
-While this spec is implemented in C++, it is only done so as a specification language to validate the concepts formally and produce the documentation. A full implementation in C++ or TypeScript is possible.
+While this spec is implemented in C++, it is only done so as a specification language to validate the concepts formally and produce the documentation. 
 
-The spec and examples are written in an object-oriented style: classes, inheritance, explicit interfaces. This is intentional as a middle ground: it is readable in both C++ and TypeScript, and maps directly to working implementations in either language.
+Other langagues that are simlarly strongly-typed should be able to implement most of the spec. TypeScript in particular is a natural home for it because of it's functional heritage combined with a rich typing system. C++ works because it's multi-paradigm and has all pieces necessary.
 
-The OO style is not the end goal. The ideas map cleanly to C++ concepts and TypeScript's structural typing, where the inheritance hierarchy is replaced by `requires` constraints and duck typing respectively. Both are valid implementations of the same spec — the names, contracts, and composition rules stay identical. What changes is the mechanism: `implements Converter<T,U>` becomes `requires Converter<T,U>`, and the vtable disappears. The spec is written in OO to be concrete; it should be read as defining contracts, not mandating inheritance.
+The spec and examples are currently written in an object-oriented style: classes, inheritance, explicit interfaces. This is intentional as a middle ground that it is readable in both C++ and TypeScript, and maps directly to working implementations in either language.
+
+Most ideas map cleanly to C++ concepts and TypeScript's structural typing, where the inheritance hierarchy is replaced by `requires` constraints and duck typing, respectively. Both are valid implementations of the same spec, so the names, contracts, and composition rules stay identical. What changes is the mechanism: `implements Converter<T,U>` becomes `requires Converter<T,U>`, and the inheritance dependency disappears. In other words, this spec is written in OO to be concrete and should should be read as defining contracts, not mandating inheritance.
 
 ---
 
