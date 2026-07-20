@@ -65,8 +65,39 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Path<T,U,P>`    | `traverse(T,P) -> U`      | Explicitly-wired T→...→U path. IS-A `Converter<T,U,P>`. `to()` adds a step; `toEither()` adds a Chain; `through()` adds a Pipeline. Can seed a `Graph`. |
 | `Registry<T>`    | —                         | Runtime complement to Extensible. Shape TBD.                                                                                                    |
 | `Graph`          | `install<T,U>` / `remove` | Unordered registry of Converter edges. Holds; does not act                                                                                      |
-| `Solver`         | `solve<T,U>(T,P) -> U`    | Graph bound at construction; untyped; one instance, any T→U path                                                                               |
-| `Router<T,U,P>`  | `Converter<T,U,P>`        | Graph bound at construction; T,U fixed; enables the Composite rule                                                                              |
+| `Solver<T,U,P>`  | `Converter<Graph,Path<T,U,P>,P>` | Typed; T,U fixed at compile time; composable. See Open Questions.            |
+| `Pathfinder`     | `find<T,U>(T,P) -> Path`         | Untyped; Graph bound at construction; one instance, any T→U query. See Open Questions.  |
+| `Router<T,U,P>`  | `Converter<T,U,P>`        | Find-and-execute; composes Solver with Path traversal; IS-A Converter                   |
+
+---
+
+## Open Questions
+
+### Solver — typed vs untyped
+
+Two distinct L1 concepts are needed; neither replaces the other.
+
+**`Solver<T,U,P>`** (typed): T and U are known at compile time. Shape is
+`Converter<Graph, Path<T,U,P>, P>` — takes a Graph, returns a Path. Pure discovery;
+does not execute. Composable: multiple typed Solvers in a Chain, each trying a different
+traversal strategy, first to find a valid path wins. Dogfoods the spec.
+
+**DynamicSolver** (working name; candidate: `Pathfinder`): T and U are only known at
+runtime. One instance serves any T→U query against its bound Graph. Cannot be expressed
+as a Converter — there is no fixed T or U to put in the template. Necessary because
+without it, handling a runtime-unknown T→U requires building a typed Solver per pair and
+a picker to choose among them — the combinatorial expansion the spec exists to prevent.
+Same argument that justifies Chain over a hand-written dispatcher.
+
+**Router<T,U,P>** is orthogonal to both: `Converter<T, U, P>`, takes a value, returns a
+result. Composes Solver or DynamicSolver with Path traversal. The "one stop shopping"
+entry point for callers who just want T→U and don't care how.
+
+**Unresolved:** final name for DynamicSolver (`Pathfinder` is the leading candidate).
+Whether DynamicSolver belongs at L0 as the algorithm substrate with Solver<T,U,P> as
+the L1 projection — mirroring the Sentinel→Failed pattern.
+
+---
 
 ## L2 — Domain Patterns
 

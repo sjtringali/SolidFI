@@ -27,6 +27,9 @@
 /// @ingroup solidfi_l1
 /// @brief Static and dynamic composition — how primitives are combined into larger wholes.
 /// Pipeline and Chain are the composite forms of Transform and Converter. Path wires
-/// an explicit multi-stage path at construction. Graph is the dynamic registry of edges;
-/// Solver traverses it at runtime; Router pins a specific T→U path as a Converter.
+/// an explicit multi-stage route at construction time and IS-A Converter.
+/// Graph is the dynamic registry of edges. Solver<T,U,P> is IS-A Converter<Graph,Path<T,U,P>,P>
+/// — typed discovery for compile-time-known T and U. Pathfinder is the untyped complement:
+/// Graph-bound, one instance, any T->U query at runtime. Router<T,U,P> composes either
+/// with Path traversal as a single Converter<T,U,P>: find-and-execute for the caller.
 /// Registry is the general-purpose runtime complement to Extensible.
