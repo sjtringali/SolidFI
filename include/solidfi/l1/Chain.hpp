@@ -3,7 +3,7 @@
 #pragma once
 
 /// @file Chain.hpp
-/// @ingroup solidfi_l1_compositions
+/// @ingroup solidfi_l1_structural
 
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Failed.hpp"
@@ -12,7 +12,7 @@
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_compositions
+/// @ingroup solidfi_l1_structural
 /// @accepted
 /// @brief An ordered composition of Converter instances. Is itself a Converter<T,U,P>.
 ///

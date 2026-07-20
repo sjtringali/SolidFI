@@ -13,9 +13,11 @@
 
 /// @defgroup solidfi_l1_structural Core
 /// @ingroup solidfi_l1
-/// @brief The atomic primitives — the roots everything else composes from.
+/// @brief The primary primitives — the roots everything else composes from.
 /// Transform (T → T, cannot fail) and Converter (T → U, may fail, carries P) are the two
-/// abstract roots. Parameters and Sentinel complete the core contract.
+/// abstract roots. Parameters and Failed complete the core contract.
+/// Chain and Pipeline are the composite forms of Converter and Transform respectively —
+/// ordered compositions that are themselves Converter and Transform, enabling the Composite rule.
 /// Generator, Inverter, Provider, and Literal are specialized subtypes.
 
 /// @defgroup solidfi_l1_state State
@@ -27,11 +29,11 @@
 
 /// @defgroup solidfi_l1_compositions Compositions
 /// @ingroup solidfi_l1
-/// @brief Static and dynamic composition — how primitives are combined into larger wholes.
-/// Pipeline and Chain are the composite forms of Transform and Converter. Path wires
-/// an explicit multi-stage route at construction time and IS-A Converter.
-/// Graph is the dynamic registry of edges. Solver<T,U,P> is IS-A Converter<Graph,Path<T,U,P>,P>
-/// — typed discovery for compile-time-known T and U. Pathfinder is the untyped complement:
-/// Graph-bound, one instance, any T->U query at runtime. Router<T,U,P> composes either
-/// with Path traversal as a single Converter<T,U,P>: find-and-execute for the caller.
+/// @brief The generalized graph solver — static paths and dynamic traversal.
+/// Path wires an explicit multi-stage route at construction time; IS-A Converter<T,U,P>.
+/// Graph is the untyped registry of Converter edges.
+/// Solver<T,U,P> IS-A Converter<Graph,Path<T,U,P>,P> — typed discovery for compile-time-known T and U.
+/// Pathfinder is the untyped complement: Graph-bound, one instance, any T->U query at runtime.
+/// Router<T,U,P> composes either with Path traversal as a single Converter<T,U,P>: find-and-execute.
+/// Traversal<U> is the reserved abstract base for traversal algorithms over a Graph.
 /// Registry is the general-purpose runtime complement to Extensible.

@@ -17,10 +17,10 @@ namespace solidfi {
 ///
 /// T and U are typically different types — this is a genuine conversion, not a
 /// transformation. Because T and U are distinct, failure is possible: there is no
-/// identity fallback. Sentinel is represented as a sentinel value of U declared via Sentinel\<U\> — a
-/// non-intrusive specialization (see Sentinel.hpp). Converter itself does not require
-/// Sentinel\<U\>; that contract belongs to Chain, which uses it to test fetch() results
-/// during traversal. Sentinel is state, not control flow — fetch() never throws.
+/// identity fallback. Failure is represented as Failed<T> — a type-distinct, non-intrusive
+/// signal. Converter itself does not require Failed<T>; that contract belongs to Chain,
+/// which uses it to test fetch() results during traversal. Failure is state, not control
+/// flow — fetch() never throws.
 ///
 /// P is an optional user-defined parameter type for routing and dispatch. The framework
 /// never inspects P — it only passes it through to fetch(). Defaults to Parameters.

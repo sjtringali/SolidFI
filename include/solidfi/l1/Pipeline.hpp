@@ -3,7 +3,7 @@
 #pragma once
 
 /// @file Pipeline.hpp
-/// @ingroup solidfi_l1_compositions
+/// @ingroup solidfi_l1_structural
 
 #include "solidfi/l1/Parameters.hpp"
 #include "solidfi/l1/Transform.hpp"
@@ -11,7 +11,7 @@
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_compositions
+/// @ingroup solidfi_l1_structural
 /// @accepted
 /// @brief An ordered composition of Transform<T,P> instances. Is itself a Transform<T,P>.
 ///

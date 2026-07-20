@@ -30,7 +30,7 @@ namespace solidfi {
 ///
 /// **Invariants:**
 /// - Router MUST NOT modify the Solver or Graph it holds.
-/// - Returns Sentinel<U>::value() if Solver finds no path or traversal fails.
+/// - Returns Failed<U> if Solver finds no path or traversal fails.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -44,7 +44,7 @@ public:
     bool accepts(T value) const override;
     bool rejects(T value) const override;
 
-    /// @brief Solve for a path T->U and traverse it. Returns Sentinel<U>::value() on failure.
+    /// @brief Solve for a path T->U and traverse it. Returns Failed<U> on failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     U fetch(T value, P params) override;

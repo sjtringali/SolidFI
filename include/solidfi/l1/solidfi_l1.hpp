@@ -11,7 +11,6 @@
 #include "solidfi/l1/groups.hpp"
 
 // Structural
-#include "solidfi/l1/Sentinel.hpp"
 #include "solidfi/l1/Transform.hpp"
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Pipeline.hpp"
