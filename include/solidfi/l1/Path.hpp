@@ -2,6 +2,9 @@
 
 /// @file Path.hpp
 /// @ingroup solidfi_l1_compositions
+/// @todo Construction API is provisional. Chained builder may be replaced with
+///       non-chained install() calls, similar to Chain. Path may converge toward
+///       Chain's construction model once real implementation clarifies the shape.
 
 #include "solidfi/l1/Chain.hpp"
 #include "solidfi/l1/Converter.hpp"

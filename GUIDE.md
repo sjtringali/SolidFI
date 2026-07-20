@@ -166,9 +166,9 @@ But `PageParser` is mechanical. It's just a hardcoded dispatch — the kind of c
 `Chain` removes the repetition. It's an ordered composition of converters, each declaring what it handles, tried in priority order until one succeeds:
 
 ```typescript
-  const xmlToPage = new Chain<XML, Page, ViewParams>()
-    .install(1, 'text',  new TextParser())
-    .install(2, 'image', new ImageParser());
+  const xmlToPage = new Chain<XML, Page, ViewParams>();
+  xmlToPage.install(1, 'text',  new TextParser());
+  xmlToPage.install(2, 'image', new ImageParser());
 
   const path = new Path<Filename>()
     .to(new FileReader())
@@ -306,9 +306,9 @@ Or use `throughAll()` — the inline form that composes multiple transforms in o
 But what if these two transforms belong to an accessibility module, assembled together and handed to the path as a unit? That's `Pipeline` — an ordered composition of transforms that is itself a `Transform<T,P>`.
 
 ```typescript
-  const accessibility = new Pipeline<HTML, ViewParams>()
-    .install(1, 'colorblind', new DeuteranopiaFilter())
-    .install(2, 'font-size',  new FontSizeTransform());
+  const accessibility = new Pipeline<HTML, ViewParams>();
+  accessibility.install(1, 'colorblind', new DeuteranopiaFilter());
+  accessibility.install(2, 'font-size',  new FontSizeTransform());
 
   const path = new Path<Filename>()
     ...
