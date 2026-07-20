@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Scott Tringali. All rights reserved.
+
 #pragma once
 
 /// @file Inverter.hpp

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Scott Tringali. All rights reserved.
+
 #pragma once
 
 /// @file solidfi_l1.hpp
