@@ -47,13 +47,13 @@ public:
 
     /// @brief Returns true if this transform explicitly refuses the input. Default: false.
     ///
-    /// Evaluated before accepts(). A transform that rejects is skipped; apply() is never
+    /// A transform that rejects is skipped; apply() is never
     /// called. Rejection is not failure; it is abstention.
     virtual bool rejects(T value) const { return false; }
 
     /// @brief Returns true if this transform can handle these parameters. Default: true.
     ///
-    /// Evaluated after accepts(). A transform that does not handle the parameters is
+    /// A transform that does not handle the parameters is
     /// skipped by Pipeline — same passthrough semantics as rejects().
     /// MUST NOT depend on T — that belongs in accepts().
     virtual bool handles(P params) const { return true; }

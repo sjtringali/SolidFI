@@ -28,7 +28,7 @@ public:
     /// @brief Produce a T. The Void argument carries no data and should be ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T fetch(Void input, P params) override = 0;
+    T resolve(Void input, P params) override = 0;
 };
 
 } // namespace solidfi

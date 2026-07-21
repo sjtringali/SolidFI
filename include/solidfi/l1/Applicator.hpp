@@ -27,7 +27,7 @@ public:
     /// @param delta  The change to apply, passed as the parameter P.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T fetch(T value, Delta<T> delta) override = 0;
+    T resolve(T value, Delta<T> delta) override = 0;
 };
 
 } // namespace solidfi

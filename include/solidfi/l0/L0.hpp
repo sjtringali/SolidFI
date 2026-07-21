@@ -25,7 +25,7 @@ namespace solidfi {  // NOLINT: intentional overlap with L1; include L0 standalo
 /// @ingroup solidfi_l0
 /// @brief A unit of executable work over a value of type T.
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: Operation<T> — the core of Transform::apply and Converter::fetch.
+/// @note L1 mapping: Operation<T> — the core of Transform::apply and Converter::resolve.
 template<typename T>
 class Operation {
 public:
@@ -145,7 +145,7 @@ public:
 };
 
 /// @ingroup solidfi_l0
-/// @brief Marker type for user-defined contextual data passed into Converter::fetch.
+/// @brief Marker type for user-defined contextual data passed into Converter::resolve.
 /// @note L1 mapping: Parameters — L1 concretizes this as a named empty struct, the default P
 ///   for all parameterized types.
 class Parameters {

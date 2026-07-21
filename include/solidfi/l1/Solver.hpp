@@ -44,7 +44,7 @@ namespace solidfi {
 ///
 /// **Invariants:**
 /// - Solver is responsible for cycle avoidance during traversal.
-/// - Solver MUST NOT modify the Runtime passed to fetch().
+/// - Solver MUST NOT modify the Runtime passed to resolve().
 /// - P flows into individual converters along the path, consistent with Converter semantics.
 ///   The Runtime itself is not inspected with P.
 ///
@@ -62,7 +62,7 @@ public:
     /// To find-and-execute in one step, use Router<T,U,P>.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Path<T, U, P> fetch(Runtime runtime, P params) override;
+    Path<T, U, P> resolve(Runtime runtime, P params) override;
 };
 
 } // namespace solidfi

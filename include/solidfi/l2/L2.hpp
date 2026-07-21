@@ -82,7 +82,7 @@ class Serialization {};
 ///
 /// A Proxy intercepts a Converter's traversal without modifying the Graph. The graph
 /// structure is unchanged; the Solver follows the route it found; but when it reaches
-/// a proxied converter, the proxy intercepts before fetch() is called. The Solver does
+/// a proxied converter, the proxy intercepts before resolve() is called. The Solver does
 /// not need to know. This is level 3 of Parameterized Traversal.
 ///
 /// Two attachment modes:

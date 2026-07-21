@@ -28,7 +28,7 @@ public:
     /// @param previousState  The previous state, passed as the parameter P.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Delta<T> fetch(T value, T previousState) override = 0;
+    Delta<T> resolve(T value, T previousState) override = 0;
 };
 
 } // namespace solidfi

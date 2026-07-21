@@ -11,12 +11,12 @@ namespace solidfi {
 /// @ingroup solidfi_l1_structural
 
 /// @accepted
-/// @brief Named marker type for user-defined contextual data passed into Converter::fetch.
+/// @brief Named marker type for user-defined contextual data passed into Converter::resolve.
 ///
 /// Parameters is the default type for the P template parameter across all SolidFI primitives
 /// that accept routing data: Converter, Chain, Generator, Solver, Traversal.
 ///
-/// The framework never inspects or constrains Parameters — it only passes it through to fetch().
+/// The framework never inspects or constrains Parameters — it only passes it through to resolve().
 /// Users may substitute any type for P; this empty struct is the named default.
 ///
 /// Parameters is not just "context" — it is the routing signal that drives parameterized

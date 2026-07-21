@@ -6,15 +6,15 @@
 /// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
-#include "solidfi/l1/Graph.hpp"
+#include "solidfi/l1/Runtime.hpp"
 
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
 /// @reserved
-/// @brief An algorithm that accepts a Graph and produces a result of type U.
+/// @brief An algorithm that accepts a Runtime and produces a result of type U.
 ///
-/// Traversal is Converter<Graph, U, P> — the Graph is the input type, and the
+/// Traversal is Converter<Runtime, U, P> — the Runtime is the input type, and the
 /// traversal algorithm produces some typed result. What U is depends on the specific
 /// traversal: it may be a bool (reachability check), a sequence (path), an executed
 /// result, or any other type.
@@ -27,15 +27,15 @@ namespace solidfi {
 ///
 /// @see Solver — a specific Traversal strategy that finds and executes a path T→U.
 template<typename U, typename P = Parameters>
-class Traversal : public Converter<Graph, U, P> {
+class Traversal : public Converter<Runtime, U, P> {
 public:
-    bool accepts(Graph graph) const override { return true; }
-    bool rejects(Graph graph) const override { return false; }
+    bool accepts(Runtime runtime) const override { return true; }
+    bool rejects(Runtime runtime) const override { return false; }
 
-    /// @brief Execute the traversal over the given graph with the given parameters.
+    /// @brief Execute the traversal over the given runtime with the given parameters.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U fetch(Graph graph, P params) override = 0;
+    U resolve(Runtime runtime, P params) override = 0;
 };
 
 } // namespace solidfi

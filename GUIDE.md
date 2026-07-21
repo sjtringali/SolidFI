@@ -43,37 +43,37 @@ Well, that's kind of vague. A string to a string can be anything. Pass in a JPG,
 
 ## A Different Approach
 
-Let's add a little more intention and use a TypeScript implementation of SolidFI. First thing we do is *name* what we did with `Converter`. Converter requires one method called `fetch`, otherwise it won't compile.
+Let's add a little more intention and use a TypeScript implementation of SolidFI. First thing we do is *name* what we did with `Converter`. Converter requires one method called `resolve`, otherwise it won't compile.
 
 ```typescript
   type HTML = string;
   type Filename = string;
 
   class TempOpenDocumentReader implements Converter<Filename, HTML> {
-    fetch(filename: Filename): HTML { /* same */ }
+    resolve(filename: Filename): HTML { /* same */ }
   }
 ```
 
 That may not look like much difference, but by implementing an interface, we will gain a lot of capabilities for free later. Stay tuned.
 
-Not bad. Here we might be tempted to open the file right inside `fetch`. Except, here's where we take a detour and start to think in types. A filename is just a string. You get bytes out of it. Then bytes turn into the HTML. The obvious solution splits it in two, and composes them externally, so they don't know about each other. Standard structured programming.
+Not bad. Here we might be tempted to open the file right inside `resolve`. Except, here's where we take a detour and start to think in types. A filename is just a string. You get bytes out of it. Then bytes turn into the HTML. The obvious solution splits it in two, and composes them externally, so they don't know about each other. Standard structured programming.
 
 ```typescript
   class FileReader implements Converter<Filename, Blob> {
-    fetch(filename: Filename): Blob {
+    resolve(filename: Filename): Blob {
       return fs.readFileSync(filename);
     }    
   }
 
   class TempOpenDocumentReader implements Converter<Blob, HTML> {
-    fetch(blob: Blob): HTML {
+    resolve(blob: Blob): HTML {
       // TODO: parse the bits from Blob something and then:
       return "<html>I am an ODF document that is " + blob.size() + " bytes long</html>";
     }    
   }
 
-  const blob = new FileReader().fetch('document.odf');
-  const html = new TempOpenDocumentReader().fetch(blob);
+  const blob = new FileReader().resolve('document.odf');
+  const html = new TempOpenDocumentReader().resolve(blob);
 ```
 
 ## Decomposing Into Types
@@ -97,14 +97,14 @@ As we develop `Parser`, a wrinkle appears: the page inside the document might be
 
 ```typescript
   class TextParser implements Converter<XML, Page> {
-    fetch(xml: XML): Page | null {
+    resolve(xml: XML): Page | null {
       if (isImagePage(xml)) return null;
       return parseText(xml);
     }
   }
 
   class ImageParser implements Converter<XML, Page> {
-    fetch(xml: XML): Page | null {
+    resolve(xml: XML): Page | null {
       if (!isImagePage(xml)) return null;
       return parseImage(xml);
     }
@@ -115,10 +115,10 @@ The obvious first move is a delegate, a `PageParser` that holds both and tries t
 
 ```typescript
   class PageParser implements Converter<XML, Page> {
-    fetch(xml: XML): Page | null {
+    resolve(xml: XML): Page | null {
       if (isImagePage(xml)) 
-        return new ImageParser().fetch(xml);
-      return new TextParser().fetch(xml);
+        return new ImageParser().resolve(xml);
+      return new TextParser().resolve(xml);
     }
   }
 ```
@@ -141,7 +141,7 @@ But `PageParser` is still mechanical. It's just a hardcoded dispatch — the kin
 
 Converters, since they are mapping between types, can fail. It might be there's no representation between the source and destination (Xml and Page), or there might be some sort of failure performing the action that has nothing to do with T (network timeout, file that disappeared, service that's down). 
 
-Chain doesn't particularly care, it just needs to know when a `fetch()` didn't succeed, so it can try the next converter. In the above example, we did this by using `Page | null` which is kinda standard, but still a bit awkward. It mixes up the desired result, getting the page, with how we get there.
+Chain doesn't particularly care, it just needs to know when a `resolve()` didn't succeed, so it can try the next converter. In the above example, we did this by using `Page | null` which is kinda standard, but still a bit awkward. It mixes up the desired result, getting the page, with how we get there.
 
 What we need is a way to represent the failure, without committing to a single solution for everything.
 
@@ -156,14 +156,14 @@ Here's what it looks like in practice. We first declare that `null` means failur
   type Failed<Page> = null;
 
   class TextParser implements Converter<XML, Page> {
-   fetch(xml: XML): Page | null {
+   resolve(xml: XML): Page | null {
       if (isImagePage(xml)) return null;  // shouldn't get here, but defensive
       return parseText(xml);
     }
   }
 
   class ImageParser implements Converter<XML, Page> {
-    fetch(xml: XML): Page | null {
+    resolve(xml: XML): Page | null {
       if (!isImagePage(xml)) return null;
       return parseImage(xml);
     }
@@ -177,10 +177,10 @@ Chain sees `null` come back from `TextParser`, recognizes it as `Failed<Page>`, 
 We now have our converter types: `FileReader`, `Unzipper`, the `xmlToPage` Chain, and `Renderer`, but they still need glue code to connect them. The obvious next step is to wire them by hand:
 
 ```typescript
-  const blob  = new FileReader().fetch(filename);
-  const xml   = new Unzipper().fetch(blob);
-  const page  = xmlToPage.fetch(xml);
-  const html  = new Renderer().fetch(page);
+  const blob  = new FileReader().resolve(filename);
+  const xml   = new Unzipper().resolve(blob);
+  const page  = xmlToPage.resolve(xml);
+  const html  = new Renderer().resolve(page);
 ```
 
 That works, but it's mechanical, just threading output to input, over and over. The types already encode exactly what connects to what. SolidFI has a better answer: `Path`. You declare the same sequence as a construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
@@ -221,13 +221,13 @@ Woe be unto you, if you were still using manual composition. Adding this new par
 
 But since we used `Path` instead... where do we add it?
 
-It's already there. `Converter<T,U,P>` has always had a third slot, it just defaulted to empty `Parameters`. The whole Path has been carrying P all along, passing it to every converter in sequence. Most of them don't care and ignore it. The one that does, say, `TextParser`, reads it in `fetch()` and only processes the requested page:
+It's already there. `Converter<T,U,P>` has always had a third slot, it just defaulted to empty `Parameters`. The whole Path has been carrying P all along, passing it to every converter in sequence. Most of them don't care and ignore it. The one that does, say, `TextParser`, reads it in `resolve()` and only processes the requested page:
 
 ```typescript
   type ViewParams = { page?: number };
 
   class TextParser implements Converter<XML, Page, ViewParams> {
-    fetch(xml: XML, params: ViewParams): Page {
+    resolve(xml: XML, params: ViewParams): Page {
       return params.page !== undefined
         ? parseOnePage(xml, params.page)
         : parseAll(xml);
@@ -235,7 +235,7 @@ It's already there. `Converter<T,U,P>` has always had a third slot, it just defa
   }
 ```
 
-The best part? `FileReader`, `Unzipper`, and `Renderer` don't change. They could declare `ViewParams` as their P and simply ignore it in `fetch()`, but they don't have to. The compiler enforces that P is consistent across the path, you can't accidentally pass the wrong type. The intent flows through each conversion end-to-end, with each converter taking what it needs and ignoring the rest.
+The best part? `FileReader`, `Unzipper`, and `Renderer` don't change. They could declare `ViewParams` as their P and simply ignore it in `resolve()`, but they don't have to. The compiler enforces that P is consistent across the path, you can't accidentally pass the wrong type. The intent flows through each conversion end-to-end, with each converter taking what it needs and ignoring the rest.
 
 Chain carries P the same way. Declare `Chain<XML, Page, ViewParams>` and P flows into each converter it holds:
 
@@ -280,7 +280,7 @@ Since we are using Path to wire everything together, where does it go? Conceptua
 
 Hooray for interfaces! The caller still only holds a `Converter<Filename, HTML>`, so the transform is invisible behind the interface.
 
-## Pipeline
+## Composing Transforms with Pipeline
 
 What if we need more than one transform? We want to also increase font size for visual acuity. That's another `Transform<HTML, ViewParams>`, obviously independent of colorblindness correction.
 
@@ -341,7 +341,7 @@ It does! Here we introduce `Runtime`, which is an *unordered* registry of conver
 
   // Router IS-A Converter<Filename, HTML>
   const router = new Router<Filename, HTML>(runtime);
-  const html = router.fetch('document.odt');
+  const html = router.resolve('document.odt');
 ```
 
 That's not magic, it's a graph traversal. This is dynamic composition replacing static composition. You don't write the glue code; the system found it and called it for you.
@@ -363,7 +363,7 @@ Bet this is starting to get familiar. Even though the code is tight, it's still 
 
 ```typescript
   class Startup implements Converter<null, Runtime> { ... }
-  const runtime = new Startup().fetch(null);
+  const runtime = new Startup().resolve(null);
 ```
 
 We now have a Factory! You've already written the code.
@@ -374,7 +374,7 @@ Here's the magic trick revealed. `Router<T,U>` IS-A `Converter<T,U>` — the sam
 
 ```typescript
   function displayODF(filename: string, magic: Converter<Filename, HTML>) {
-    const html: HTML = magic.fetch(filename);
+    const html: HTML = magic.resolve(filename);
     document.setHTML(html);
   }
 
@@ -385,16 +385,16 @@ Here's the magic trick revealed. `Router<T,U>` IS-A `Converter<T,U>` — the sam
   displayODF('document.odt', new Router<Filename, HTML>(runtime));
 ```
 
-Whoever writes `displayODF` doesn't know or care that you just handed them a graph traversal in disguise, hidden behind a tiny `fetch`. You can swap a temporary thing for the real thing. But this also works in reverse, swap the real thing for a test stub, and now your *testing* and leverage all this composition we built.
+Whoever writes `displayODF` doesn't know or care that you just handed them a graph traversal in disguise, hidden behind a tiny `resolve`. You can swap a temporary thing for the real thing. But this also works in reverse, swap the real thing for a test stub, and now your *testing* and leverage all this composition we built.
 
 ## Extending the System at Runtime
 
 Since Converter works on free types T and U, Runtimes themselves can be transformed. Earlier we converted nothing into a Runtime and called it "startup", so it's no big leap to convert one Runtime into another. Now you have the skeleton of a plugin loading system, and it has a natural home in the Factory part of the system.
 
 ```typescript
-  class PluginLoader implements Converter<Runtime, Runtime, string> { ... };
-  var runtime = new Startup().fetch(null);
-  runtime = new PluginLoader().fetch(runtime, 'FancyVisualizationLibraryOfConverters');
+  class Loader implements Converter<Runtime, Runtime, string> { ... };
+  var runtime = new Startup().resolve(null);
+  runtime = new Loader().resolve(runtime, 'FancyVisualizationLibraryOfConverters');
 ```
 
 Since it's just a converter, you can build multiple variants, swap them at compile or runtime, and choose between them with Chain. Maybe one loads local plugins, and another fetches them from (uh oh, let's think security) a secure server somewhere that you control.

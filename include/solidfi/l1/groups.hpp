@@ -7,11 +7,11 @@
 /// @defgroup solidfi_l1 L1
 /// @brief The primary surface — fully specified interfaces for composable systems.
 /// L1 is what you use. It defines the complete set of typed, named primitives for
-/// building compositions: how data flows and is converted (Core), how change is
+/// building compositions: how data flows and is converted (Structural), how change is
 /// represented and applied (State), and how things are composed statically and
 /// dynamically (Compositions).
 
-/// @defgroup solidfi_l1_structural Core
+/// @defgroup solidfi_l1_structural Structural
 /// @ingroup solidfi_l1
 /// @brief The primary primitives — the roots everything else composes from.
 /// Transform (T → T, cannot fail) and Converter (T → U, may fail, carries P) are the two

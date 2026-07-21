@@ -32,3 +32,4 @@
 #include "solidfi/l1/Pathfinder.hpp"
 #include "solidfi/l1/Solver.hpp"
 #include "solidfi/l1/Router.hpp"
+#include "solidfi/l1/Traversal.hpp"

@@ -51,7 +51,7 @@ public:
     /// @brief Solve for a path T->U and traverse it. Returns Failed<U> on failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U fetch(T value, P params) override;
+    U resolve(T value, P params) override;
 };
 
 } // namespace solidfi

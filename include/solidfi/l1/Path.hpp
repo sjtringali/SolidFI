@@ -72,13 +72,13 @@ public:
     template<typename... Ts>
     Path<T, U, P> throughAll(Ts... transforms);
 
-    /// @brief Execute the path. Friendly alias for fetch().
+    /// @brief Execute the path. Friendly alias for resolve().
     ///
     /// Prefer traverse() when calling a known Path directly.
     U traverse(T value, P params);
 
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U fetch(T value, P params) override;
+    U resolve(T value, P params) override;
 };
 
 /// @brief Begin building a Path starting from type T.

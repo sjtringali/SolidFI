@@ -11,7 +11,7 @@ namespace solidfi {
 /// @ingroup solidfi_l1_structural
 
 /// @accepted
-/// @brief Explicit failure signal returned by a Converter to indicate fetch() did not succeed.
+/// @brief Explicit failure signal returned by a Converter to indicate resolve() did not succeed.
 ///
 /// Failed<T> is a type-distinct failure signal — separate from T's value space entirely.
 /// A Converter returns Failed<T> to tell Chain "I could not handle this; try the next one."

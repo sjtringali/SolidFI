@@ -26,7 +26,7 @@ public:
     /// @brief Perform the lookup. Returns absent value if the lookup fails or produces nothing.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U fetch(T value, Parameters params) override = 0;
+    U resolve(T value, Parameters params) override = 0;
 };
 
 } // namespace solidfi

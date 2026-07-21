@@ -19,15 +19,15 @@ namespace solidfi {
 /// transformation. Because T and U are distinct, failure is possible: there is no
 /// identity fallback. Failure is represented as Failed<T> — a type-distinct, non-intrusive
 /// signal. Converter itself does not require Failed<T>; that contract belongs to Chain,
-/// which uses it to test fetch() results during traversal. Failure is state, not control
-/// flow — fetch() never throws.
+/// which uses it to test resolve() results during traversal. Failure is state, not control
+/// flow — resolve() never throws.
 ///
 /// P is an optional user-defined parameter type for routing and dispatch. The framework
-/// never inspects P — it only passes it through to fetch(). Defaults to Parameters.
+/// never inspects P — it only passes it through to resolve(). Defaults to Parameters.
 ///
 /// **Filtering rule** (shared with Chain):
 /// @code
-///   if (accepts(value) && !rejects(value) && handles(params)) → attempt fetch()
+///   if (accepts(value) && !rejects(value) && handles(params)) → attempt resolve()
 /// @endcode
 /// All three must pass; evaluation order is unspecified and implementation-defined.
 /// A converter with none overridden is always attempted. Each method has one concern:
@@ -37,7 +37,7 @@ namespace solidfi {
 /// - accepts(), rejects(), and handles() MUST be stateless and synchronous.
 /// - accepts() and rejects() MUST NOT depend on P.
 /// - handles() MUST NOT depend on T.
-/// - fetch() MAY fail; returns Failed<T> on failure. MUST NOT throw.
+/// - resolve() MAY fail; returns Failed<T> on failure. MUST NOT throw.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -51,20 +51,20 @@ public:
 
     /// @brief Returns true if this converter explicitly refuses the input. Default: false.
     ///
-    /// Evaluated before accepts(). A converter that rejects is never attempted via fetch().
+    /// A converter that rejects is never attempted via resolve().
     virtual bool rejects(T value) const { return false; }
 
     /// @brief Returns true if this converter can handle these parameters. Default: true.
     ///
-    /// Evaluated after accepts(). A converter that does not handle the parameters is
-    /// never attempted via fetch(). MUST NOT depend on T — that belongs in accepts().
+    /// A converter that does not handle the parameters is
+    /// never attempted via resolve(). MUST NOT depend on T — that belongs in accepts().
     virtual bool handles(P params) const { return true; }
 
     /// @brief Perform the conversion. Returns Failed<T> on failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     /// @note Never throws. Sentinel is a returned value, not a control flow path.
-    virtual U fetch(T value, P params) = 0;
+    virtual U resolve(T value, P params) = 0;
 
 };
 

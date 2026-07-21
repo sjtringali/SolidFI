@@ -20,13 +20,13 @@ namespace solidfi {
 /// Also known as Closed<T> at L0.
 ///
 /// Common uses:
-/// - Inject a constant or variable into a Chain or Pipeline without changing the type contract.
+/// - Inject a constant into a Chain or Pipeline without changing the type contract.
 /// - Adapt an existing value into a composition that expects a transform or converter.
 /// - Stand-in during development before a real implementation exists.
 ///
 /// **Invariants:**
 /// - MUST always produce a T.
-/// - fetch() and apply() MUST NOT depend on the input value.
+/// - resolve() and apply() MUST NOT depend on the input value.
 /// - accepts() returns true, rejects() returns false.
 ///
 /// @tparam T The captured and produced type; free generic, owned by the user.
@@ -41,9 +41,6 @@ public:
     /// @brief Retrieve the captured value.
     T get() const;
 
-    /// @brief Update the captured value.
-    void set(T value);
-
     bool accepts(T value) const override { return true; }
     bool rejects(T value) const override { return false; }
 
@@ -53,7 +50,7 @@ public:
     /// @brief Return the captured value. The input and parameters are ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T fetch(InputT, P) override;
+    T resolve(InputT, P) override;
 };
 
 } // namespace solidfi

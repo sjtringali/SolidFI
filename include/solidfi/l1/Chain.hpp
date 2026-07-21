@@ -20,24 +20,24 @@ namespace solidfi {
 /// a single converter — the Composite rule. Chain is the composite form of Converter.
 ///
 /// Execution order is determined by priority. The first converter that passes the filter
-/// (rejects() is false AND accepts() is true) is attempted via fetch(). If fetch() succeeds,
-/// the chain short-circuits and returns the result. If fetch() fails, the chain continues
+/// (rejects() is false AND accepts() is true) is attempted via resolve(). If resolve() succeeds,
+/// the chain short-circuits and returns the result. If resolve() fails, the chain continues
 /// to the next converter in priority order. If no converter succeeds, the chain fails.
 ///
 /// **Filtering rule:**
 /// @code
-///   if (accepts(value) && !rejects(value) && handles(params)) → attempt fetch()
+///   if (accepts(value) && !rejects(value) && handles(params)) → attempt resolve()
 /// @endcode
 /// All three must pass; evaluation order is unspecified and implementation-defined.
 /// A converter with none overridden is always attempted.
-/// Selection is only final when fetch() succeeds.
+/// Selection is only final when resolve() succeeds.
 ///
-/// A Chain may optionally have a prepare Transform<T> applied before dispatching to fetch(),
-/// and a finalize `Transform<U>` applied after a successful fetch(). Either may be a Pipeline<T>
+/// A Chain may optionally have a prepare Transform<T> that conditions the input, and a
+/// finalize `Transform<U>` that conditions the output. Either may be a Pipeline<T>
 /// or `Pipeline<U>` — the composite rule ensures any Transform<T> satisfies the slot.
 ///
-/// prepare and finalize are normalization: they condition the input before dispatch and
-/// the output after a successful fetch, unconditionally. They are not routing — the Solver
+/// prepare and finalize are normalization: they condition the input and output
+/// unconditionally. They are not routing — the Solver
 /// does not see them, P does not select them, and they apply on every traversal of this
 /// Chain regardless of path. Normalization that belongs to this Chain lives here;
 /// normalization that should be visible across the Graph goes in via Graph::install(Transform<T>).
@@ -63,17 +63,17 @@ public:
 
     /// @brief Construct a Chain with optional prepare and finalize transforms.
     ///
-    /// @param prepare  Transform applied to the input before dispatching to fetch(). May be nullptr.
-    /// @param finalize Transform applied to the result after a successful fetch(). May be nullptr.
+    /// @param prepare  Transform that conditions the input. May be nullptr.
+    /// @param finalize Transform that conditions the result. May be nullptr.
     explicit Chain(Transform<T>* prepare, Transform<U>* finalize = nullptr);
 
-    /// @brief Optional transform applied to the input before dispatching to fetch().
+    /// @brief Optional transform that conditions the input.
     ///
     /// May be a Pipeline<T,P> — the composite rule ensures any Transform<T,P> satisfies this slot.
     /// Null means no prepare transform is applied.
     Transform<T, P>* prepare = nullptr;
 
-    /// @brief Optional transform applied to the result after a successful fetch().
+    /// @brief Optional transform that conditions the result.
     ///
     /// May be a Pipeline<U,P> — the composite rule ensures any Transform<U,P> satisfies this slot.
     /// Null means no finalize transform is applied.
@@ -82,15 +82,15 @@ public:
     bool accepts(T value) const override;
     bool rejects(T value) const override;
 
-    /// @brief Execute the chain. Friendly alias for fetch().
+    /// @brief Execute the chain. Friendly alias for resolve().
     ///
-    /// Prefer resolve() when calling a known Chain directly.
-    U resolve(T value, P params);
+    /// Prefer dispatch() when calling a known Chain directly.
+    U dispatch(T value, P params);
 
     /// @brief Try each installed converter in priority order until one succeeds.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U fetch(T value, P params) override;
+    U resolve(T value, P params) override;
 
     /// @brief Install a converter at the given priority under the given name.
     ///

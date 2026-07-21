@@ -22,7 +22,7 @@ namespace solidfi {
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 ///
-/// @todo Full specification pending. Reverse fetch signature (parameters, failure semantics)
+/// @todo Full specification pending. Reverse resolve signature (parameters, failure semantics)
 ///   and composition rules for inverted chains are TBD.
 template<typename T, typename U>
 class Inverter : public Converter<T, U> {
@@ -30,7 +30,7 @@ public:
     /// @brief Convert in the forward direction: T to U.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U fetch(T value, Parameters params) override = 0;
+    U resolve(T value, Parameters params) override = 0;
 
     /// @brief Convert in the reverse direction: U to T.
     ///
