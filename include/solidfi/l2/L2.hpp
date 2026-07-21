@@ -9,7 +9,7 @@
 /// whose full definition will be elaborated in a future revision.
 
 #include <any>
-#include "solidfi/l1/Graph.hpp"
+#include "solidfi/l1/Runtime.hpp"
 #include "solidfi/l1/Parameters.hpp"
 
 namespace solidfi {
@@ -118,17 +118,14 @@ class Proxy {};
 class Roundtrip {};
 
 /// @ingroup solidfi_l2
-/// @brief A Graph populated with the edges valid for a specific deployment context.
+/// @brief Enriches a Runtime with converters valid for a specific deployment context.
 ///
 /// Different deployment contexts (browser vs. Node, client vs. server) require different
-/// edge sets — some converters cannot load or execute in a given environment. A Runtime
-/// is the Graph for one such context: same converter vocabulary, only the edges that work here.
-///
-/// Assembly is direct: install the edges your environment supports. That assembly
-/// generalizes into a `Transform<Graph>` (unconditional) or `Converter<Graph,Graph,P>`
-/// (environment-driven) when you want to name, compose, or parameterize it.
+/// edge sets — some converters cannot load or execute in a given environment. A PluginLoader
+/// is a `Converter<Runtime, Runtime, P>` that installs only the edges appropriate for its
+/// context, returning an enriched Runtime. Multiple PluginLoaders can be chained.
 ///
 /// @todo Specification pending.
-class Runtime : public Graph {};
+class PluginLoader {};
 
 } // namespace solidfi

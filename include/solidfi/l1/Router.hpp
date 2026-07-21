@@ -6,7 +6,7 @@
 /// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
-#include "solidfi/l1/Graph.hpp"
+#include "solidfi/l1/Runtime.hpp"
 #include "solidfi/l1/Solver.hpp"
 
 namespace solidfi {
@@ -30,7 +30,7 @@ namespace solidfi {
 /// behind the same interface as a single hand-written converter.
 ///
 /// **Invariants:**
-/// - Router MUST NOT modify the Solver or Graph it holds.
+/// - Router MUST NOT modify the Solver or Runtime it holds.
 /// - Returns Failed<U> if Solver finds no path or traversal fails.
 ///
 /// @tparam T source type; free generic, owned by the user.
@@ -39,8 +39,8 @@ namespace solidfi {
 template<typename T, typename U, typename P = Parameters>
 class Router : public Converter<T, U, P> {
 public:
-    /// @brief Bind this Router to a Graph. Creates a default Solver internally.
-    explicit Router(Graph graph);
+    /// @brief Bind this Router to a Runtime. Creates a default Solver internally.
+    explicit Router(Runtime runtime);
 
     /// @brief Bind this Router to an explicit Solver. Use when traversal strategy matters.
     explicit Router(Solver<T, U, P> solver);

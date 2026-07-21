@@ -2,7 +2,7 @@
 
 #pragma once
 
-/// @file Graph.hpp
+/// @file Runtime.hpp
 /// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Path.hpp"
@@ -13,31 +13,34 @@ namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
 /// @proposed
-/// @brief An unordered, potentially cyclic registry of Converter edges.
+/// @brief An unordered, potentially cyclic registry of Converter edges. L0: Graph.
 ///
-/// Graph is a passive data structure — a bag of converter edges. Nodes are implied by
+/// Runtime is a passive data structure — a bag of converter edges. Nodes are implied by
 /// the type signatures of the installed converters; there are no explicit node objects.
-/// Graph does not execute converters. Execution is Solver's concern.
+/// Runtime does not execute converters. Execution is Solver's concern.
 ///
-/// Graph answers no runtime questions on its own. It holds; it does not act. Traversal
+/// Runtime answers no runtime questions on its own. It holds; it does not act. Traversal
 /// and Solver supply the verbs.
 ///
-/// **Invariants:**
-/// - Installed converters are unordered. No priority applies at the Graph level.
-/// - The graph MAY contain cycles. Cycle detection and avoidance is Solver's responsibility.
-/// - A Graph SHOULD be assembled at startup and treated as stable. It is not designed for
-///   high-frequency mutation. Plugin loading is an L2 concern (see Runtime).
-/// - Graph MUST NOT execute any converter.
+/// You need a Runtime the moment you use Solver or Router — even without domain-specific
+/// patterns like codecs or plugins. It is the initial state of the system: install your
+/// converters, hand it to a Router, and dynamic composition takes over.
 ///
-/// @note L0 mapping: Category — objects are types, arrows are Converter edges.
-/// @note L2 mapping: Runtime — a Graph assembled for a specific deployment context.
-class Graph {
+/// **Invariants:**
+/// - Installed converters are unordered. No priority applies at the Runtime level.
+/// - The graph MAY contain cycles. Cycle detection and avoidance is Solver's responsibility.
+/// - A Runtime SHOULD be assembled at startup and treated as stable. It is not designed for
+///   high-frequency mutation. Plugin loading is handled by Converter<Runtime, Runtime>.
+/// - Runtime MUST NOT execute any converter.
+///
+/// @note L0 mapping: Graph — the abstract directed graph structure Runtime is built on.
+class Runtime {
 public:
-    /// @brief Add a converter edge to the graph.
+    /// @brief Add a converter edge to the runtime.
     template<typename T, typename U, typename P = Parameters>
     void install(Converter<T, U, P> converter);
 
-    /// @brief Remove a converter edge from the graph.
+    /// @brief Remove a converter edge from the runtime.
     template<typename T, typename U, typename P = Parameters>
     void remove(Converter<T, U, P> converter);
 
@@ -51,15 +54,15 @@ public:
 
     /// @brief Decompose a Path and install each step as an individual edge.
     ///
-    /// The Path's explicit path is disassembled: each Converter and Transform is
+    /// The Path's explicit route is disassembled: each Converter and Transform is
     /// extracted and installed as if passed to install() directly. Steps whose identity
-    /// already exists in the Graph are silently skipped. The Path itself is not
+    /// already exists in the Runtime are silently skipped. The Path itself is not
     /// installed as a single edge.
     ///
-    /// This allows a statically-declared Path to seed the dynamic Graph without
+    /// This allows a statically-declared Path to seed the dynamic Runtime without
     /// duplication. The Path may continue to be used directly alongside Solver.
     template<typename T, typename U, typename P = Parameters>
-    void install(Path<T, U, P> blazer);
+    void install(Path<T, U, P> path);
 
 };
 

@@ -23,7 +23,8 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                            |
 | `Readonly<T>`    | —                          | A T that cannot be modified after construction                                     |
 | `Parameters`     | —                          | Marker for user-defined contextual data                                            |
-| `Category`       | —                          | Objects (types) + arrows (converters). L1: `Graph`. L2: `Runtime`                 |
+| `Category`       | —                          | Objects (types) + arrows (converters). Theoretical grounding; not an implementation. L0 realization: `Graph` |
+| `Graph`          | —                          | Directed graph: typed nodes (types) and typed edges (converters). L1: `Runtime`    |
 | `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category. L1: `Traversal<U,P>` (reserved); `Path<T,U,P>` (proposed) |
 | `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection -> single value                                                   |
 | `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value -> collection                                                 |
@@ -63,11 +64,11 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | Concept          | Shape                              | Notes                                                                           |
 | ------------------| ------------------------------------| --------------------------------------------------------------------------------|
 | `Path<T,U,P>`    | `traverse(T,P) -> U`               | Explicitly-wired T→...→U. IS-A `Converter<T,U,P>`. Builder API provisional.    |
-| `Graph`          | `install<T,U>` / `remove`          | Unordered registry of Converter edges. Holds; does not act.                     |
-| `Solver<T,U,P>`  | `Converter<Graph,Path<T,U,P>,P>`   | Typed discovery; T,U fixed at compile time; composable via Chain.               |
-| `Pathfinder`     | `find<T,U>(T,P) -> Path`           | Untyped; Graph bound at construction; one instance, any T→U query at runtime.   |
+| `Runtime`        | `install<T,U>` / `remove`          | Unordered registry of Converter edges. Holds; does not act. L0: `Graph`         |
+| `Solver<T,U,P>`  | `Converter<Runtime,Path<T,U,P>,P>` | Typed discovery; T,U fixed at compile time; composable via Chain.               |
+| `Pathfinder`     | `find<T,U>(T,P) -> Path`           | Untyped; Runtime-bound at construction; one instance, any T→U query at runtime. |
 | `Router<T,U,P>`  | `Converter<T,U,P>`                 | Find-and-execute; composes Solver with Path traversal.                          |
-| `Traversal<U,P>` | `Converter<Graph,U,P>`             | Reserved. Abstract base for traversal algorithms over a Graph.                  |
+| `Traversal<U,P>` | `Converter<Runtime,U,P>`           | Reserved. Abstract base for traversal algorithms over a Runtime.                |
 | `Registry<T>`    | —                                  | Runtime complement to Extensible. Shape TBD.                                    |
 
 ---
@@ -93,4 +94,4 @@ Stubs. Built on L1 primitives. Not yet fully specified.
 | `Serialization` | Converter between in-memory representation and serialized form |
 | `Proxy`         | Optional interception on a Converter; opt-in, default-off      |
 | `Roundtrip`     | Bidirectional communication; builds on `Inverter<T,U>`         |
-| `Runtime`       | Graph with dynamic plugin-loading machinery                    |
+| `PluginLoader`  | `Converter<Runtime, Runtime>` — enriches a Runtime with additional converters |

@@ -170,11 +170,26 @@ using Readonly = const T;
 ///
 /// In SolidFI, objects are types and arrows are `Converter<T,U>` instances —
 /// morphisms between types. Category is the abstract substrate concept; it names the
-/// mathematical structure that the framework implements.
+/// mathematical structure that the framework implements. The concrete CS realization
+/// is a directed graph with typed edges — see Graph.
 ///
-/// @note L1 mapping: Graph — the concrete unordered registry of Converter edges.
-/// @note L2 mapping: Runtime — a Graph assembled for a specific deployment context.
+/// @note Category theory provides the theoretical grounding, not the implementation.
+/// @note L0 realization: Graph — the concrete directed graph structure.
+/// @note L1 mapping: Runtime — the SolidFI-named converter registry built on Graph.
 class Category {
+public:
+};
+
+/// @ingroup solidfi_l0
+/// @brief A directed graph: typed nodes (types) and typed edges (converters).
+///
+/// Graph is the concrete CS structure underlying the Category concept. Nodes are types;
+/// edges are Converter instances between them. Graph carries no SolidFI-specific
+/// semantics — it is the raw structural substrate. The L1 projection (Runtime) adds
+/// the converter-aware install/remove API and the SolidFI identity.
+///
+/// @note L1 mapping: Runtime — the SolidFI converter registry. Runtime IS-A Graph.
+class Graph {
 public:
 };
 
