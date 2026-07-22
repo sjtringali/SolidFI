@@ -31,9 +31,9 @@
 /// @ingroup solidfi_l1
 /// @brief The generalized graph solver — static paths and dynamic traversal.
 /// Path wires an explicit multi-stage route at construction time; IS-A Converter<T,U,P>.
-/// Runtime is the unordered registry of Converter edges. L0: Graph.
-/// Solver<T,U,P> IS-A Converter<Runtime,Path<T,U,P>,P> — typed discovery for compile-time-known T and U.
-/// Pathfinder is the untyped complement: Runtime-bound, one instance, any T->U query at runtime.
+/// Domain is the unordered registry of Converter edges. L0: Graph.
+/// Solver<T,U,P> IS-A Converter<Domain,Path<T,U,P>,P> — typed discovery for compile-time-known T and U.
+/// Pathfinder is the untyped complement: Domain-bound, one instance, any T->U query at runtime.
 /// Router<T,U,P> composes Solver with Path traversal as a single Converter<T,U,P>: find-and-execute.
-/// Traversal<U> is the reserved abstract base for traversal algorithms over a Runtime.
+/// Traversal<U> is the reserved abstract base for traversal algorithms over a Domain.
 /// Registry is the general-purpose runtime complement to Extensible.

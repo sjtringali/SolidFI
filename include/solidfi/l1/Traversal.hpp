@@ -6,15 +6,15 @@
 /// @ingroup solidfi_l1_compositions
 
 #include "solidfi/l1/Converter.hpp"
-#include "solidfi/l1/Runtime.hpp"
+#include "solidfi/l1/Domain.hpp"
 
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
 /// @reserved
-/// @brief An algorithm that accepts a Runtime and produces a result of type U.
+/// @brief An algorithm that accepts a Domain and produces a result of type U.
 ///
-/// Traversal is Converter<Runtime, U, P> — the Runtime is the input type, and the
+/// Traversal is Converter<Domain, U, P> — the Domain is the input type, and the
 /// traversal algorithm produces some typed result. What U is depends on the specific
 /// traversal: it may be a bool (reachability check), a sequence (path), an executed
 /// result, or any other type.
@@ -27,15 +27,15 @@ namespace solidfi {
 ///
 /// @see Solver — a specific Traversal strategy that finds and executes a path T→U.
 template<typename U, typename P = Parameters>
-class Traversal : public Converter<Runtime, U, P> {
+class Traversal : public Converter<Domain, U, P> {
 public:
-    bool accepts(Runtime runtime) const override { return true; }
-    bool rejects(Runtime runtime) const override { return false; }
+    bool accepts(Domain domain) const override { return true; }
+    bool rejects(Domain domain) const override { return false; }
 
-    /// @brief Execute the traversal over the given runtime with the given parameters.
+    /// @brief Execute the traversal over the given domain with the given parameters.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U resolve(Runtime runtime, P params) override = 0;
+    U resolve(Domain domain, P params) override = 0;
 };
 
 } // namespace solidfi

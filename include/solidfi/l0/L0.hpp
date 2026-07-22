@@ -166,32 +166,29 @@ template<typename T>
 using Readonly = const T;
 
 /// @ingroup solidfi_l0
-/// @brief A collection of objects (types) and arrows (converters) between them.
+/// @brief A directed graph: typed nodes (types) and typed edges (converters).
 ///
-/// In SolidFI, objects are types and arrows are `Converter<T,U>` instances —
-/// morphisms between types. Category is the abstract substrate concept; it names the
-/// mathematical structure that the framework implements. The concrete CS realization
-/// is a directed graph with typed edges — see Graph.
+/// In SolidFI, objects are types and arrows are `Converter<T,U>` instances — morphisms
+/// between types. Graph is the concrete CS structure realizing that: nodes are types,
+/// edges are Converter instances between them. Graph carries no SolidFI-specific
+/// semantics — it is the raw structural substrate. The L1 projection (Domain) adds the
+/// converter-aware install/remove API and the SolidFI identity.
 ///
-/// @note Category theory provides the theoretical grounding, not the implementation.
-/// @note L0 realization: Graph — the concrete directed graph structure.
-/// @note L1 mapping: Runtime — the SolidFI-named converter registry built on Graph.
-class Category {
+/// @note Category theory provides the theoretical grounding, not the implementation —
+///   there is nothing to Category beyond the CS structure Graph already names, so it is
+///   an alias rather than a distinct type. See Category below.
+/// @note L1 mapping: Domain — the SolidFI converter registry. Domain IS-A Graph.
+class Graph {
 public:
 };
 
 /// @ingroup solidfi_l0
-/// @brief A directed graph: typed nodes (types) and typed edges (converters).
+/// @brief Category theory's name for Graph: objects (types) and arrows (converters).
 ///
-/// Graph is the concrete CS structure underlying the Category concept. Nodes are types;
-/// edges are Converter instances between them. Graph carries no SolidFI-specific
-/// semantics — it is the raw structural substrate. The L1 projection (Runtime) adds
-/// the converter-aware install/remove API and the SolidFI identity.
-///
-/// @note L1 mapping: Runtime — the SolidFI converter registry. Runtime IS-A Graph.
-class Graph {
-public:
-};
+/// Category is the mathematical vocabulary; Graph is its concrete CS realization. They
+/// name the same structure, so Category is a plain alias — theoretical grounding, not a
+/// second implementation.
+using Category = Graph;
 
 /// @ingroup solidfi_l0
 /// @brief An algorithm that accepts a Category and produces a result of type U.

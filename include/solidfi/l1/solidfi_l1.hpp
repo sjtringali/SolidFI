@@ -27,8 +27,8 @@
 #include "solidfi/l1/Differencer.hpp"
 #include "solidfi/l1/Applicator.hpp"
 
-// Runtime
-#include "solidfi/l1/Runtime.hpp"
+// Domain
+#include "solidfi/l1/Domain.hpp"
 #include "solidfi/l1/Pathfinder.hpp"
 #include "solidfi/l1/Solver.hpp"
 #include "solidfi/l1/Router.hpp"

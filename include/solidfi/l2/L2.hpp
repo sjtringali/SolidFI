@@ -9,7 +9,7 @@
 /// whose full definition will be elaborated in a future revision.
 
 #include <any>
-#include "solidfi/l1/Runtime.hpp"
+#include "solidfi/l1/Domain.hpp"
 #include "solidfi/l1/Parameters.hpp"
 #include "solidfi/l2/Serializer.hpp"
 #include "solidfi/l2/Codec.hpp"
@@ -22,10 +22,10 @@ namespace solidfi {
 /// L2 names the patterns that emerge when L1 compositions cross network or process
 /// boundaries: Protocol and Transport (encoding and channel), Serializer and Codec
 /// (one-way and round-trip wire representation), Proxy (runtime interception without
-/// modifying the Graph), Roundtrip (bidirectional guarantee at the protocol level), and
-/// Runtime (a Graph assembled for a specific deployment context). Handshake is the standard
-/// L2 P type, covering the common request/response case. Currently stubs; full specification
-/// follows network transparency work.
+/// modifying the Domain), Roundtrip (bidirectional guarantee at the protocol level), and
+/// Runtime (a Domain realized for a specific deployment context, enriched via Loader).
+/// Handshake is the standard L2 P type, covering the common request/response case.
+/// Currently stubs; full specification follows network transparency work.
 
 /// @ingroup solidfi_l2
 /// @brief Named parameter bag covering the common request/response case.
@@ -100,6 +100,16 @@ class Transport {};
 ///   structure. Both attachment modes are expected to survive; the API shape is TBD.
 /// @note L0 root: Delegate<T> — pure object indirection, no network assumptions.
 class Proxy {};
+
+/// @ingroup solidfi_l2
+/// @brief A Domain realized for a specific deployment context.
+///
+/// Runtime is a named alias for Domain — the guts (install/remove, the unordered registry
+/// of Converter edges, Pathfinder, Router, Solver, Traversal) all live at L1 on Domain
+/// itself. Runtime is L2 vocabulary for the same structure once it has been assembled and
+/// enriched for a specific deployment context (browser vs. Node, client vs. server) — a
+/// name for the slot, not a new type.
+using Runtime = Domain;
 
 /// @ingroup solidfi_l2
 /// @brief Enriches a Runtime with converters valid for a specific deployment context.
