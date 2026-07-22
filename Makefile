@@ -3,6 +3,9 @@
 CXX      ?= c++
 CXXFLAGS  = -fsyntax-only -std=c++17 -I include
 
+GIT_SHA  := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+export GIT_SHA
+
 all: check doc
 
 check:

@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "SolidFI"
 PROJECT_BRIEF          = "Functional Interfaces for Composition"
-PROJECT_NUMBER         = "Draft"
+PROJECT_NUMBER         = "Draft ($(GIT_SHA))"
 OUTPUT_DIRECTORY       = docs
 
 #---------------------------------------------------------------------------
@@ -51,6 +51,7 @@ HTML_OUTPUT            = html
 CREATE_SUBDIRS         = NO
 GENERATE_TREEVIEW      = NO
 DISABLE_INDEX          = NO
+HTML_FOOTER            = docs/copyright.html
 HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome.css
 HTML_COLORSTYLE        = LIGHT
 TREEVIEW_WIDTH         = 300
