@@ -11,17 +11,21 @@
 #include <any>
 #include "solidfi/l1/Runtime.hpp"
 #include "solidfi/l1/Parameters.hpp"
+#include "solidfi/l2/Serializer.hpp"
+#include "solidfi/l2/Codec.hpp"
+#include "solidfi/l2/Roundtrip.hpp"
 
 namespace solidfi {
 
 /// @defgroup solidfi_l2 L2
 /// @brief Domain patterns — higher-level concepts built on L1 primitives.
 /// L2 names the patterns that emerge when L1 compositions cross network or process
-/// boundaries: Protocol and Transport (encoding and channel), Serialization (wire
-/// representation), Proxy (runtime interception without modifying the Graph), Roundtrip
-/// (bidirectional guarantee at the protocol level), and Runtime (a Graph assembled for a
-/// specific deployment context). Handshake is the standard L2 P type, covering the common
-/// request/response case. Currently stubs; full specification follows network transparency work.
+/// boundaries: Protocol and Transport (encoding and channel), Serializer and Codec
+/// (one-way and round-trip wire representation), Proxy (runtime interception without
+/// modifying the Graph), Roundtrip (bidirectional guarantee at the protocol level), and
+/// Runtime (a Graph assembled for a specific deployment context). Handshake is the standard
+/// L2 P type, covering the common request/response case. Currently stubs; full specification
+/// follows network transparency work.
 
 /// @ingroup solidfi_l2
 /// @brief Named parameter bag covering the common request/response case.
@@ -69,15 +73,6 @@ class Protocol {};
 class Transport {};
 
 /// @ingroup solidfi_l2
-/// @brief Converts between in-memory representations and serialized forms.
-///
-/// Serialization is a Converter concern: T (in-memory) ↔ bytes/string/stream.
-/// Typically used as a step in a Graph path when crossing a process or network boundary.
-///
-/// @todo Specification pending.
-class Serialization {};
-
-/// @ingroup solidfi_l2
 /// @brief Dynamic interception on a Converter — the detour on the road.
 ///
 /// A Proxy intercepts a Converter's traversal without modifying the Graph. The graph
@@ -107,25 +102,14 @@ class Serialization {};
 class Proxy {};
 
 /// @ingroup solidfi_l2
-/// @brief Guarantees bidirectional communication between two endpoints.
-///
-/// Roundtrip builds on L1 Inverter<T,U>, which guarantees bidirectional conversion
-/// (T→U and U→T at the type level), and elevates that guarantee to the protocol level:
-/// a full round trip — serialize, transmit, receive, deserialize — with the inverse path
-/// guaranteed to exist.
-///
-/// @todo Specification pending.
-class Roundtrip {};
-
-/// @ingroup solidfi_l2
 /// @brief Enriches a Runtime with converters valid for a specific deployment context.
 ///
 /// Different deployment contexts (browser vs. Node, client vs. server) require different
-/// edge sets — some converters cannot load or execute in a given environment. A PluginLoader
+/// edge sets — some converters cannot load or execute in a given environment. A Loader
 /// is a `Converter<Runtime, Runtime, P>` that installs only the edges appropriate for its
-/// context, returning an enriched Runtime. Multiple PluginLoaders can be chained.
+/// context, returning an enriched Runtime. Multiple Loaders can be chained.
 ///
 /// @todo Specification pending.
-class PluginLoader {};
+class Loader {};
 
 } // namespace solidfi

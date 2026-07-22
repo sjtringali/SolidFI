@@ -91,7 +91,8 @@ Stubs. Built on L1 primitives. Not yet fully specified.
 | -----------------| ----------------------------------------------------------------|
 | `Protocol`      | Encoding and framing contract for a communication exchange     |
 | `Transport`     | Physical or logical transmission channel                       |
-| `Serialization` | Converter between in-memory representation and serialized form |
+| `Serializer<T,U>` | `Converter<T,U>` alias; named boundary marker, in-memory to wire form. One-way |
+| `Codec<T,U>`    | `Inverter<T,U>`; encode/decode pair. Satisfies `Serializer<T,U>` for free      |
 | `Proxy`         | Optional interception on a Converter; opt-in, default-off      |
-| `Roundtrip`     | Bidirectional communication; builds on `Inverter<T,U>`         |
-| `PluginLoader`  | `Converter<Runtime, Runtime>` — enriches a Runtime with additional converters |
+| `Roundtrip<T,U>`| `Inverter<T,U>`; request/response pair at the protocol level   |
+| `Loader`        | `Converter<Runtime, Runtime>` — enriches a Runtime with additional converters |
