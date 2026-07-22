@@ -3,14 +3,14 @@
 #pragma once
 
 /// @file Literal.hpp
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 
 #include "solidfi/l1/Transform.hpp"
 #include "solidfi/l1/Converter.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 /// @proposed
 /// @brief Captures a value of type T and produces it regardless of input.
 ///

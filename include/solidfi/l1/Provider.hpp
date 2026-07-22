@@ -3,13 +3,13 @@
 #pragma once
 
 /// @file Provider.hpp
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 
 #include "solidfi/l1/Converter.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 /// @proposed
 /// @brief A Converter oriented toward one-way lookups, typically involving external data sources.
 ///

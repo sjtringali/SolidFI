@@ -3,13 +3,13 @@
 #pragma once
 
 /// @file Generator.hpp
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 
 #include "solidfi/l1/Converter.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 /// @reserved
 /// @brief Produces a value of type T from nothing.
 ///

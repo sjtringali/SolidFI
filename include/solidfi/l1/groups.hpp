@@ -7,9 +7,9 @@
 /// @defgroup solidfi_l1 L1
 /// @brief The primary surface — fully specified interfaces for composable systems.
 /// L1 is what you use. It defines the complete set of typed, named primitives for
-/// building compositions: how data flows and is converted (Structural), how change is
-/// represented and applied (State), and how things are composed statically and
-/// dynamically (Compositions).
+/// building compositions: how data flows and is converted (Structural), specialized
+/// subtypes built on those roots (Extras), how change is represented and applied
+/// (State), and how things are composed statically and dynamically (Compositions).
 
 /// @defgroup solidfi_l1_structural Structural
 /// @ingroup solidfi_l1
@@ -18,7 +18,13 @@
 /// abstract roots. Parameters and Failed complete the core contract.
 /// Chain and Pipeline are the composite forms of Converter and Transform respectively —
 /// ordered compositions that are themselves Converter and Transform, enabling the Composite rule.
-/// Generator, Inverter, Provider, and Literal are specialized subtypes.
+
+/// @defgroup solidfi_l1_extras Extras
+/// @ingroup solidfi_l1
+/// @brief Specialized subtypes built on the structural roots.
+/// Generator, Inverter, Provider, and Literal add no new shape — each is a named
+/// Converter or Transform specialization (Generator: from nothing; Inverter: both
+/// directions; Provider: one-way lookup; Literal: satisfies both hierarchies).
 
 /// @defgroup solidfi_l1_state State
 /// @ingroup solidfi_l1

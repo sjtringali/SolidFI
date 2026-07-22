@@ -3,13 +3,13 @@
 #pragma once
 
 /// @file Inverter.hpp
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 
 #include "solidfi/l1/Converter.hpp"
 
 namespace solidfi {
 
-/// @ingroup solidfi_l1_structural
+/// @ingroup solidfi_l1_extras
 /// @proposed
 /// @brief A pair of converters that roundtrip T and U, implementing both interfaces.
 ///
