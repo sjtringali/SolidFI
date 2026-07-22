@@ -47,7 +47,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | Concept             | Shape                                  | Notes                                                     |
 | ---------------------| ----------------------------------------| -----------------------------------------------------------|
 | `Generator<T,P>`    | `Converter<Void,T,P>`                  | Produces T from nothing                                   |
-| `Inverter<T,U>`     | `Converter<T,U>`                       | Guarantees bidirectional T↔U                              |
+| `Inverter<T,U>`     | `Converter<T,U>` + `Converter<U,T>`    | `forward()`/`reverse()`; implements both interfaces, swap in either|
 | `Provider<T,U>`     | `Converter<T,U>`                       | One-way lookup; I/O oriented                              |
 | `Literal<T,InputT>` | `Transform<T>` + `Converter<InputT,T>` | Captures a T; satisfies both hierarchies. L0: `Closed<T>` |
 
