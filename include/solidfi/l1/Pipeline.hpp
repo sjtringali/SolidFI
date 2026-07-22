@@ -7,6 +7,7 @@
 
 #include "solidfi/l1/Parameters.hpp"
 #include "solidfi/l1/Transform.hpp"
+#include "solidfi/l1/forward.hpp"
 #include <string>
 
 namespace solidfi {
@@ -56,7 +57,7 @@ public:
     ///   Duplicate priorities are rejected — install() MUST fail rather than silently reorder.
     /// @param name Group key. Multiple entries may share a name.
     /// @param transform The transform to install. May itself be a Pipeline<T,P>.
-    void install(int priority, std::string name, Transform<T, P> transform);
+    void install(Priority priority, std::string name, Transform<T, P> transform);
 
     /// @brief Remove all transforms with the given name.
     void remove(std::string name);

@@ -36,7 +36,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | Concept            | Shape               | Notes                                                                  |
 | --------------------| ---------------------| -----------------------------------------------------------------------|
 | `Transform<T,P>`   | `apply(T,P) -> T`   | Takes T, produces T. Cannot fail; degrades to identity                 |
-| `Converter<T,U,P>` | `fetch(T,P) -> U`   | Takes T, produces U. Failure is `Failed<U>`. P for routing             |
+| `Converter<T,U,P>` | `resolve(T,P) -> U` | Takes T, produces U. Failure is `Failed<U>`. P for routing             |
 | `Parameters`       | empty               | Default P across all parameterized types                               |
 | `Failed<T>`        | —                   | Explicit failure signal. Non-intrusive; type-distinct from T. L0: `Sentinel<T>` |
 | `Pipeline<T,P>`    | `run(T,P) -> T`     | Ordered composition of `Transform<T,P>`. IS-A `Transform<T,P>`         |

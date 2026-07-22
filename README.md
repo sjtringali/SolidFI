@@ -9,7 +9,7 @@ Each primitive takes the SOLID principles seriously, not as guidelines but as lo
 - **S, Single Responsibility.** Every primitive has exactly one concern. Converter turns one type into another; Chain chooses from multiple similar converters. Transform takes an object and turns it into another of the same type; Pipeline orders a group of them deterministically. None bleed into each other.
 - **O, Open/Closed.** Install a new converter and nothing existing changes. Chain, Graph, and Runtime are all open for extension by design, closed to modification by contract.
 - **L, Liskov Substitution.** Converters of matching types can be freely swapped with each other, as can Transforms. The Composite rule extends this to object groups: swap one for many to extend (a Converter becomes a Chain transparently), or the reverse to narrow them for testing, staging, or stubbing (a Chain becomes a single Converter).
-- **I, Interface Segregation.** The interfaces are as thin as possible. `fetch()` is one method. `apply()` is one method. You implement only what you need, and no more.
+- **I, Interface Segregation.** The interfaces are as thin as possible. `resolve()` is one method. `apply()` is one method. You implement only what you need, and no more.
 - **D, Dependency Inversion.** Chain and Pipeline are the most common injection mechanisms and you get them for free. They both speak `Converter` and `Transform`, so any conforming implementation drops in without the caller changing. Dependency injection is structural, not configured.
 
 ## The Problem

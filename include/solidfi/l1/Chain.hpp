@@ -8,6 +8,7 @@
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Failed.hpp"
 #include "solidfi/l1/Transform.hpp"
+#include "solidfi/l1/forward.hpp"
 #include <string>
 
 namespace solidfi {
@@ -95,7 +96,7 @@ public:
     /// @brief Install a converter at the given priority under the given name.
     ///
     /// Accepts any Converter<T,U,P>, including another Chain, an Inverter, or a Solver.
-    void install(int priority, std::string name, Converter<T, U, P> converter);
+    void install(Priority priority, std::string name, Converter<T, U, P> converter);
 
     /// @brief Remove all converters with the given name.
     void remove(std::string name);
