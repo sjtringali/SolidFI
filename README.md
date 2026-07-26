@@ -1,6 +1,6 @@
 # SolidFI
 
-SolidFI (**SOLID Implmentation for Functional Interfaces**) is a typed interface specification for composable systems. It defines a small set of interfaces, derived from SOLID principles, that give explicit names and contracts to the transitions between data: the conversions, transformations, and paths that most systems leave anonymous. The interfaces compile. The semantics are defined. It is not a framework, and it is not opinionated about your architecture.
+SolidFI™ (**SOLID Implmentation for Functional Interfaces**) is a typed interface specification for composable systems. It defines a small set of interfaces, derived from SOLID principles, that give explicit names and contracts to the transitions between data: the conversions, transformations, and paths that most systems leave anonymous. The interfaces compile. The semantics are defined. It is not a framework, and it is not opinionated about your architecture.
 
 ### Why SOLID
 
@@ -86,4 +86,4 @@ Not to be confused with Java's `@FunctionalInterface` — that's one interface w
 
 Scott Tringali  
 Copyright (c) 2026. All rights reserved.  
-A permissive license will be applied upon publication.
+A permissive license will be applied when the specification stabilizes.
