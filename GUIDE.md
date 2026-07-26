@@ -139,38 +139,43 @@ But `PageParser` is still mechanical. It's just a hardcoded dispatch — the kin
 
 ## Handling Failure
 
-Converters, since they are mapping between types, can fail. It might be there's no representation between the source and destination (Xml and Page), or there might be some sort of failure performing the action that has nothing to do with T (network timeout, file that disappeared, service that's down). 
+Converters, since they are mapping between types, can fail. It might be there's no 
+representation between the source and destination (Xml and Page), or there might be 
+some sort of failure performing the action that has nothing to do with T (network 
+timeout, file that disappeared, service that's down). 
 
-Chain doesn't particularly care, it just needs to know when a `resolve()` didn't succeed, so it can try the next converter. In the above example, we did this by using `Page | null` which is kinda standard, but still a bit awkward. It mixes up the desired result, getting the page, with how we get there.
+Chain doesn't particularly care, it just needs to know when a `resolve()` didn't 
+succeed, so it can try the next converter. In the above example, we did this by 
+using `Page | null` which is kinda standard, but still a bit awkward. It mixes 
+up the desired result, getting the page, with how we get there.
 
-What we need is a way to represent the failure, without committing to a single solution for everything.
+What we need is a way to represent the failure, without committing to a single 
+solution for everything.
 
-SolidFI uses `Failed<T>` for this, so what `Failed<T>` actually *is* is left entirely to you. The reason it isn't built in is flexibility across large sets of disparately developed types that already exist. Forcing a single representation would mean either restricting which types can participate in a Chain, or wrapping every return value in a container you didn't choose.
+Chain itself stores that value, and you can change it for every link if you need to.
+The reason it isn't built in is flexibility across large sets of disparately
+developed types, that already exist. Forcing a single representation would mean 
+either restricting which types can participate in a Chain, or wrapping every 
+return value in a container you didn't choose.
 
-Now, `null` is still a perfectly valid choice, and in fact usually works for the large majority of cases. But `undefined` or `Symbol` or a blank object are no more right than any others. There are no constraints here, SolidFI just needs to be able to tell success from failure, and you define what failure looks like for your type.
-
-Here's what it looks like in practice. We first declare that `null` means failure for `Page`, and each parser returns it when it encounters something it can't handle:
+Now, `null` is still a perfectly valid choice, and in fact usually works for 
+the large majority of cases. But `undefined` or `Symbol` or a blank object are 
+no more right than any others. There are no constraints here, SolidFI just 
+needs to be able to tell success from failure, and you define what failure 
+looks like for the chain participants.
 
 ```typescript
-  // Declare what failure looks like for Page
-  type Failed<Page> = null;
-
-  class TextParser implements Converter<XML, Page> {
-   resolve(xml: XML): Page | null {
-      if (isImagePage(xml)) return null;  // shouldn't get here, but defensive
-      return parseText(xml);
-    }
-  }
-
-  class ImageParser implements Converter<XML, Page> {
-    resolve(xml: XML): Page | null {
-      if (!isImagePage(xml)) return null;
-      return parseImage(xml);
-    }
-  }
+  const xmlToPage = new Chain<XML, Page>(null);
+  xmlToPage.install(1, 'text',  new TextParser(), undefined);
+  xmlToPage.install(2, 'image', new ImageParser(), ImageParser.ERROR);
 ```
 
-Chain sees `null` come back from `TextParser`, recognizes it as `Failed<Page>`, and moves on to `ImageParser`. The Chain wiring doesn't need to change.
+Chain sees `undefined` come back from `TextParser`, recognizes it as failed, and moves on
+to `ImageParser`. Should that return then ERROR value, then that link fails. Then, the 
+chain itself fails, and returns the chain's *own* failure value: null.
+
+Each link, by the way, is a type 'Strategy' that you can define constants of, pass
+around, compute, even store and load.
 
 ## Static Composition with Path
 

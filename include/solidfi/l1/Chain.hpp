@@ -6,7 +6,6 @@
 /// @ingroup solidfi_l1_structural
 
 #include "solidfi/l1/Converter.hpp"
-#include "solidfi/l1/Failed.hpp"
 #include "solidfi/l1/Transform.hpp"
 #include "solidfi/l1/forward.hpp"
 #include <string>
@@ -18,7 +17,7 @@ namespace solidfi {
 /// @brief An ordered composition of Converter instances. Is itself a Converter<T,U,P>.
 ///
 /// To any caller holding a Converter<T,U,P> reference, a Chain is indistinguishable from
-/// a single converter — the Composite rule. Chain is the composite form of Converter.
+/// a single converter by the Composite rule. Chain is the composite form of Converter.
 ///
 /// Execution order is determined by priority. The first converter that passes the filter
 /// (rejects() is false AND accepts() is true) is attempted via resolve(). If resolve() succeeds,
@@ -35,10 +34,10 @@ namespace solidfi {
 ///
 /// A Chain may optionally have a prepare Transform<T> that conditions the input, and a
 /// finalize `Transform<U>` that conditions the output. Either may be a Pipeline<T>
-/// or `Pipeline<U>` — the composite rule ensures any Transform<T> satisfies the slot.
+/// or `Pipeline<U>`, as the composite rule ensures any Transform<T> satisfies the slot.
 ///
 /// prepare and finalize are normalization: they condition the input and output
-/// unconditionally. They are not routing — the Solver
+/// unconditionally. They are not routing, the Solver
 /// does not see them, P does not select them, and they apply on every traversal of this
 /// Chain regardless of path. Normalization that belongs to this Chain lives here;
 /// normalization that should be visible across the Graph goes in via Graph::install(Transform<T>).
@@ -62,6 +61,10 @@ public:
     /// @brief Construct an empty Chain with no prepare or finalize transform.
     Chain() = default;
 
+    // @brief Consrruct and empty chain.
+    // @param failed Value that represents a conversion failed.
+    Chain(U failed);
+
     /// @brief Construct a Chain with optional prepare and finalize transforms.
     ///
     /// @param prepare  Transform that conditions the input. May be nullptr.
@@ -76,7 +79,7 @@ public:
 
     /// @brief Optional transform that conditions the result.
     ///
-    /// May be a Pipeline<U,P> — the composite rule ensures any Transform<U,P> satisfies this slot.
+    /// May be a Pipeline<U,P>, the composite rule ensures any Transform<U,P> satisfies this slot.
     /// Null means no finalize transform is applied.
     Transform<U, P>* finalize = nullptr;
 
@@ -105,6 +108,9 @@ public:
     ///
     /// Equivalent to remove(name) followed by install() at the original priority.
     void replace(std::string name, Converter<T, U, P> converter);
+
+private:
+    T failed;
 };
 
 } // namespace solidfi
