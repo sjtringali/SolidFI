@@ -18,7 +18,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Delegate<T>`    | `target() -> T&`           | Object indirection. L2: `Proxy`                                                    |
 | `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                                  |
 | `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`                   |
-| `Sentinel<T>`    | —                          | Abstract signal of absence/failure. L1 mapping: `Failed<T>`                       |
+| `Sentinel<T>`    | —                          | Abstract signal of absence/failure. No current L1 mapping — L1 failure is a plain per-Chain value, not a named type |
 | `Optional<T>`    | —                          | May or may not hold a T                                                            |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                            |
 | `Readonly<T>`    | —                          | A T that cannot be modified after construction                                     |
@@ -36,11 +36,10 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | Concept            | Shape               | Notes                                                                  |
 | --------------------| ---------------------| -----------------------------------------------------------------------|
 | `Transform<T,P>`   | `apply(T,P) -> T`   | Takes T, produces T. Cannot fail; degrades to identity                 |
-| `Converter<T,U,P>` | `resolve(T,P) -> U` | Takes T, produces U. Failure is `Failed<U>`. P for routing             |
+| `Converter<T,U,P>` | `resolve(T,P) -> U` | Takes T, produces U. Failure is a plain value of U defined by the composer (e.g. Chain), not a wrapper type. P for routing |
 | `Parameters`       | empty               | Default P across all parameterized types                               |
-| `Failed<T>`        | —                   | Explicit failure signal. Non-intrusive; type-distinct from T. L0: `Sentinel<T>` |
 | `Pipeline<T,P>`    | `run(T,P) -> T`     | Ordered composition of `Transform<T,P>`. IS-A `Transform<T,P>`         |
-| `Chain<T,U,P>`     | `resolve(T,P) -> U` | Ordered composition of `Converter<T,U,P>`. IS-A `Converter<T,U,P>`    |
+| `Chain<T,U,P>`     | `resolve(T,P) -> U` | Ordered composition of `Converter<T,U,P>`. IS-A `Converter<T,U,P>`. Carries its own `failed: U` value; install() has a 4-arg overload for a per-link failed value, else the chain's own applies |
 
 ### Extras
 
@@ -65,9 +64,9 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | ------------------| ------------------------------------| --------------------------------------------------------------------------------|
 | `Path<T,U,P>`    | `traverse(T,P) -> U`               | Explicitly-wired T→...→U. IS-A `Converter<T,U,P>`. Builder API provisional.    |
 | `Domain`         | `install<T,U>` / `remove`          | Unordered registry of Converter edges. Holds; does not act. L0: `Graph`. L2: `Runtime` |
-| `Solver<T,U,P>`  | `Converter<Domain,Path<T,U,P>,P>`  | Typed discovery; T,U fixed at compile time; composable via Chain.               |
+| `Solver<T,U,P>`  | `Converter<Domain,Path<T,U,P>,P>`  | Typed discovery; T,U fixed at compile time; composable via Chain. Carries its own `failed: Path<T,U,P>` value |
 | `Pathfinder`     | `find<T,U>(T,P) -> Path`           | Untyped; Domain-bound at construction; one instance, any T→U query at runtime. |
-| `Router<T,U,P>`  | `Converter<T,U,P>`                 | Find-and-execute; composes Solver with Path traversal.                          |
+| `Router<T,U,P>`  | `Converter<T,U,P>`                 | Find-and-execute; composes Solver with Path traversal. Carries its own `failed: U` value — no Path exists to defer to when Solver finds nothing |
 | `Traversal<U,P>` | `Converter<Domain,U,P>`            | Reserved. Abstract base for traversal algorithms over a Domain.                 |
 | `Registry<T>`    | —                                  | Runtime complement to Extensible. Shape TBD.                                    |
 
@@ -78,8 +77,9 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 ### Pathfinder — L0 or L1?
 
 Pathfinder (untyped, Graph-bound, any T→U at runtime) may belong at L0 as the algorithm
-substrate, with `Solver<T,U,P>` as the L1 typed projection — mirroring the Sentinel→Failed
-pattern. Currently treated as L1 until implementation clarifies the right level.
+substrate, with `Solver<T,U,P>` as the L1 typed projection — mirroring how other L0
+concepts get concretized at L1. Currently treated as L1 until implementation clarifies
+the right level.
 
 ---
 

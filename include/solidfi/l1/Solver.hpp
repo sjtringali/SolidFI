@@ -47,6 +47,8 @@ namespace solidfi {
 /// - Solver MUST NOT modify the Domain passed to resolve().
 /// - P flows into individual converters along the path, consistent with Converter semantics.
 ///   The Domain itself is not inspected with P.
+/// - Solver carries its own failed value (see the constructor), returned when no
+///   route T->U exists in the Domain.
 ///
 /// @tparam T source type; the start of the path being sought.
 /// @tparam U destination type; the end of the path being sought.
@@ -54,15 +56,25 @@ namespace solidfi {
 template<typename T, typename U, typename P = Parameters>
 class Solver : public Converter<Domain, Path<T, U, P>, P> {
 public:
+    /// @brief Construct a Solver with a default-constructed failed Path.
+    Solver() = default;
+
+    /// @brief Construct a Solver with an explicit failure value.
+    /// @param failed Path<T,U,P> returned when no route exists.
+    explicit Solver(Path<T, U, P> failed);
+
     /// @brief Find a path T->U through the given Domain. Returns it without executing.
     ///
     /// The returned Path IS-A Converter<T,U,P> and can be traversed immediately or
-    /// retained for reuse. Returns a failed Path if no route exists.
+    /// retained for reuse. Returns Solver's own failed value if no route exists.
     ///
     /// To find-and-execute in one step, use Router<T,U,P>.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     Path<T, U, P> resolve(Domain domain, P params) override;
+
+private:
+    Path<T, U, P> failed;
 };
 
 } // namespace solidfi

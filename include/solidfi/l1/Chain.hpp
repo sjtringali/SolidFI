@@ -20,9 +20,14 @@ namespace solidfi {
 /// a single converter by the Composite rule. Chain is the composite form of Converter.
 ///
 /// Execution order is determined by priority. The first converter that passes the filter
-/// (rejects() is false AND accepts() is true) is attempted via resolve(). If resolve() succeeds,
-/// the chain short-circuits and returns the result. If resolve() fails, the chain continues
-/// to the next converter in priority order. If no converter succeeds, the chain fails.
+/// (rejects() is false AND accepts() is true) is attempted via resolve(). If the result is
+/// not equal to the applicable failure value, the chain short-circuits and returns it.
+/// Otherwise the chain continues to the next converter in priority order. If no converter
+/// succeeds, the chain fails and returns its own failed value.
+///
+/// Each link may declare its own failure value via the four-argument install() overload.
+/// A link installed without one is compared against the chain's own failed value
+/// instead (see the Chain constructor).
 ///
 /// **Filtering rule:**
 /// @code
@@ -49,7 +54,10 @@ namespace solidfi {
 /// - Priority determines execution order. Duplicate priorities are rejected — install() MUST
 ///   fail (throw or return an error) rather than silently produce undefined ordering.
 /// - Names are group keys: multiple entries may share a name. remove(name) removes all.
-/// - If no converter succeeds, the chain fails (returns Failed<T>).
+/// - If no converter succeeds, the chain fails and returns its own configured
+///   failed value (see the `failed` constructor parameter).
+/// - A link's failure value, if given at install(), is what that link's resolve()
+///   is compared against. Omitted means the chain's own failed value applies.
 /// - prepare and finalize are optional; absent means no transform applied.
 ///
 /// @tparam T source type; free generic, owned by the user.
@@ -61,8 +69,8 @@ public:
     /// @brief Construct an empty Chain with no prepare or finalize transform.
     Chain() = default;
 
-    // @brief Consrruct and empty chain.
-    // @param failed Value that represents a conversion failed.
+    /// @brief Construct an empty chain with an explicit failure value.
+    /// @param failed Value of U returned when no installed converter succeeds.
     Chain(U failed);
 
     /// @brief Construct a Chain with optional prepare and finalize transforms.
@@ -99,7 +107,17 @@ public:
     /// @brief Install a converter at the given priority under the given name.
     ///
     /// Accepts any Converter<T,U,P>, including another Chain, an Inverter, or a Solver.
+    /// This link's resolve() is compared against the chain's own failed value.
     void install(Priority priority, std::string name, Converter<T, U, P> converter);
+
+    /// @brief Install a converter with its own per-link failure value.
+    ///
+    /// Accepts any Converter<T,U,P>, including another Chain, an Inverter, or a Solver.
+    ///
+    /// @param failed Per-link failure value of U. This link's resolve() is compared
+    ///   against it, instead of the chain's own failed value, to decide whether this
+    ///   link failed.
+    void install(Priority priority, std::string name, Converter<T, U, P> converter, U failed);
 
     /// @brief Remove all converters with the given name.
     void remove(std::string name);
@@ -109,8 +127,14 @@ public:
     /// Equivalent to remove(name) followed by install() at the original priority.
     void replace(std::string name, Converter<T, U, P> converter);
 
+    /// @brief Replace the converter(s) with the given name, preserving priority,
+    /// with its own per-link failure value.
+    ///
+    /// Equivalent to remove(name) followed by install() at the original priority.
+    void replace(std::string name, Converter<T, U, P> converter, U failed);
+
 private:
-    T failed;
+    U failed;
 };
 
 } // namespace solidfi

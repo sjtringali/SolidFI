@@ -31,7 +31,8 @@ namespace solidfi {
 ///
 /// **Invariants:**
 /// - Router MUST NOT modify the Solver or Domain it holds.
-/// - Returns Failed<U> if Solver finds no path or traversal fails.
+/// - Router carries its own failed value (see the constructor), returned when
+///   Solver finds no path at all, or when the resulting Path's traversal fails.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -42,16 +43,28 @@ public:
     /// @brief Bind this Router to a Domain. Creates a default Solver internally.
     explicit Router(Domain domain);
 
+    /// @brief Bind this Router to a Domain, with an explicit failure value.
+    /// @param failed Value of U returned when Solver finds no path or traversal fails.
+    Router(Domain domain, U failed);
+
     /// @brief Bind this Router to an explicit Solver. Use when traversal strategy matters.
     explicit Router(Solver<T, U, P> solver);
+
+    /// @brief Bind this Router to an explicit Solver, with an explicit failure value.
+    /// @param failed Value of U returned when Solver finds no path or traversal fails.
+    Router(Solver<T, U, P> solver, U failed);
 
     bool accepts(T value) const override;
     bool rejects(T value) const override;
 
-    /// @brief Solve for a path T->U and traverse it. Returns Failed<U> on failure.
+    /// @brief Solve for a path T->U and traverse it. On failure (no path found, or
+    /// traversal fails), returns Router's own failed value.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     U resolve(T value, P params) override;
+
+private:
+    U failed;
 };
 
 } // namespace solidfi

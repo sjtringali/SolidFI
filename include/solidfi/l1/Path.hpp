@@ -35,7 +35,8 @@ namespace solidfi {
 ///
 /// **Invariants:**
 /// - The path is defined at construction. Steps are not added after build.
-/// - Failure at any stage propagates as Failed<U> — the path does not retry.
+/// - Failure at any stage propagates as whatever failure value that stage's
+///   Converter or Chain defines for U — the path does not retry.
 /// - Path MUST NOT modify any Converter or Transform it holds.
 /// - The internal structure is recursive (cons-list of steps). No runtime iteration.
 ///

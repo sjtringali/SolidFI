@@ -15,7 +15,8 @@
 /// @ingroup solidfi_l1
 /// @brief The primary primitives — the roots everything else composes from.
 /// Transform (T → T, cannot fail) and Converter (T → U, may fail, carries P) are the two
-/// abstract roots. Parameters and Failed complete the core contract.
+/// abstract roots. Parameters completes the core contract; failure itself is a
+/// plain value each Chain defines (see Chain's `failed`), not a dedicated type.
 /// Chain and Pipeline are the composite forms of Converter and Transform respectively —
 /// ordered compositions that are themselves Converter and Transform, enabling the Composite rule.
 

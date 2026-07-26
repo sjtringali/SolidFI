@@ -17,13 +17,13 @@ namespace solidfi {
 ///
 /// T and U are typically different types — this is a genuine conversion, not a
 /// transformation. Because T and U are distinct, failure is possible: there is no
-/// identity fallback. Failure is represented as Failed<T> — a type-distinct, non-intrusive
-/// signal. Converter itself does not require Failed<T>; that contract belongs to Chain,
-/// which uses it to test resolve() results during traversal. Failure is state, not control
-/// flow — resolve() never throws.
+/// identity fallback. Converter does not mandate a single failure representation,
+/// resolve() returns a plain value of U, and what counts as failure is defined by
+/// whoever composes converters (e.g. Chain's own `failed` value), not by Converter
+/// itself.
 ///
-/// P is an optional user-defined parameter type for routing and dispatch. The framework
-/// never inspects P — it only passes it through to resolve(). Defaults to Parameters.
+/// P is an optional user-defined parameter type for routing and dispatch. The primitives 
+/// does not inspect P, it only passes it through to resolve(). Defaults to Parameters.
 ///
 /// **Filtering rule** (shared with Chain):
 /// @code
@@ -37,7 +37,8 @@ namespace solidfi {
 /// - accepts(), rejects(), and handles() MUST be stateless and synchronous.
 /// - accepts() and rejects() MUST NOT depend on P.
 /// - handles() MUST NOT depend on T.
-/// - resolve() MAY fail; returns Failed<T> on failure. MUST NOT throw.
+/// - resolve() MAY fail; the composing context (e.g. Chain) defines which value of
+///   U represents failure. MUST NOT throw.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -60,7 +61,8 @@ public:
     /// never attempted via resolve(). MUST NOT depend on T — that belongs in accepts().
     virtual bool handles(P params) const { return true; }
 
-    /// @brief Perform the conversion. Returns Failed<T> on failure.
+    /// @brief Perform the conversion. On failure, returns whichever value of U the
+    /// composing context has defined to mean failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     /// @note Never throws. Sentinel is a returned value, not a control flow path.

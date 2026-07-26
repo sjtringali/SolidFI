@@ -258,7 +258,7 @@ Now let's add a new feature for accessiblity. Say we want the reader to support 
 
 This is a Transform. Unlike Converters that change type and thus the value, Transforms, change the value, but not the type. Therefore this filter is a `Transform<HTML>`.
 
-One really nice property of Transforms is they cannot fail. If a transform can't do anything useful with its input, it returns the original value unchanged. No failure path, no `Failed<T>`, no sentinel. The degradation floor is identity. That constraint is what makes them composable much easier than Converter. 
+One really nice property of Transforms is they cannot fail. If a transform can't do anything useful with its input, it returns the original value unchanged. No failure path, no sentinel value to define, nothing you need to reserve to mean "this didn't work." The degradation floor is identity. That constraint is what makes them composable much easier than Converter. 
 
 Still, it only should run when needed. Since P flows through the whole path, the transform just checks it directly in `apply()` and returns the original value unchanged if it doesn't apply:
 

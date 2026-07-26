@@ -15,9 +15,8 @@ namespace solidfi {
 /// and returns it on demand via a static value() method. Specialize to declare which
 /// value of U represents failure.
 ///
-/// The L1 mapping is Failed<T>: a type-distinct, non-intrusive failure signal that
-/// does not require U to reserve any value. Prefer Failed<T> in L1 code.
-///
+/// L1 currently has no dedicated failure type — Chain defines failure as a plain,
+/// per-instance value of U (its `failed` member) rather than a named wrapper.
 /// Sentinel<U> remains useful when U is a type that cannot be changed (third-party
 /// or primitive types) and must use a reserved in-band value to signal failure.
 ///
@@ -35,7 +34,6 @@ namespace solidfi {
 /// @tparam U the type for which a failure sentinel is declared.
 /// @note L0 mapping: Closed<T> — Sentinel<U> is a Closed<U> with semantic meaning.
 /// @note Pattern: std::hash<T> — same non-intrusive specialization mechanism.
-/// @see Failed<T> — the preferred L1 alternative.
 template<typename U>
 struct Sentinel;
 
