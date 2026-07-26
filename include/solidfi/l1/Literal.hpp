@@ -41,16 +41,16 @@ public:
     /// @brief Retrieve the captured value.
     T get() const;
 
-    bool accepts(T value) const override { return true; }
-    bool rejects(T value) const override { return false; }
+    bool accepts(T value) const noexcept override { return true; }
+    bool rejects(T value) const noexcept override { return false; }
 
     /// @brief Return the captured value. The input and parameters are ignored.
-    T apply(T, P) override;
+    T apply(T, P) noexcept override;
 
     /// @brief Return the captured value. The input and parameters are ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T resolve(InputT, P) override;
+    T resolve(InputT, P) noexcept override;
 };
 
 } // namespace solidfi

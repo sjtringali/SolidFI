@@ -43,25 +43,25 @@ template<typename T, typename P = Parameters>
 class Transform {
 public:
     /// @brief Returns true if this transform claims the input. Default: true.
-    virtual bool accepts(T value) const { return true; }
+    virtual bool accepts(T value) const noexcept { return true; }
 
     /// @brief Returns true if this transform explicitly refuses the input. Default: false.
     ///
     /// A transform that rejects is skipped; apply() is never
     /// called. Rejection is not failure; it is abstention.
-    virtual bool rejects(T value) const { return false; }
+    virtual bool rejects(T value) const noexcept { return false; }
 
     /// @brief Returns true if this transform can handle these parameters. Default: true.
     ///
     /// A transform that does not handle the parameters is
     /// skipped by Pipeline — same passthrough semantics as rejects().
     /// MUST NOT depend on T — that belongs in accepts().
-    virtual bool handles(P params) const { return true; }
+    virtual bool handles(P params) const noexcept { return true; }
 
     /// @brief Perform the transformation. MUST return a T.
     ///
     /// If this transform does not accept the input, MUST return the original value unchanged.
-    virtual T apply(T value, P params) = 0;
+    virtual T apply(T value, P params) noexcept = 0;
 
 };
 

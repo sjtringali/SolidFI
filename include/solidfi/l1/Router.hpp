@@ -54,14 +54,14 @@ public:
     /// @param failed Value of U returned when Solver finds no path or traversal fails.
     Router(Solver<T, U, P> solver, U failed);
 
-    bool accepts(T value) const override;
-    bool rejects(T value) const override;
+    bool accepts(T value) const noexcept override;
+    bool rejects(T value) const noexcept override;
 
     /// @brief Solve for a path T->U and traverse it. On failure (no path found, or
     /// traversal fails), returns Router's own failed value.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U resolve(T value, P params) override;
+    U resolve(T value, P params) noexcept override;
 
 private:
     U failed;

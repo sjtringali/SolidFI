@@ -27,7 +27,7 @@ namespace solidfi {
 template<typename T, typename U, typename P = Parameters>
 class Race : public Converter<T, U, P> {
 public:
-    U resolve(T value, P params) override = 0;
+    U resolve(T value, P params) noexcept override = 0;
 };
 
 } // namespace solidfi

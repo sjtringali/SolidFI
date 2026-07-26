@@ -91,18 +91,18 @@ public:
     /// Null means no finalize transform is applied.
     Transform<U, P>* finalize = nullptr;
 
-    bool accepts(T value) const override;
-    bool rejects(T value) const override;
+    bool accepts(T value) const noexcept override;
+    bool rejects(T value) const noexcept override;
 
     /// @brief Execute the chain. Friendly alias for resolve().
     ///
     /// Prefer dispatch() when calling a known Chain directly.
-    U dispatch(T value, P params);
+    U dispatch(T value, P params) noexcept;
 
     /// @brief Try each installed converter in priority order until one succeeds.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U resolve(T value, P params) override;
+    U resolve(T value, P params) noexcept override;
 
     /// @brief Install a converter at the given priority under the given name.
     ///

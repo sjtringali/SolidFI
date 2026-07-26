@@ -40,18 +40,18 @@ public:
     /// @brief Convert in the forward direction: T to U. Primary entry point.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    virtual U forward(T value, Parameters params) = 0;
+    virtual U forward(T value, Parameters params) noexcept = 0;
 
     /// @brief Convert in the reverse direction: U to T. Primary entry point.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    virtual T reverse(U value, Parameters params) = 0;
+    virtual T reverse(U value, Parameters params) noexcept = 0;
 
     /// @brief Forwarding alias satisfying Converter<T,U>. Prefer forward() when calling directly.
-    U resolve(T value, Parameters params) override { return forward(value, params); }
+    U resolve(T value, Parameters params) noexcept override { return forward(value, params); }
 
     /// @brief Forwarding alias satisfying Converter<U,T>. Prefer reverse() when calling directly.
-    T resolve(U value, Parameters params) override { return reverse(value, params); }
+    T resolve(U value, Parameters params) noexcept override { return reverse(value, params); }
 };
 
 } // namespace solidfi

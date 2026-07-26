@@ -71,7 +71,7 @@ public:
     /// To find-and-execute in one step, use Router<T,U,P>.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    Path<T, U, P> resolve(Domain domain, P params) override;
+    Path<T, U, P> resolve(Domain domain, P params) noexcept override;
 
 private:
     Path<T, U, P> failed;

@@ -22,13 +22,13 @@ namespace solidfi {
 template<typename T, typename P = Parameters>
 class Generator : public Converter<Void, T, P> {
 public:
-    bool accepts(Void) const override { return true; }
-    bool rejects(Void) const override { return false; }
+    bool accepts(Void) const noexcept override { return true; }
+    bool rejects(Void) const noexcept override { return false; }
 
     /// @brief Produce a T. The Void argument carries no data and should be ignored.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    T resolve(Void input, P params) override = 0;
+    T resolve(Void input, P params) noexcept override = 0;
 };
 
 } // namespace solidfi

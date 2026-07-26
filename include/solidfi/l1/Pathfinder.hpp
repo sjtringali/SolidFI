@@ -49,7 +49,7 @@ public:
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     template<typename T, typename U, typename P = Parameters>
-    Path<T, U, P> find(T value, P params);
+    Path<T, U, P> find(T value, P params) noexcept;
 };
 
 } // namespace solidfi

@@ -18,7 +18,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Delegate<T>`    | `target() -> T&`           | Object indirection. L2: `Proxy`                                                    |
 | `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                                  |
 | `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`                   |
-| `Sentinel<T>`    | —                          | Abstract signal of absence/failure. No current L1 mapping — L1 failure is a plain per-Chain value, not a named type |
+| `Sentinel<T>`    | —                          | Reserved. Not implemented — removed along with `Failed<T>`; L1 failure is a plain per-Chain value, not a named type |
 | `Optional<T>`    | —                          | May or may not hold a T                                                            |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                            |
 | `Readonly<T>`    | —                          | A T that cannot be modified after construction                                     |

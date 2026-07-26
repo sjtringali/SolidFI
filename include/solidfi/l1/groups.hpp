@@ -42,5 +42,5 @@
 /// Solver<T,U,P> IS-A Converter<Domain,Path<T,U,P>,P> — typed discovery for compile-time-known T and U.
 /// Pathfinder is the untyped complement: Domain-bound, one instance, any T->U query at runtime.
 /// Router<T,U,P> composes Solver with Path traversal as a single Converter<T,U,P>: find-and-execute.
-/// Traversal<U> is the reserved abstract base for traversal algorithms over a Domain.
+/// `Traversal<U>` is the reserved abstract base for traversal algorithms over a Domain.
 /// Registry is the general-purpose runtime complement to Extensible.

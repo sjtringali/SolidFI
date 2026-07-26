@@ -29,13 +29,13 @@ namespace solidfi {
 template<typename U, typename P = Parameters>
 class Traversal : public Converter<Domain, U, P> {
 public:
-    bool accepts(Domain domain) const override { return true; }
-    bool rejects(Domain domain) const override { return false; }
+    bool accepts(Domain domain) const noexcept override { return true; }
+    bool rejects(Domain domain) const noexcept override { return false; }
 
     /// @brief Execute the traversal over the given domain with the given parameters.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U resolve(Domain domain, P params) override = 0;
+    U resolve(Domain domain, P params) noexcept override = 0;
 };
 
 } // namespace solidfi

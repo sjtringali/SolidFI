@@ -38,7 +38,7 @@ namespace solidfi {
 /// - accepts() and rejects() MUST NOT depend on P.
 /// - handles() MUST NOT depend on T.
 /// - resolve() MAY fail; the composing context (e.g. Chain) defines which value of
-///   U represents failure. MUST NOT throw.
+///   U represents failure.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -48,25 +48,25 @@ template<typename T, typename U, typename P = Parameters>
 class Converter {
 public:
     /// @brief Returns true if this converter claims the input. Default: true.
-    virtual bool accepts(T value) const { return true; }
+    virtual bool accepts(T value) const noexcept { return true; }
 
     /// @brief Returns true if this converter explicitly refuses the input. Default: false.
     ///
     /// A converter that rejects is never attempted via resolve().
-    virtual bool rejects(T value) const { return false; }
+    virtual bool rejects(T value) const noexcept { return false; }
 
     /// @brief Returns true if this converter can handle these parameters. Default: true.
     ///
     /// A converter that does not handle the parameters is
     /// never attempted via resolve(). MUST NOT depend on T — that belongs in accepts().
-    virtual bool handles(P params) const { return true; }
+    virtual bool handles(P params) const noexcept { return true; }
 
     /// @brief Perform the conversion. On failure, returns whichever value of U the
     /// composing context has defined to mean failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    /// @note Never throws. Sentinel is a returned value, not a control flow path.
-    virtual U resolve(T value, P params) = 0;
+    /// @note Failure is state, not control flow — it is the returned value described above.
+    virtual U resolve(T value, P params) noexcept = 0;
 
 };
 

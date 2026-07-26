@@ -76,10 +76,10 @@ public:
     /// @brief Execute the path. Friendly alias for resolve().
     ///
     /// Prefer traverse() when calling a known Path directly.
-    U traverse(T value, P params);
+    U traverse(T value, P params) noexcept;
 
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    U resolve(T value, P params) override;
+    U resolve(T value, P params) noexcept override;
 };
 
 /// @brief Begin building a Path starting from type T.
