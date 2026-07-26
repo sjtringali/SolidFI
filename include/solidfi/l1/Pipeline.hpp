@@ -63,6 +63,7 @@ public:
     void remove(std::string name);
 
     /// @brief Replace the transform(s) with the given name, preserving priority.
+    /// @proposed
     ///
     /// Equivalent to remove(name) followed by install() at the original priority.
     void replace(std::string name, Transform<T, P> transform);

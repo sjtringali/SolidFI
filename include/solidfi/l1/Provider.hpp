@@ -13,7 +13,7 @@ namespace solidfi {
 /// @proposed
 /// @brief A Converter oriented toward one-way lookups, typically involving external data sources.
 ///
-/// Provider implies a one-directional fetch from an external resource — I/O, a database,
+/// Provider implies a one-directional fetch from an external resource: for I/O, a database,
 /// a network service, a registry. Unlike Inverter, there is no reverse direction guarantee.
 ///
 /// @tparam T source type (lookup key); free generic, owned by the user.

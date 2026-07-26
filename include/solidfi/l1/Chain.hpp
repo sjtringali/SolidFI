@@ -77,15 +77,18 @@ public:
     ///
     /// @param prepare  Transform that conditions the input. May be nullptr.
     /// @param finalize Transform that conditions the result. May be nullptr.
+    /// @proposed
     explicit Chain(Transform<T>* prepare, Transform<U>* finalize = nullptr);
 
     /// @brief Optional transform that conditions the input.
+    /// @proposed
     ///
     /// May be a Pipeline<T,P> — the composite rule ensures any Transform<T,P> satisfies this slot.
     /// Null means no prepare transform is applied.
     Transform<T, P>* prepare = nullptr;
 
     /// @brief Optional transform that conditions the result.
+    /// @proposed
     ///
     /// May be a Pipeline<U,P>, the composite rule ensures any Transform<U,P> satisfies this slot.
     /// Null means no finalize transform is applied.
@@ -123,12 +126,14 @@ public:
     void remove(std::string name);
 
     /// @brief Replace the converter(s) with the given name, preserving priority.
+    /// @proposed
     ///
     /// Equivalent to remove(name) followed by install() at the original priority.
     void replace(std::string name, Converter<T, U, P> converter);
 
     /// @brief Replace the converter(s) with the given name, preserving priority,
     /// with its own per-link failure value.
+    /// @proposed
     ///
     /// Equivalent to remove(name) followed by install() at the original priority.
     void replace(std::string name, Converter<T, U, P> converter, U failed);
