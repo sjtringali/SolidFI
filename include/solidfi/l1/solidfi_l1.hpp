@@ -15,6 +15,7 @@
 #include "solidfi/l1/Converter.hpp"
 #include "solidfi/l1/Pipeline.hpp"
 #include "solidfi/l1/Chain.hpp"
+#include "solidfi/l1/Race.hpp"
 #include "solidfi/l1/Path.hpp"
 #include "solidfi/l1/Registry.hpp"
 #include "solidfi/l1/Generator.hpp"
