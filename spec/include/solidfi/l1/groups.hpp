@@ -23,9 +23,10 @@
 /// @defgroup solidfi_l1_extras Extras
 /// @ingroup solidfi_l1
 /// @brief Specialized subtypes built on the structural roots.
-/// Generator, Inverter, Provider, and Literal add no new shape — each is a named
-/// Converter or Transform specialization (Generator: from nothing; Inverter: both
-/// directions; Provider: one-way lookup; Literal: satisfies both hierarchies).
+/// Generator, Inverter, Provider, Literal, and Delegate add no new shape — each is a
+/// named Converter or Transform specialization (Generator: from nothing; Inverter: both
+/// directions; Provider: one-way lookup; Literal: satisfies both hierarchies; Delegate:
+/// forwards to another converter, eagerly or lazily).
 
 /// @defgroup solidfi_l1_state State
 /// @ingroup solidfi_l1

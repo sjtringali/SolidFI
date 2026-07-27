@@ -22,6 +22,7 @@
 #include "solidfi/l1/Inverter.hpp"
 #include "solidfi/l1/Provider.hpp"
 #include "solidfi/l1/Literal.hpp"
+#include "solidfi/l1/Delegate.hpp"
 
 // State
 #include "solidfi/l1/Delta.hpp"

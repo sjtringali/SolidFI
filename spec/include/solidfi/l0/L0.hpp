@@ -81,27 +81,6 @@ public:
 };
 
 /// @ingroup solidfi_l0
-/// @brief Object indirection: refers to another T and delegates to it.
-///
-/// Delegate<T> is the abstract concept of "this T points to another T." It carries no
-/// network assumptions, no lifecycle policy — just the redirect. Any T that holds a
-/// Delegate<T> can delegate its behavior to the target instead of executing directly.
-///
-/// At L1 a Converter may carry a Delegate as a field (creation-bound or injected), making
-/// it either a delegating converter or a passthrough to another. At L2 this concept is
-/// specialized into Proxy, which adds network transparency, live service directories,
-/// and remote redirection.
-///
-/// @tparam T the type being redirected; free generic, owned by the user.
-/// @note L1 mapping: optional redirect field on Converter — TBD.
-/// @note L2 mapping: Proxy — the network-transparency specialization of Delegate.
-template<typename T>
-class Delegate {
-public:
-    virtual T& target() = 0;
-};
-
-/// @ingroup solidfi_l0
 /// @brief Reserved. A directed relationship between two types T and U.
 ///
 /// @tparam T source type; free generic, owned by the user.
