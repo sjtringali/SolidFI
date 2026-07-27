@@ -4,16 +4,16 @@
 PROJECT_NAME           = "SolidFI"
 PROJECT_BRIEF          = "Functional Interfaces for Composition"
 PROJECT_NUMBER         = "Draft ($(GIT_SHA))"
-OUTPUT_DIRECTORY       = docs
+OUTPUT_DIRECTORY       = spec/docs
 
 #---------------------------------------------------------------------------
 # Input
 #---------------------------------------------------------------------------
-INPUT                  = include/solidfi README.md docs/INSPIRATION.md
+INPUT                  = spec/include/solidfi README.md spec/docs/INSPIRATION.md
 FILE_PATTERNS          = *.hpp *.md
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
-STRIP_FROM_PATH        = include/
+STRIP_FROM_PATH        = spec/include/
 
 #---------------------------------------------------------------------------
 # Extraction — document everything, spec is the source of truth
@@ -52,9 +52,9 @@ HTML_OUTPUT            = html
 CREATE_SUBDIRS         = NO
 GENERATE_TREEVIEW      = NO
 DISABLE_INDEX          = NO
-HTML_HEADER            = docs/header.html
-HTML_FOOTER            = docs/copyright.html
-HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome.css
+HTML_HEADER            = spec/docs/header.html
+HTML_FOOTER            = spec/docs/copyright.html
+HTML_EXTRA_STYLESHEET  = spec/docs/doxygen-awesome.css
 HTML_COLORSTYLE        = LIGHT
 TREEVIEW_WIDTH         = 300
 ENUM_VALUES_PER_LINE   = 1

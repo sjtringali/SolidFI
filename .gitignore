@@ -1,1 +1,3 @@
-docs/html
+spec/docs/html
+ts/node_modules
+ts/dist
