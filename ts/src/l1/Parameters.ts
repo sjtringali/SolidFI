@@ -1,0 +1,3 @@
+// Copyright (c) 2026 Scott Tringali. All rights reserved.
+
+export interface Parameters {}
