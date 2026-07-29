@@ -18,7 +18,7 @@ namespace solidfi {
 /// a Converter<T,U,P>: one traverse(), one answer.
 ///
 /// Because Path IS-A Multipath IS-A Converter<T,U,P>, it satisfies both type slots.
-/// Solver<T,U,P> produces a Path<T,U,P>.
+/// Solver<T,U,P> produces a Path<T,U,P>. L0: Typechain<T,U>.
 ///
 /// Builder interface -- mirrors Multipath without toEither() or varargs:
 /// - to()      -- advances the type (T->V) by adding a single Converter.

@@ -19,13 +19,12 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Goto<T,U>`      | —                          | Reserved. Directed relationship T→U; purpose TBD                                  |
 | `Closed<T>`      | `get() -> T`               | Captures a T; produces it regardless of input. L1: `Literal<T>`                   |
 | `Sentinel<T>`    | —                          | Reserved. Not implemented — removed along with `Failed<T>`; L1 failure is a plain per-Chain value, not a named type |
-| `Optional<T>`    | —                          | May or may not hold a T                                                            |
+| `Optional<T>`    | —                          | Reserved. May or may not hold a T. L1: `Optional<T>` (std::optional alias)        |
 | `Shared<T>`      | `get() -> T&`              | Shared ownership of a T                                                            |
 | `Readonly<T>`    | —                          | A T that cannot be modified after construction                                     |
-| `Parameters`     | —                          | Marker for user-defined contextual data                                            |
 | `Graph`          | —                          | Directed graph: typed nodes (types) and typed edges (converters). L1: `Domain`     |
 | `Category`       | —                          | `Graph` alias; category theory's name for the same structure. Theoretical grounding |
-| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category. L1: `Traversal<U,P>` (reserved); `Multipath<T,U,P>`, `Path<T,U,P>` (proposed) |
+| `Typechain<T,U>` | —                          | Type-safe chain of steps T→U; the route itself. L1: `Path<T,U,P>`                         |
 | `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection -> single value                                                   |
 | `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value -> collection                                                 |
 
@@ -64,7 +63,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | Concept          | Shape                              | Notes                                                                           |
 | ------------------| ------------------------------------| --------------------------------------------------------------------------------|
 | `Multipath<T,U,P>` | `traverse(T,P) -> U`             | Wired multi-stage route, may branch. IS-A `Converter<T,U,P>`. Builder: `to()`, `toEither()`, `through()`, `throughAll()`. |
-| `Path<T,U,P>`    | `traverse(T,P) -> U`               | Non-branching route. IS-A `Multipath<T,U,P>`. No `toEither()`. What Solver produces. Builder API provisional. |
+| `Path<T,U,P>`    | `traverse(T,P) -> U`               | Non-branching route. IS-A `Multipath<T,U,P>`. No `toEither()`. What Solver produces. L0: `Typechain<T,U>`. Builder API provisional. |
 | `Domain`         | `install<T,U>` / `remove`          | Unordered registry of Converter edges. Holds; does not act. L0: `Graph`. L2: `Runtime` |
 | `Solver<T,U,P>`  | `Converter<Domain,Path<T,U,P>,P>`  | Typed discovery; T,U fixed at compile time; composable via Chain. Carries its own `failed: Path<T,U,P>` value |
 | `Pathfinder`     | `find<T,U>(T,P) -> Path`           | Untyped; Domain-bound at construction; one instance, any T→U query at runtime. |
@@ -107,6 +106,37 @@ required override. The interface does not punish the common case to cover the ra
 Distinct concepts get distinct names even when they share a pattern. `Chain` vs
 `Pipeline`, `Deferred` vs `Delayed` -- same structural idea, different types, different
 names. Resist collapsing them into a hierarchy just because they look alike.
+
+### Node-scoped vs. edge-scoped hooks
+
+`prepare()` and `finalize()` normalize a converter's input and output. The question is
+who decides: the converter itself, or the assembler that wires it into a path.
+
+Both are valid. A converter can define them directly -- hardcoding the invariant. Or the
+assembler can attach them at wiring time, keeping the converter neutral and letting the
+composition context decide. Either way the hooks are node-scoped: they fire for every
+path that reaches this node, regardless of where it came from.
+
+The alternative -- a standalone Transform wired between two specific converters -- is
+edge-scoped: it applies only to that one transition and is bypassed by any other route
+into or out of the converter. The converter cannot make guarantees about its own
+environment because it depends on every caller wiring it correctly.
+
+In practice, the edge-scoped case rarely comes up. A Transform that is not interested
+in the current data can skip itself via `accepts`/`rejects`/`handles` -- so "this
+transform only applies between A and B" is handled by the Transform's own filtering, not
+by careful wiring. Most real usage is node-scoped.
+
+This pattern brushes up against SRP, but the violation is apparent rather than real. The
+converter does not implement the normalization -- it delegates to a separate named
+Transform. Owning the declaration of what applies at your boundary is part of being that
+boundary, not an extra responsibility. The converter says "this always applies to me."
+The Transform says "here is what that means." Two responsibilities, two concepts.
+
+The parallel is `accepts`/`rejects`: a converter does not implement filtering inline as a
+side concern, it exposes a hook that another concept fills. Or Chain's `failed`: Chain
+does not define what failure means, it holds a value decided elsewhere. Ownership of a
+slot is not the same as responsibility for its content.
 
 ### Construction time vs. execution time
 
