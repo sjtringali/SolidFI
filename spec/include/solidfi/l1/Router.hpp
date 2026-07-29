@@ -12,13 +12,13 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @proposed
+/// @accepted
 /// @brief Find-and-execute as a single Converter<T,U,P>. Composes Solver with Path traversal.
 ///
 /// Router is the third of three complementary concepts:
 ///
 /// - **Solver** — finds the route. Returns a Path<T,U,P>; never executes it.
-/// - **Path** — is the route. IS-A Converter<T,U,P>; executes when traversed.
+/// - **Path** — is the route. IS-A Multipath<T,U,P> IS-A Converter<T,U,P>; executes when traversed.
 /// - **Router** — does both. Holds a Solver; IS-A Converter<T,U,P> for the caller.
 ///
 /// Use Solver directly when you want the Path before executing it (inspection, caching,
@@ -26,7 +26,7 @@ namespace solidfi {
 /// a Converter<T,U,P> and the find-then-execute detail is not their concern.
 ///
 /// Because Router IS-A Converter<T,U,P>, it composes anywhere a Converter does: in a
-/// Chain, in a Path step, or as a direct dependency. The dynamic graph search is hidden
+/// Chain, in a Multipath step, or as a direct dependency. The dynamic graph search is hidden
 /// behind the same interface as a single hand-written converter.
 ///
 /// **Invariants:**

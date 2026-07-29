@@ -25,7 +25,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | `Parameters`     | —                          | Marker for user-defined contextual data                                            |
 | `Graph`          | —                          | Directed graph: typed nodes (types) and typed edges (converters). L1: `Domain`     |
 | `Category`       | —                          | `Graph` alias; category theory's name for the same structure. Theoretical grounding |
-| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category. L1: `Traversal<U,P>` (reserved); `Path<T,U,P>` (proposed) |
+| `Traversal<U>`   | `traverse(Category) -> U`  | Algorithm over a Category. L1: `Traversal<U,P>` (reserved); `Multipath<T,U,P>`, `Path<T,U,P>` (proposed) |
 | `Reduce<T>`      | `reduce([T]) -> T`         | Fold: collection -> single value                                                   |
 | `Expand<T>`      | `expand(T) -> [T]`         | Unfold: single value -> collection                                                 |
 
@@ -47,7 +47,7 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 | ---------------------| ----------------------------------------| -----------------------------------------------------------|
 | `Generator<T,P>`    | `Converter<Void,T,P>`                  | Produces T from nothing                                   |
 | `Inverter<T,U>`     | `Converter<T,U>` + `Converter<U,T>`    | `forward()`/`reverse()`; implements both interfaces, swap in either|
-| `Provider<T,U>`     | `Converter<T,U>`                       | One-way lookup; I/O oriented                              |
+| `Provider<T,U>`     | `Converter<T,U>`                       | Concrete Converter base. Proposed: may be unnecessary with explicit linked-list wiring      |
 | `Literal<T,InputT>` | `Transform<T>` + `Converter<InputT,T>` | Captures a T; satisfies both hierarchies. L0: `Closed<T>` |
 | `Delegate<T,U,P>`   | `Converter<T,U,P>`                     | Forwards to a target converter, bound eagerly or built lazily via a factory function. Not yet lazy through accepts()/rejects()/handles(); see @proposed note in the header |
 
@@ -63,13 +63,64 @@ Foundational concepts that inform L1. For implementers. L0 and L1 are independen
 
 | Concept          | Shape                              | Notes                                                                           |
 | ------------------| ------------------------------------| --------------------------------------------------------------------------------|
-| `Path<T,U,P>`    | `traverse(T,P) -> U`               | Explicitly-wired T→...→U. IS-A `Converter<T,U,P>`. Builder API provisional.    |
+| `Multipath<T,U,P>` | `traverse(T,P) -> U`             | Wired multi-stage route, may branch. IS-A `Converter<T,U,P>`. Builder: `to()`, `toEither()`, `through()`, `throughAll()`. |
+| `Path<T,U,P>`    | `traverse(T,P) -> U`               | Non-branching route. IS-A `Multipath<T,U,P>`. No `toEither()`. What Solver produces. Builder API provisional. |
 | `Domain`         | `install<T,U>` / `remove`          | Unordered registry of Converter edges. Holds; does not act. L0: `Graph`. L2: `Runtime` |
 | `Solver<T,U,P>`  | `Converter<Domain,Path<T,U,P>,P>`  | Typed discovery; T,U fixed at compile time; composable via Chain. Carries its own `failed: Path<T,U,P>` value |
 | `Pathfinder`     | `find<T,U>(T,P) -> Path`           | Untyped; Domain-bound at construction; one instance, any T→U query at runtime. |
 | `Router<T,U,P>`  | `Converter<T,U,P>`                 | Find-and-execute; composes Solver with Path traversal. Carries its own `failed: U` value: no Path exists to defer to when Solver finds nothing |
 | `Traversal<U,P>` | `Converter<Domain,U,P>`            | Reserved. Abstract base for traversal algorithms over a Domain.                 |
 | `Registry<T>`    | —                                  | Runtime complement to Extensible. Shape TBD.                                    |
+
+---
+
+## Design Notes
+
+### Simple things have simple syntax
+
+Let the language's primitives do the work. If a class has no constructor args, pass the
+constructor directly -- `new Delayed(Trim)`, not `new Delayed(() => new Trim())`. A
+constructor reference is already the right shape; don't wrap it in a closure just because
+a factory function is the reflex.
+
+This works for objects; primitives don't have constructors you can pass this way. That's
+fine -- objects first. Primitive support is a bonus if it can be done without ugly
+gymnastics, not a requirement.
+
+Common-case friction should be zero. The complex form (closure, args) exists for when
+you need it. You shouldn't pay for it when you don't.
+
+### Names carry meaning
+
+Named classes over anonymous objects and lambdas. The class name is documentation that
+survives refactoring and shows up in stack traces, logs, and tooling. An anonymous
+function has no name. When the name says everything, extra syntax is noise.
+
+### Optional means optional
+
+Guards (`accepts?`, `rejects?`, `handles?`) are optional properties on the interface. If
+you don't need one, you simply don't implement it -- no stub, no `return true`, no
+required override. The interface does not punish the common case to cover the rare one.
+
+### Separate what is actually separate
+
+Distinct concepts get distinct names even when they share a pattern. `Chain` vs
+`Pipeline`, `Deferred` vs `Delayed` -- same structural idea, different types, different
+names. Resist collapsing them into a hierarchy just because they look alike.
+
+### Construction time vs. execution time
+
+Builder methods (`to()`, `through()`, `toEither()`) are not `noexcept`. Construction is
+the right moment to reject a bad route -- type mismatches, invalid wiring, malformed
+arguments. If something is wrong, throw early.
+
+Data-flow methods (`resolve()`, `traverse()`, `accepts()`, `rejects()`, `handles()`) are
+`noexcept`. By the time you're executing, the route is already validated. Failure at
+execution time is a value -- the `failed` the composer carries -- not an exception. An
+exception here would mean the caller has to handle two different failure channels for the
+same operation.
+
+The split is deliberate: loud at construction, silent at execution.
 
 ---
 

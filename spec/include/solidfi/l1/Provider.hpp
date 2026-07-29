@@ -10,16 +10,13 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @accepted
-/// @brief A named base class for Converter. Extending Provider is the participation contract.
+/// @proposed
+/// @brief A named concrete base for Converter.
 ///
-/// Provider adds no behavior. It exists so that components like the Solver and Router can
-/// distinguish registered converters from anonymous ones. If you want to participate in
-/// graph-based routing or solver discovery, extend Provider. If you only need to satisfy
-/// a Converter<T,U,P> slot directly, a plain Converter implementation is sufficient.
-///
-/// What Provider means in practice is decided by the components that consume it. Provider
-/// itself is intentionally neutral.
+/// Provider adds no behavior -- it is a named abstract base that subclasses implement.
+/// Its original role as a participation contract for Solver and Router is under review:
+/// with explicit linked-list wiring in Multipath and Path, a separate marker base class
+/// may not be necessary. Status: proposed pending implementation experience.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
