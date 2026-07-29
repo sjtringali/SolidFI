@@ -6,9 +6,10 @@ import assert from 'node:assert/strict';
 import { Provider } from './Provider';
 import { Converter } from './Converter';
 import { Chain } from './Chain';
+import { Parameters } from './Parameters';
 
 class UpperCase extends Provider<string, string> {
-    resolve(value: string): string {
+    resolve(value: string, params: Parameters): string {
         return value.toUpperCase();
     }
 }
@@ -18,7 +19,7 @@ class NonEmptyFilter extends Provider<string, string | null> {
         return value.length > 0;
     }
 
-    resolve(value: string): string {
+    resolve(value: string, params: Parameters): string {
         return value;
     }
 }
@@ -28,7 +29,7 @@ class PrefixedConverter extends Provider<string, string> {
         super();
     }
 
-    resolve(value: string): string {
+    resolve(value: string, params: Parameters): string {
         return `${this.prefix}${value}`;
     }
 }
@@ -51,7 +52,7 @@ describe('Provider', () => {
     });
 
     it('optional accepts() is absent when not defined on the subclass', () => {
-        const p = new UpperCase();
+        const p: Converter<string, string> = new UpperCase();
         assert.equal(p.accepts, undefined);
     });
 
