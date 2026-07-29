@@ -83,6 +83,42 @@ the right level.
 
 ---
 
+## Design Notes
+
+### Simple things have simple syntax
+
+Let the language's primitives do the work. If a class has no constructor args, pass the
+constructor directly -- `new Delayed(Trim)`, not `new Delayed(() => new Trim())`. A
+constructor reference is already the right shape; don't wrap it in a closure just because
+a factory function is the reflex.
+
+This works for objects; primitives don't have constructors you can pass this way. That's
+fine -- objects first. Primitive support is a bonus if it can be done without ugly
+gymnastics, not a requirement.
+
+Common-case friction should be zero. The complex form (closure, args) exists for when
+you need it. You shouldn't pay for it when you don't.
+
+### Names carry meaning
+
+Named classes over anonymous objects and lambdas. The class name is documentation that
+survives refactoring and shows up in stack traces, logs, and tooling. An anonymous
+function has no name. When the name says everything, extra syntax is noise.
+
+### Optional means optional
+
+Guards (`accepts?`, `rejects?`, `handles?`) are optional properties on the interface. If
+you don't need one, you simply don't implement it -- no stub, no `return true`, no
+required override. The interface does not punish the common case to cover the rare one.
+
+### Separate what is actually separate
+
+Distinct concepts get distinct names even when they share a pattern. `Chain` vs
+`Pipeline`, `Deferred` vs `Delayed` -- same structural idea, different types, different
+names. Resist collapsing them into a hierarchy just because they look alike.
+
+---
+
 ## L2 — Domain Patterns
 
 Stubs. Built on L1 primitives. Not yet fully specified.

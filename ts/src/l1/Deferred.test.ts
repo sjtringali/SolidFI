@@ -14,43 +14,26 @@ class UpperCase implements Converter<string, string> {
 }
 
 describe('Deferred', () => {
-    it('constructs the converter on first acquire()', () => {
-        let constructions = 0;
-        const d = new Deferred<string, string>(() => { constructions++; return new UpperCase(); });
-        assert.equal(constructions, 0);
-        d.acquire('hello', {});
-        assert.equal(constructions, 1);
-    });
-
-    it('reuses the same converter instance on subsequent calls', () => {
-        let constructions = 0;
-        const d = new Deferred<string, string>(() => { constructions++; return new UpperCase(); });
-        d.resolve('a', {});
-        d.resolve('b', {});
-        d.resolve('c', {});
-        assert.equal(constructions, 1);
-    });
-
     it('delegates resolve() to the constructed converter', () => {
-        const d = new Deferred<string, string>(() => new UpperCase());
+        const d = new Deferred(UpperCase);
         assert.equal(d.resolve('hello', {}), 'HELLO');
         assert.equal(d.resolve('world', {}), 'WORLD');
     });
 
+    it('acquire() resolves via the constructed converter', () => {
+        const d = new Deferred(UpperCase);
+        assert.equal(d.acquire('hello', {}), 'HELLO');
+    });
+
     it('is assignable to Converter<T, U>', () => {
-        const d: Converter<string, string> = new Deferred(() => new UpperCase());
+        const d: Converter<string, string> = new Deferred(UpperCase);
         assert.equal(d.resolve('hi', {}), 'HI');
     });
 
     it('can be installed in a Chain instead of a direct instance', () => {
-        let constructions = 0;
         const chain = new Chain<string, string | null>(null);
-        chain.install(1, 'upper', new Deferred(() => { constructions++; return new UpperCase(); }));
-
-        assert.equal(constructions, 0);
+        chain.install(1, 'upper', new Deferred(UpperCase));
         assert.equal(chain.resolve('hello', {}), 'HELLO');
-        assert.equal(constructions, 1);
         assert.equal(chain.resolve('world', {}), 'WORLD');
-        assert.equal(constructions, 1);
     });
 });

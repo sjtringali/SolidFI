@@ -8,11 +8,11 @@ export class Deferred<T, U, P extends Parameters = Parameters>
 
     private instance: Converter<T, U, P> | undefined;
 
-    constructor(private readonly factory: () => Converter<T, U, P>) {}
+    constructor(private readonly factory: new () => Converter<T, U, P>) {}
 
     acquire(value: T, params: P): U {
         if (!this.instance) {
-            this.instance = this.factory();
+            this.instance = new this.factory();
         }
         return this.instance.resolve(value, params);
     }
