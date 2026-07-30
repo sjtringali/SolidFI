@@ -67,11 +67,11 @@ public:
     };
     /// @brief Returns a Deferred::Converter that constructs C on first use.
     template<typename C>
-    static auto create() -> Converter<typename C::source_type, typename C::target_type, typename C::params_type>;
+    static auto create() -> Converter<typename C::From, typename C::To, typename C::Parameters>;
 
     /// @brief Returns a Deferred::Transform that constructs C on first use.
     template<typename C>
-    static auto create() -> Transform<typename C::value_type, typename C::params_type>;
+    static auto create() -> Transform<typename C::Input, typename C::Parameters>;
 };
 
 } // namespace solidfi
