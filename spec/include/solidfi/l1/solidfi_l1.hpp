@@ -16,12 +16,14 @@
 #include "solidfi/l1/Pipeline.hpp"
 #include "solidfi/l1/Chain.hpp"
 #include "solidfi/l1/Race.hpp"
+#include "solidfi/l1/Multipath.hpp"
 #include "solidfi/l1/Path.hpp"
 #include "solidfi/l1/Registry.hpp"
 #include "solidfi/l1/Generator.hpp"
 #include "solidfi/l1/Inverter.hpp"
 #include "solidfi/l1/Provider.hpp"
 #include "solidfi/l1/Literal.hpp"
+#include "solidfi/l1/Delegate.hpp"
 
 // State
 #include "solidfi/l1/Delta.hpp"

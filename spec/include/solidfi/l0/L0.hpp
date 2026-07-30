@@ -7,8 +7,7 @@
 ///
 /// L0 defines the foundational primitives that inform L1. Each concept is declared as a
 /// stub with a note describing its relationship to L1. L0 and L1 are independent — L1
-/// does not include or depend on L0. Do not include this alongside L1 headers; names
-/// intentionally overlap (e.g. Optional, Parameters) since L1 concretizes L0 concepts.
+/// does not include or depend on L0. Do not include this alongside L1 headers.
 
 #include <string>
 #include <vector>
@@ -18,7 +17,7 @@
 /// L0 defines the vocabulary of the spec without prescribing implementation. Each concept
 /// is a stub: it claims an identity and notes its relationship to L1, but imposes no
 /// structure on how it is realized. L0 is for implementers — a reference layer that names
-/// what L1 concretizes. L0 and L1 are independent; names overlap intentionally.
+/// what L1 concretizes. L0 and L1 are independent.
 
 namespace solidfi {  // NOLINT: intentional overlap with L1; include L0 standalone only
 
@@ -81,27 +80,6 @@ public:
 };
 
 /// @ingroup solidfi_l0
-/// @brief Object indirection: refers to another T and delegates to it.
-///
-/// Delegate<T> is the abstract concept of "this T points to another T." It carries no
-/// network assumptions, no lifecycle policy — just the redirect. Any T that holds a
-/// Delegate<T> can delegate its behavior to the target instead of executing directly.
-///
-/// At L1 a Converter may carry a Delegate as a field (creation-bound or injected), making
-/// it either a delegating converter or a passthrough to another. At L2 this concept is
-/// specialized into Proxy, which adds network transparency, live service directories,
-/// and remote redirection.
-///
-/// @tparam T the type being redirected; free generic, owned by the user.
-/// @note L1 mapping: optional redirect field on Converter — TBD.
-/// @note L2 mapping: Proxy — the network-transparency specialization of Delegate.
-template<typename T>
-class Delegate {
-public:
-    virtual T& target() = 0;
-};
-
-/// @ingroup solidfi_l0
 /// @brief Reserved. A directed relationship between two types T and U.
 ///
 /// @tparam T source type; free generic, owned by the user.
@@ -109,6 +87,25 @@ public:
 /// @todo Purpose TBD.
 template<typename T, typename U>
 class Goto {
+public:
+};
+
+/// @ingroup solidfi_l0
+/// @brief A type-safe chain of directed steps from T to U.
+///
+/// A Typechain is a composed sequence of Goto steps, each advancing the current type,
+/// from source type T to destination type U through zero or more intermediate types.
+/// The intermediate types are captured by the chain's structure but not named at this level.
+///
+/// Typechain is the single-chain form: no branching, one route. It is the structural
+/// complement to Traversal: Traversal is the algorithm that walks a Graph; Typechain
+/// is the explicit route through it.
+///
+/// @tparam T source type; start of the chain.
+/// @tparam U destination type; end of the chain.
+/// @note L1 mapping: Path<T,U,P> -- Typechain with Converter semantics and parameters.
+template<typename T, typename U>
+class Typechain {
 public:
 };
 
@@ -125,9 +122,10 @@ public:
 };
 
 /// @ingroup solidfi_l0
+/// @reserved
 /// @brief May or may not hold a value of type T.
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: Optional<T> — L1 aliases this to std::optional<T> in forward.hpp.
+/// @note L1 mapping: Optional<T> -- concretized as std::optional<T> in forward.hpp.
 template<typename T>
 class Optional {
 public:
@@ -142,14 +140,6 @@ template<typename T>
 class Shared {
 public:
     virtual T& get() = 0;
-};
-
-/// @ingroup solidfi_l0
-/// @brief Marker type for user-defined contextual data passed into Converter::resolve.
-/// @note L1 mapping: Parameters — L1 concretizes this as a named empty struct, the default P
-///   for all parameterized types.
-class Parameters {
-public:
 };
 
 /// @ingroup solidfi_l0
@@ -189,23 +179,6 @@ public:
 /// name the same structure, so Category is a plain alias — theoretical grounding, not a
 /// second implementation.
 using Category = Graph;
-
-/// @ingroup solidfi_l0
-/// @brief An algorithm that accepts a Category and produces a result of type U.
-///
-/// The abstract shape of graph traversal: Category in, typed result out. U may be
-/// a reachability bool, an executed conversion result, or any other type produced
-/// by walking the graph.
-///
-/// @tparam U destination type; the result produced by this traversal.
-/// @note L1 mapping: Path<T,U,P> — a Traversal with endpoints T and U fixed. May be
-///   constructed explicitly or returned as the result of path-finding (e.g. by Solver).
-template<typename U>
-class Traversal {
-public:
-    virtual U traverse(Category graph) = 0;
-};
-
 
 /// @ingroup solidfi_l0
 /// @brief Reduces a collection of T to a single T (fold).
