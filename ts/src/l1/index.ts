@@ -7,4 +7,3 @@ export { Chain } from './Chain';
 export { Pipeline } from './Pipeline';
 export { Provider } from './Provider';
 export { Deferred } from './Deferred';
-export { Delayed } from './Delayed';
