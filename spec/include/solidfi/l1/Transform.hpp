@@ -61,8 +61,10 @@ public:
     /// @brief Perform the transformation. MUST return a T.
     ///
     /// If this transform does not accept the input, MUST return the original value unchanged.
-    virtual T apply(T value, P params) noexcept = 0;
+    virtual T apply(T value, P params) = 0;
 
+    using Input      = T;
+    using Parameters = P;
 };
 
 } // namespace solidfi

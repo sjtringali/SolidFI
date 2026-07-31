@@ -66,8 +66,12 @@ public:
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     /// @note Failure is state, not control flow — it is the returned value described above.
-    virtual U resolve(T value, P params) noexcept = 0;
+    virtual U resolve(T value, P params) = 0;
 
+    // For use by Deferred
+    using From = T;
+    using To = U;
+    using Parameters = P;
 };
 
 } // namespace solidfi

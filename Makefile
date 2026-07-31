@@ -18,4 +18,4 @@ doc:
 		's/&lt; \([A-Za-z0-9_]\)/\&lt;\1/g; s/\([A-Za-z0-9_]\) &gt;/\1\&gt;/g' {} \;
 
 clean:
-	$(RM) -rf spec/docs/html
+	$(RM) -rf spec/docs/html ts/node_modules ts/dist
