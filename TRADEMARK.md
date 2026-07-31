@@ -11,7 +11,7 @@ Scott J. Tringali.
 
 ## Permitted use
 
-You may use the name "SolidFI" nominatively — to accurately describe compatibility or
+You may use the name "SolidFI" nominatively, to accurately describe compatibility or
 relationship. For example: "implements SolidFI," "compatible with SolidFI," or "based on
 the SolidFI specification."
 
