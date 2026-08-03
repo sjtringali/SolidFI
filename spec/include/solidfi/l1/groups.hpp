@@ -5,7 +5,7 @@
 /// @file groups.hpp
 
 /// @defgroup solidfi_l1 L1
-/// @brief The primary surface — fully specified interfaces for composable systems.
+/// @brief The primary surface, fully specified interfaces for composable systems.
 /// L1 is what you use. It defines the complete set of typed, named primitives for
 /// building compositions: how data flows and is converted (Structural), specialized
 /// subtypes built on those roots (Extras), how change is represented and applied
@@ -13,7 +13,7 @@
 
 /// @defgroup solidfi_l1_structural Structural
 /// @ingroup solidfi_l1
-/// @brief The primary primitives — the roots everything else composes from.
+/// @brief The primary primitives, the roots everything else composes from.
 /// Transform (T → T, cannot fail) and Converter (T → U, may fail, carries P) are the two
 /// abstract roots. Parameters completes the core contract; failure itself is a
 /// plain value each Chain defines (see Chain's `failed`), not a dedicated type.
@@ -23,10 +23,11 @@
 /// @defgroup solidfi_l1_extras Extras
 /// @ingroup solidfi_l1
 /// @brief Specialized subtypes built on the structural roots.
-/// Generator, Inverter, Provider, Literal, and Delegate add no new shape — each is a
+/// Generator, Inverter, Provider, Literal, Delegate, and Selector add no new shape — each is a
 /// named Converter or Transform specialization (Generator: from nothing; Inverter: both
 /// directions; Provider: participation contract for Solver and Router; Literal: satisfies both hierarchies;
-/// Delegate: forwards to another converter, eagerly or lazily).
+/// Delegate: forwards to another converter, eagerly or lazily;
+/// Selector: extracts zero-or-more sub-values of U from a containing T, for use with Transform).
 
 /// @defgroup solidfi_l1_state State
 /// @ingroup solidfi_l1
@@ -37,11 +38,11 @@
 
 /// @defgroup solidfi_l1_compositions Compositions
 /// @ingroup solidfi_l1
-/// @brief The generalized graph solver -- static paths and dynamic traversal.
+/// @brief The generalized graph solver, static paths and dynamic traversal.
 /// Multipath wires an explicit multi-stage route at construction time; IS-A Converter<T,U,P>; supports branching via toEither().
 /// Path IS-A Multipath -- the non-branching form; what Solver produces.
 /// Domain is the unordered registry of Converter edges. L0: Graph.
-/// Solver<T,U,P> IS-A Converter<Domain,Path<T,U,P>,P> -- typed discovery for compile-time-known T and U.
+/// Solver<T,U,P> IS-A Converter<Domain,Path<T,U,P>,P>, typed discovery for compile-time-known T and U.
 /// Pathfinder is the untyped complement: Domain-bound, one instance, any T->U query at runtime.
 /// Router<T,U,P> composes Solver with Path traversal as a single Converter<T,U,P>: find-and-execute.
 /// Traversal<U> is the reserved abstract base for traversal algorithms over a Domain.

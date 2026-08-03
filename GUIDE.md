@@ -329,6 +329,74 @@ If the Pipeline is local to this one path and doesn't need a name, `throughAll()
 
 Transforms aren't limited to the output end of a path. A `Transform<XML>` could normalize whitespace before parsing; a `Transform<Blob>` could strip a header before unzipping. They can live at any stage — `through()` works wherever the type matches.
 
+```
+================================================================
+DRAFT -- Selector (proposed L1 addition)
+The concept is stable; the wiring syntax is not yet finalized.
+================================================================
+```
+
+## Transforming Parts of a Value
+
+A homophone checker catches words that sound alike but mean different things -- "their", "there", "they're". A basic spell-checker can flag a word in isolation, but a homophone checker cannot: it needs the words around it to know which one is wrong. The right type for it is `Transform<Sentence>`, not `Transform<Word>` and not `Transform<Page>`. The problem defines the level.
+
+```typescript
+  interface Word     { text: string; }
+  interface Sentence { words: Word[]; }
+  interface Page     { title: string; sentences: Sentence[]; }
+
+  class HomophoneChecker implements Transform<Sentence> {
+    apply(sentence: Sentence): Sentence {
+      return { ...sentence, words: correctHomophones(sentence.words) };
+    }
+  }
+```
+
+`HomophoneChecker` has no knowledge of `Page`. It only knows about sentences -- which is exactly as much as it needs.
+
+The problem of finding sentences inside a page is entirely separate. That is what `Selector` expresses. A `Selector<Page, Sentence>` is a `Converter<Page, Sentence[]>` -- it resolves to zero or more sentences. An empty result is not failure; it just means nothing matched. The only class in the system that knows how sentences are stored inside a page is the selector itself:
+
+```typescript
+  class PageSentences implements Selector<Page, Sentence> {
+    resolve(page: Page): Sentence[] {
+      return page.sentences;
+    }
+  }
+```
+
+If `Page` restructures how it stores paragraphs or sentences, only `PageSentences` changes. `HomophoneChecker` is untouched.
+
+To wire them into a `Pipeline<Page>`, an adapter applies the transform to each selected element. In languages with reference semantics -- JavaScript and TypeScript included -- the sentences are already references into the page, so updating them updates the page directly. No reconstruction needed.
+
+```typescript
+  class PerSentence implements Transform<Page> {
+    constructor(
+      private selector: Selector<Page, Sentence>,
+      private transform: Transform<Sentence>
+    ) {}
+
+    apply(page: Page): Page {
+      for (const sentence of this.selector.resolve(page, {})) {
+        this.transform.apply(sentence, {});
+      }
+      return page;
+    }
+  }
+
+  const pipeline = new Pipeline<Page>();
+  pipeline.install(1, 'homophones', new PerSentence(new PageSentences(), new HomophoneChecker()));
+```
+
+Three classes. Three responsibilities. `HomophoneChecker` fixes text. `PageSentences` finds sentences. `PerSentence` applies one to the other. None of them bleeds into the others.
+
+> **Note:** `PerSentence` above is a hand-written adapter. A future `Traversal` concept will formalize this pattern -- a named composition of a `Selector` with a `Transform` on its element type, itself a `Transform` on the container.
+
+```
+================================================================
+END DRAFT
+================================================================
+```
+
 ## From Static Composition to Dynamic
 
 Back to Path. As clear as it is, is still kind of annoying and mechanical. Aside from the Transforms, why do we have to tell which types fit together *at all*? Doesn't the type system already know which ones fit together? We should just be able to create them, toss them into a virtual salad bowl, and have the computer figure it out.
