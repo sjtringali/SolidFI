@@ -27,7 +27,8 @@
 /// named Converter or Transform specialization (Generator: from nothing; Inverter: both
 /// directions; Provider: participation contract for Solver and Router; Literal: satisfies both hierarchies;
 /// Delegate: forwards to another converter, eagerly or lazily;
-/// Selector: extracts zero-or-more sub-values of U from a containing T, for use with Transform).
+/// Selector: extracts zero-or-more sub-values of U from a containing T, for use with Transform;
+/// Lens: concrete composition of Selector and optional Transform -- IS-A Converter<T,U[]> and optionally Transform<T>).
 
 /// @defgroup solidfi_l1_state State
 /// @ingroup solidfi_l1

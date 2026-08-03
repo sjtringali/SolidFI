@@ -25,6 +25,7 @@
 #include "solidfi/l1/Literal.hpp"
 #include "solidfi/l1/Deferred.hpp"
 #include "solidfi/l1/Selector.hpp"
+#include "solidfi/l1/Lens.hpp"
 
 // State
 #include "solidfi/l1/Delta.hpp"

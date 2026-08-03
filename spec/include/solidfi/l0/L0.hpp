@@ -200,4 +200,21 @@ public:
     virtual std::vector<T> expand(T value) = 0;
 };
 
+/// @ingroup solidfi_l0
+/// @reserved
+/// @brief Produces zero or more U values from a single T.
+///
+/// Fanout is the heterogeneous complement to Expand: where Expand produces T[]
+/// from T (same type, structural split), Fanout produces U[] from T (different
+/// type, value-based derivation). U need not be a structural part of T.
+///
+/// @tparam T source type.
+/// @tparam U derived type; any value producible from T.
+/// @note L1 mapping: — reserved for future L1 promotion.
+template<typename T, typename U>
+class Fanout {
+public:
+    virtual std::vector<U> fanout(T value) = 0;
+};
+
 } // namespace solidfi
