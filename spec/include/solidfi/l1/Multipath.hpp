@@ -16,7 +16,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @accepted
+/// @proposed
 /// @brief A wired, multi-stage conversion path that may include branching. IS-A Converter<T,U,P>.
 ///
 /// Where Solver finds a path through a Domain at runtime, Multipath declares one at

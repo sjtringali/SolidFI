@@ -12,7 +12,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @accepted
+/// @proposed
 /// @brief Find-and-execute as a single Converter<T,U,P>. Composes Solver with Path traversal.
 ///
 /// Router is the third of three complementary concepts:

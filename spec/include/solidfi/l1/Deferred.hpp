@@ -13,7 +13,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @proposed
+/// @accepted
 /// @brief Lazy-constructing wrapper. The target is built on first use.
 ///
 /// Deferred::Converter and Deferred::Transform are the two concrete forms.

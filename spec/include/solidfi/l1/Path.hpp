@@ -10,7 +10,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @accepted
+/// @proposed
 /// @brief A single, non-branching wired route from T to U. IS-A Multipath<T,U,P>.
 ///
 /// Path is the strict form of Multipath: every step is deterministic -- no toEither(),
