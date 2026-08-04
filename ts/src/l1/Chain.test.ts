@@ -3,7 +3,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { Chain } from './Chain';
+import { Chain, Failed } from './Chain';
 import { Converter } from './Converter';
 
 interface Contact {
@@ -34,8 +34,9 @@ class CompanyEmailFormat implements Converter<string, Contact | null> {
     }
 }
 
+// Object U: no Failed argument needed; NullFailed is the default.
 function contactParser(): Chain<string, Contact | null> {
-    const parser = new Chain<string, Contact | null>(null);
+    const parser = new Chain<string, Contact | null>();
     parser.install(1, 'named-email', new NamedEmailFormat());
     parser.install(2, 'bare-email', new BareEmailFormat());
     return parser;
@@ -58,9 +59,56 @@ describe('Chain', () => {
         );
     });
 
-    it('returns the chain failure value when nothing matches', () => {
+    it('returns null by default when nothing matches, without passing a Failed', () => {
         const parser = contactParser();
         assert.equal(parser.resolve('not a contact', {}), null);
+    });
+
+    it('accepts an explicit Failed for a non-object U', () => {
+        class LineCount implements Converter<string, number> {
+            resolve(line: string): number {
+                return line.split(',').length;
+            }
+        }
+
+        class EmptyLineCount implements Converter<string, number> {
+            rejects(line: string): boolean {
+                return line.trim().length > 0;
+            }
+            resolve(): number {
+                return 0;
+            }
+        }
+
+        const counter = new Chain<string, number>({ value: -1 });
+        counter.install(1, 'line-count', new LineCount());
+        assert.equal(counter.resolve('a,b,c', {}), 3);
+        assert.equal(counter.chainFailed.value, -1);
+    });
+
+    it('accepts a Symbol as a Failed value', () => {
+        const UNPARSEABLE = Symbol('unparseable');
+
+        class NamedEmailFormatWithSentinel implements Converter<string, Contact | typeof UNPARSEABLE> {
+            resolve(line: string): Contact | typeof UNPARSEABLE {
+                return new NamedEmailFormat().resolve(line) ?? UNPARSEABLE;
+            }
+        }
+
+        class BareEmailFormatWithSentinel implements Converter<string, Contact | typeof UNPARSEABLE> {
+            resolve(line: string): Contact | typeof UNPARSEABLE {
+                return new BareEmailFormat().resolve(line) ?? UNPARSEABLE;
+            }
+        }
+
+        const parser = new Chain<string, Contact | typeof UNPARSEABLE>({ value: UNPARSEABLE });
+        parser.install(1, 'named-email', new NamedEmailFormatWithSentinel());
+        parser.install(2, 'bare-email', new BareEmailFormatWithSentinel());
+        assert.deepEqual(
+            parser.resolve('ada@example.com', {}),
+            { name: 'ada', email: 'ada@example.com' },
+        );
+        assert.equal(parser.resolve('not a contact', {}), UNPARSEABLE);
     });
 
     it('tries formats in priority order, not install order', () => {
@@ -80,7 +128,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null>(null);
+        const parser = new Chain<string, Contact | null>();
         parser.install(2, 'bare-email', new TrackedBareEmailFormat());
         parser.install(1, 'named-email', new TrackedNamedEmailFormat());
         parser.resolve('ada@example.com', {});
@@ -88,7 +136,7 @@ describe('Chain', () => {
     });
 
     it('throws when two formats share a priority', () => {
-        const parser = new Chain<string, Contact | null>(null);
+        const parser = new Chain<string, Contact | null>();
         parser.install(1, 'named-email', new NamedEmailFormat());
         assert.throws(() => {
             parser.install(1, 'duplicate', new BareEmailFormat());
@@ -96,9 +144,6 @@ describe('Chain', () => {
     });
 
     it('only tries a format when handles() approves the params', () => {
-        // The format owns its own gate: it knows it's a legacy, opt-in format,
-        // so it declares that as part of itself rather than relying on the
-        // caller to conditionally install it.
         type ParseParams = { allowLegacyFormat: boolean };
 
         class LegacyPipeSeparatedFormat implements Converter<string, Contact | null, ParseParams> {
@@ -111,7 +156,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null, ParseParams>(null);
+        const parser = new Chain<string, Contact | null, ParseParams>();
         parser.install(1, 'legacy-pipe-separated', new LegacyPipeSeparatedFormat());
         assert.equal(parser.resolve('Ada Lovelace|ada@example.com', { allowLegacyFormat: false }), null);
         assert.deepEqual(
@@ -131,7 +176,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null>(null);
+        const parser = new Chain<string, Contact | null>();
         parser.install(1, 'named-email', new NamedEmailOnlyFormat());
         assert.equal(parser.resolve('ada@example.com', {}), null);
         assert.deepEqual(
@@ -151,7 +196,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null>(null);
+        const parser = new Chain<string, Contact | null>();
         parser.install(1, 'named-email', new NamedEmailOnlyFormat());
         assert.equal(parser.resolve('ada@example.com', {}), null);
         assert.deepEqual(
@@ -160,10 +205,7 @@ describe('Chain', () => {
         );
     });
 
-    it('accepts a blank object as a per-format failure sentinel', () => {
-        // GUIDE.md calls this out directly: null, undefined, a Symbol, or "a blank
-        // object" are all equally valid failure markers. This adapts an existing
-        // format's null-based failure convention to a Contact-shaped placeholder.
+    it('accepts a plain U value as a per-link failure sentinel', () => {
         const UNRECOGNIZED: Contact = { name: '', email: '' };
 
         class NamedEmailFormatWithSentinel implements Converter<string, Contact | null> {
@@ -172,7 +214,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null>(null);
+        const parser = new Chain<string, Contact | null>();
         parser.install(1, 'named-email', new NamedEmailFormatWithSentinel(), UNRECOGNIZED);
         parser.install(2, 'bare-email', new BareEmailFormat());
         assert.deepEqual(
@@ -199,10 +241,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null>(null);
-        // This format's own failure marker is UNRECOGNIZED, not null, so
-        // returning null here is a legitimate success, even though it matches
-        // the chain's overall failure value.
+        const parser = new Chain<string, Contact | null>();
         parser.install(1, 'literal-null-contact', new LiteralNullFormat(), UNRECOGNIZED);
         parser.install(2, 'bare-email', new TrackedBareEmailFormat());
         assert.equal(parser.resolve('ada@example.com', {}), null);
@@ -216,7 +255,6 @@ describe('Chain', () => {
         class CopycatFormat implements Converter<string, Contact | null> {
             resolve(): Contact | null {
                 tried.push('copycat');
-                // Same shape as UNRECOGNIZED, but a different reference.
                 return { name: '', email: '' };
             }
         }
@@ -228,42 +266,15 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null>(null);
-        // Chain compares with `!==`, which is reference equality for objects, so
-        // CopycatFormat's result counts as a genuine success, not a failure.
+        const parser = new Chain<string, Contact | null>();
         parser.install(1, 'copycat', new CopycatFormat(), UNRECOGNIZED);
         parser.install(2, 'bare-email', new TrackedBareEmailFormat());
         assert.deepEqual(parser.resolve('ada@example.com', {}), { name: '', email: '' });
         assert.deepEqual(tried, ['copycat']);
     });
 
-    it('accepts a Symbol as a sentinel, just as well as null or an object', () => {
-        const UNPARSEABLE = Symbol('unparseable');
-
-        class NamedEmailFormatWithSentinel implements Converter<string, Contact | typeof UNPARSEABLE> {
-            resolve(line: string): Contact | typeof UNPARSEABLE {
-                return new NamedEmailFormat().resolve(line) ?? UNPARSEABLE;
-            }
-        }
-
-        class BareEmailFormatWithSentinel implements Converter<string, Contact | typeof UNPARSEABLE> {
-            resolve(line: string): Contact | typeof UNPARSEABLE {
-                return new BareEmailFormat().resolve(line) ?? UNPARSEABLE;
-            }
-        }
-
-        const parser = new Chain<string, Contact | typeof UNPARSEABLE>(UNPARSEABLE);
-        parser.install(1, 'named-email', new NamedEmailFormatWithSentinel());
-        parser.install(2, 'bare-email', new BareEmailFormatWithSentinel());
-        assert.deepEqual(
-            parser.resolve('ada@example.com', {}),
-            { name: 'ada', email: 'ada@example.com' },
-        );
-        assert.equal(parser.resolve('not a contact', {}), UNPARSEABLE);
-    });
-
     it('installNew constructs a format from its constructor arguments', () => {
-        const parser = new Chain<string, Contact | null>(null);
+        const parser = new Chain<string, Contact | null>();
         parser.installNew(1, 'company-email', CompanyEmailFormat, 'acme.example');
         assert.deepEqual(
             parser.resolve('ada@acme.example', {}),
@@ -282,7 +293,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null, ParseParams>(null);
+        const parser = new Chain<string, Contact | null, ParseParams>();
         parser.install(1, 'domain-restricted-email', new DomainRestrictedEmailFormat());
         assert.equal(parser.resolve('ada@example.com', { requiredDomain: 'acme.example' }), null);
         assert.deepEqual(
@@ -293,7 +304,7 @@ describe('Chain', () => {
 
     it('lets a format declared without P run inside a chain typed with a specific P', () => {
         type ParseParams = { allowBareEmail: boolean };
-        const parser = new Chain<string, Contact | null, ParseParams>(null);
+        const parser = new Chain<string, Contact | null, ParseParams>();
         parser.install(1, 'named-email', new NamedEmailFormat());
         parser.install(2, 'bare-email', new BareEmailFormat());
         assert.deepEqual(
@@ -324,12 +335,10 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null, ParseParams>(null);
+        const parser = new Chain<string, Contact | null, ParseParams>();
         parser.install(1, 'domain-restricted-email', new DomainRestrictedEmailFormat());
         parser.install(2, 'opt-in-bare-email', new OptInBareEmailFormat());
 
-        // domain-restricted-email only reads requiredDomain, opt-in-bare-email only
-        // reads allowBareEmail; ParseParams satisfies both because it's a superset of each.
         assert.deepEqual(
             parser.resolve('ada@acme.example', { requiredDomain: 'acme.example', allowBareEmail: false }),
             { name: 'ada', email: 'ada@acme.example' },
@@ -347,7 +356,6 @@ describe('Chain', () => {
 
         class AuthenticatedBareEmailFormat implements Converter<string, Contact | null, AuthParams> {
             resolve(line: string, params: AuthParams): Contact | null {
-                // apiKey is required, not optional, so no guard is needed here.
                 if (params.apiKey.length === 0) {
                     return null;
                 }
@@ -356,7 +364,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | null, AuthParams>(null);
+        const parser = new Chain<string, Contact | null, AuthParams>();
         parser.install(1, 'authenticated-bare-email', new AuthenticatedBareEmailFormat());
         assert.deepEqual(
             parser.resolve('ada@example.com', { apiKey: 'secret' }),
@@ -365,3 +373,17 @@ describe('Chain', () => {
         assert.equal(parser.resolve('ada@example.com', { apiKey: '' }), null);
     });
 });
+
+// Compile-time checks -- these must not compile.
+// @ts-expect-error: raw value is not a Failed<U>
+new Chain<string, number>(42);
+
+// @ts-expect-error: raw null is not a Failed<U>
+new Chain<string, Contact | null>(null);
+
+// @ts-expect-error: Failed typed for the wrong U
+const wrongFailed: Failed<string> = { value: 'error' };
+new Chain<string, number>(wrongFailed);
+
+// @ts-expect-error: object missing the value property
+new Chain<string, number>({});

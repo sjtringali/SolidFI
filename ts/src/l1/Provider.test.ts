@@ -57,7 +57,7 @@ describe('Provider', () => {
     });
 
     it('can be installed in a Chain and participates in normal chain resolution', () => {
-        const chain = new Chain<string, string | null>(null);
+        const chain = new Chain<string, string | null>();
         chain.install(1, 'non-empty', new NonEmptyFilter());
         assert.equal(chain.resolve('hello', {}), 'hello');
         assert.equal(chain.resolve('', {}), null);

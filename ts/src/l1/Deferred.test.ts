@@ -57,7 +57,7 @@ describe('Deferred', () => {
         });
 
         it('can be installed in a Chain', () => {
-            const chain = new Chain<string, string | null>(null);
+            const chain = new Chain<string, string | null>();
             chain.install(1, 'upper', Deferred(UpperCase));
             assert.equal(chain.resolve('hello', {}), 'HELLO');
             assert.equal(chain.resolve('world', {}), 'WORLD');

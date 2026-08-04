@@ -3,12 +3,18 @@
 import { Converter } from './Converter';
 import { Parameters } from './Parameters';
 
+export interface Failed<U> {
+    readonly value: U;
+}
+
+const NullFailed: Failed<any> = { value: null };
+
 export class Chain<T, U, P extends Parameters = Parameters> implements Converter<T, U, P> {
-    readonly failed: U;
+    readonly chainFailed: Failed<U>;
     private entries: Chain.Strategy<T, U, P>[] = [];
 
-    constructor(failed: U) {
-        this.failed = failed;
+    constructor(failed: Failed<U> = NullFailed) {
+        this.chainFailed = failed;
     }
 
     install(priority: number, name: string, converter: Converter<T, U, P>, failed?: U): void {
@@ -36,11 +42,11 @@ export class Chain<T, U, P extends Parameters = Parameters> implements Converter
                 continue;
             }
             const result = converter.resolve(value, params);
-            if (result !== (linkFailed ?? this.failed)) {
+            if (result !== (linkFailed ?? this.chainFailed.value)) {
                 return result;
             }
         }
-        return this.failed;
+        return this.chainFailed.value;
     }
 }
 
