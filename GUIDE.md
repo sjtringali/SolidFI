@@ -152,29 +152,42 @@ up the desired result, getting the page, with how we get there.
 What we need is a way to represent the failure, without committing to a single 
 solution for everything.
 
-Chain itself stores that value, and you can change it for every link if you need to.
-The reason it isn't built in is flexibility across large sets of disparately
-developed types, that already exist. Forcing a single representation would mean 
-either restricting which types can participate in a Chain, or wrapping every 
-return value in a container you didn't choose.
+Chain holds the failure policy in a `Failed<U>` — a small wrapper with a single 
+`value` member. The reason it isn't built in is flexibility across large sets of 
+disparately developed types that already exist. Forcing a single representation 
+would mean either restricting which types can participate in a Chain, or wrapping 
+every return value in a container you didn't choose.
 
-Now, `null` is still a perfectly valid choice, and in fact usually works for 
-the large majority of cases. But `undefined` or `Symbol` or a blank object are 
-no more right than any others. There are no constraints here, SolidFI just 
-needs to be able to tell success from failure, and you define what failure 
-looks like for the chain participants.
+For object types, `null` is the obvious default, and Chain uses it automatically 
+when you don't pass a `Failed<U>`. For non-nullable types — numbers, symbols, your 
+own sentinel objects — you pass one explicitly:
 
 ```typescript
-  const xmlToPage = new Chain<XML, Page>(null);
-  xmlToPage.install(1, 'text',  new TextParser(), undefined);
+  const xmlToPage = new Chain<XML, Page>();             // null by default
+  const counter   = new Chain<XML, number>({ value: -1 });  // explicit sentinel
+```
+
+Per-link overrides are plain `U` values, passed directly to `install()`. Chain 
+compares a link's result against the link's own sentinel (if given), or against 
+the chain's `Failed<U>` otherwise. If every link fails, Chain returns the chain's 
+own `Failed.value`:
+
+```typescript
+  xmlToPage.install(1, 'text',  new TextParser());
   xmlToPage.install(2, 'image', new ImageParser(), ImageParser.ERROR);
 ```
 
-Chain sees `undefined` come back from `TextParser`, recognizes it as failed, and moves on
-to `ImageParser`. Should that return then ERROR value, then that link fails. Then, the 
-chain itself fails, and returns the chain's *own* failure value: null.
+Chain sees `ImageParser.ERROR` come back from `ImageParser`, recognizes it as that 
+link's failure, and moves on. If both links fail, Chain returns `null` — its own 
+failure value.
 
-Each link, by the way, is a type 'Strategy' that you can define constants of, pass
+`null`, `undefined`, a `Symbol`, a blank object, `-1` — any value works as a 
+sentinel. SolidFI just needs to be able to tell success from failure, and you 
+define what failure looks like. The `Failed<U>` wrapper also means any U-producing 
+concept that exposes a `value` — a Provider, a Literal, a Generator — can serve 
+as a Chain's failure policy directly, with no adapter needed.
+
+Each link, by the way, is a type `Strategy` that you can define constants of, pass
 around, compute, even store and load.
 
 ## Static Composition with Path

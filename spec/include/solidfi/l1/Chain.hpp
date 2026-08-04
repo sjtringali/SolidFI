@@ -14,6 +14,23 @@ namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
 /// @accepted
+/// @brief Failure policy for Chain: holds the sentinel value returned when no converter succeeds.
+///
+/// Chain accepts a Failed<U> rather than a raw U so that the sentinel can be provided
+/// by any U-producing concept (Provider, Literal, Generator, etc.) that exposes a `value`
+/// member. Structural compatibility is sufficient; no explicit relationship is required.
+///
+/// The default implementation returns null (suitable for pointer and nullable types).
+/// For non-nullable U, construct an explicit Failed<U> and pass it to the Chain constructor.
+///
+/// @tparam U destination type of the owning Chain.
+template<typename U>
+struct Failed {
+    U value;
+};
+
+/// @ingroup solidfi_l1_structural
+/// @accepted
 /// @brief An ordered composition of Converter instances. Is itself a Converter<T,U,P>.
 ///
 /// To any caller holding a Converter<T,U,P> reference, a Chain is indistinguishable from
@@ -66,12 +83,15 @@ namespace solidfi {
 template<typename T, typename U, typename P = Parameters>
 class Chain : public Converter<T, U, P> {
 public:
-    /// @brief Construct an empty Chain with no prepare or finalize transform.
+    /// @brief Construct an empty Chain. Defaults to Failed<U>{} as the failure policy.
     Chain() = default;
 
-    /// @brief Construct an empty chain with an explicit failure value.
-    /// @param failed Value of U returned when no installed converter succeeds.
-    Chain(U failed);
+    /// @brief Construct a Chain with an explicit failure policy.
+    /// @param failed Failure policy; its value member is returned when no converter succeeds.
+    ///
+    /// Any U-producing concept that exposes a `value` member satisfies this parameter
+    /// structurally — Provider, Literal, Generator, etc. No explicit relationship required.
+    Chain(Failed<U> failed);
 
     /// @brief Construct a Chain with optional prepare and finalize transforms.
     ///
@@ -139,7 +159,7 @@ public:
     void replace(std::string name, Converter<T, U, P> converter, U failed);
 
 private:
-    U failed;
+    Failed<U> chainFailed;
 };
 
 } // namespace solidfi
