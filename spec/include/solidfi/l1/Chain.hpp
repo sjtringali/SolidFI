@@ -83,15 +83,13 @@ struct Failed {
 template<typename T, typename U, typename P = Parameters>
 class Chain : public Converter<T, U, P> {
 public:
-    /// @brief Construct an empty Chain. Defaults to `Failed<U>{}` as the failure policy.
-    Chain() = default;
-
-    /// @brief Construct a Chain with an explicit failure policy.
+    /// @brief Construct a Chain with an optional failure policy.
     /// @param failed Failure policy; its value member is returned when no converter succeeds.
+    ///   Defaults to `Failed<U>{}`, which zero-initializes value (null for pointer and nullable types).
     ///
     /// Any U-producing concept that exposes a `value` member satisfies this parameter
     /// structurally — Provider, Literal, Generator, etc. No explicit relationship required.
-    Chain(Failed<U> failed);
+    Chain(Failed<U> failed = Failed<U>{});
 
     /// @brief Construct a Chain with optional prepare and finalize transforms.
     ///
