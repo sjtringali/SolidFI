@@ -80,7 +80,7 @@ describe('Chain', () => {
             }
         }
 
-        const counter = new Chain<string, number>({ value: -1 });
+        const counter = new Chain<string, number>(Failed(-1));
         counter.install(1, 'line-count', new LineCount());
         assert.equal(counter.resolve('a,b,c', {}), 3);
         assert.equal(counter.chainFailed.value, -1);
@@ -101,7 +101,7 @@ describe('Chain', () => {
             }
         }
 
-        const parser = new Chain<string, Contact | typeof UNPARSEABLE>({ value: UNPARSEABLE });
+        const parser = new Chain<string, Contact | typeof UNPARSEABLE>(Failed(UNPARSEABLE));
         parser.install(1, 'named-email', new NamedEmailFormatWithSentinel());
         parser.install(2, 'bare-email', new BareEmailFormatWithSentinel());
         assert.deepEqual(
@@ -382,8 +382,7 @@ new Chain<string, number>(42);
 new Chain<string, Contact | null>(null);
 
 // @ts-expect-error: Failed typed for the wrong U
-const wrongFailed: Failed<string> = { value: 'error' };
-new Chain<string, number>(wrongFailed);
+new Chain<string, number>(Failed('error'));
 
 // @ts-expect-error: object missing the value property
 new Chain<string, number>({});

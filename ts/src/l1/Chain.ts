@@ -7,13 +7,19 @@ export interface Failed<U> {
     readonly value: U;
 }
 
-const NullFailed: Failed<any> = { value: null };
+export function Failed<U>(value: U): Failed<U> {
+    return { value };
+}
+
+export namespace Failed {
+    export const Null: Failed<any> = { value: null };
+}
 
 export class Chain<T, U, P extends Parameters = Parameters> implements Converter<T, U, P> {
     readonly chainFailed: Failed<U>;
     private entries: Chain.Strategy<T, U, P>[] = [];
 
-    constructor(failed: Failed<U> = NullFailed) {
+    constructor(failed: Failed<U> = Failed.Null) {
         this.chainFailed = failed;
     }
 
