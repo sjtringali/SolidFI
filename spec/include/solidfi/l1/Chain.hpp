@@ -16,12 +16,12 @@ namespace solidfi {
 /// @accepted
 /// @brief Failure policy for Chain: holds the sentinel value returned when no converter succeeds.
 ///
-/// Chain accepts a Failed<U> rather than a raw U so that the sentinel can be provided
+/// Chain accepts a `Failed<U>` rather than a raw U so that the sentinel can be provided
 /// by any U-producing concept (Provider, Literal, Generator, etc.) that exposes a `value`
 /// member. Structural compatibility is sufficient; no explicit relationship is required.
 ///
 /// The default implementation returns null (suitable for pointer and nullable types).
-/// For non-nullable U, construct an explicit Failed<U> and pass it to the Chain constructor.
+/// For non-nullable U, construct an explicit `Failed<U>` and pass it to the Chain constructor.
 ///
 /// @tparam U destination type of the owning Chain.
 template<typename U>
@@ -83,7 +83,7 @@ struct Failed {
 template<typename T, typename U, typename P = Parameters>
 class Chain : public Converter<T, U, P> {
 public:
-    /// @brief Construct an empty Chain. Defaults to Failed<U>{} as the failure policy.
+    /// @brief Construct an empty Chain. Defaults to `Failed<U>{}` as the failure policy.
     Chain() = default;
 
     /// @brief Construct a Chain with an explicit failure policy.
