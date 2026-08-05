@@ -73,4 +73,9 @@ describe('Path', () => {
         assert.equal(path.traverse('bad', { size: 20 }), null);
     });
 
+    it('detects and throws on a step type mismatch (requires interior builder)', { todo: true }, () => {
+        const path: Path<string, Rect> = new Path();
+        path.append(new ExpandToRect(100)); // wrong: expects Point, gets string
+        assert.throws(() => path.traverse('10,20', {}));
+    });
 });

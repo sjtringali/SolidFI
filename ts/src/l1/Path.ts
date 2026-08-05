@@ -29,6 +29,7 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
         return path;
     }
 
+    // TODO: type mismatches between steps are undetected; requires an interior builder to catch at append time.
     append(converter: Converter<any, any, P>): void {
         const node: PathNode = { converter, next: null };
         if (this.tail) {
