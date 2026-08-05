@@ -21,6 +21,14 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
         this.pathFailed = failed;
     }
 
+    static create<T, U, P extends Parameters = Parameters>(...converters: Converter<any, any, any>[]): Path<T, U, P> {
+        const path = new Path<T, U, P>();
+        for (const c of converters) {
+            path.append(c);
+        }
+        return path;
+    }
+
     append(converter: Converter<any, any, P>): void {
         const node: PathNode = { converter, next: null };
         if (this.tail) {

@@ -37,9 +37,8 @@ describe('Path', () => {
         const step1 = new ParsePoint();      // string -> Point
         const step2 = new ExpandToRect(100); // Point -> Rect
 
-        const path: Path<string, Rect> = new Path();
-        path.append(step1);
-        path.append(step2);
+        // Factory vararg variant to make a Path
+        const path = Path.create<string, Rect>(step1, step2);
         assert.deepEqual(path.fetch('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
         assert.equal(path.fetch('bad', {}), null);
     });
