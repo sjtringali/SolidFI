@@ -5,49 +5,65 @@
 /// @file Path.hpp
 /// @ingroup solidfi_l1_compositions
 
-#include "solidfi/l1/Multipath.hpp"
+#include "solidfi/l1/Converter.hpp"
+#include "solidfi/l1/Chain.hpp"
+#include "solidfi/l1/forward.hpp"
+#include <initializer_list>
 
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @proposed
-/// @brief A single, non-branching wired route from T to U. IS-A Multipath<T,U,P>.
+/// @accepted
+/// @brief A sequential, type-advancing composition of Converters. IS-A Converter<T,U,P>.
 ///
-/// Path is the strict form of Multipath: every step is deterministic -- no toEither(),
-/// no Chain at any position. The route is fully declared at construction; the result is
-/// a Converter<T,U,P>: one traverse(), one answer.
+/// Path is the heterogeneous composite over Converter: each step may advance the type
+/// (T -> X -> Y -> U), unlike Chain where every link shares T and U. To any caller
+/// holding a Converter<T,U,P> reference, a Path is indistinguishable from a single
+/// converter by the Composite rule.
 ///
-/// Because Path IS-A Multipath IS-A Converter<T,U,P>, it satisfies both type slots.
-/// Solver<T,U,P> produces a Path<T,U,P>. L0: Typechain<T,U>.
+/// Relationship to Chain and Pipeline:
+/// - Chain:    homogeneous Converter composite (T -> U at every step; routes via priority)
+/// - Pipeline: homogeneous Transform composite (T -> T at every step)
+/// - Path:     heterogeneous Converter composite (T -> X -> Y -> U; every step always runs)
 ///
-/// Builder interface -- mirrors Multipath without toEither() or varargs:
-/// - to()      -- advances the type (T->V) by adding a single Converter.
-/// - through() -- holds the type (T->T) by adding a single Transform.
+/// Steps are appended in execution order. There is no priority or routing -- every step
+/// always runs, feeding its output as the next step's input. append() is the only
+/// mutation; there is no insert or remove.
 ///
-/// Each step returns Path<T,...,P> rather than Multipath<T,...,P>.
+/// Failure policy follows Chain: Path holds a `Failed<U>` returned when the path is
+/// empty. Each step's own failure semantics are its own responsibility; Path does not
+/// check intermediate results.
 ///
 /// **Invariants:**
-/// - The path is defined at construction. Steps are not added after build.
-/// - Failure at any stage propagates as whatever failure value that stage's Converter
-///   defines for U -- the path does not retry.
-/// - Path MUST NOT modify any Converter or Transform it holds.
+/// - Steps run in append order. The output of step N is the input to step N+1.
+/// - An empty Path returns its failed value immediately.
+/// - Path MUST NOT modify any Converter it holds.
 ///
 /// @tparam T source (start) type; input type of the first step.
 /// @tparam U destination (end) type; output type of the last step.
 /// @tparam P parameters type; flows into every Converter along the path. Defaults to Parameters.
 template<typename T, typename U, typename P = Parameters>
-class Path : public Multipath<T, U, P> {
+class Path : public Converter<T, U, P> {
 public:
-    /// @brief Add a single Converter that advances the current end type to V.
-    ///
-    /// Returns Path<T,V,P> so further calls can be chained.
-    template<typename V>
-    Path<T, V, P> to(Converter<U, V, P> converter);
+    /// @brief Construct an empty Path with an optional failure policy.
+    /// @param failed Value returned when the path is empty.
+    ///   Defaults to `Failed<U>{}`, which zero-initializes value (null for pointer and nullable types).
+    Path(Failed<U> failed = Failed<U>{});
 
-    /// @brief Add a Transform that holds the current end type.
+    /// @brief Construct a Path from an initializer list of converters, in execution order.
     ///
-    /// Returns Path<T,U,P> so further calls can be chained.
-    Path<T, U, P> through(Transform<U, P> transform);
+    /// Equivalent to default-constructing and appending each converter in order.
+    /// For short, fixed paths:
+    /// @code
+    ///   auto p = Path<Filename, HTML>::create({reader, unzipper, parser, renderer});
+    /// @endcode
+    static Path<T, U, P> create(std::initializer_list<Converter<T, U, P>> converters);
+
+    /// @brief Append a converter as the next step in the path.
+    ///
+    /// The converter's input type must match the current end type; this is a
+    /// caller responsibility -- the path does not verify intermediate types.
+    void append(Converter<T, U, P> converter);
 
     /// @brief Execute the path. Friendly alias for resolve().
     ///
@@ -57,19 +73,8 @@ public:
     /// @note Async-capable. Concrete implementations may execute asynchronously.
     U resolve(T value, P params) noexcept override;
 
-protected:
-    T* start() const override;
-    U* finish() const override;
+private:
+    Failed<U> pathFailed;
 };
-
-/// @brief Begin building a Path starting from type T.
-///
-/// Entry point for the builder:
-/// @code
-///   auto p = path<Filename>().to(reader).to(unzipper).to(parser).to(renderer);
-///   HTML html = p.traverse("document.odt", {});
-/// @endcode
-template<typename T, typename P = Parameters>
-Path<T, T, P> path();
 
 } // namespace solidfi
