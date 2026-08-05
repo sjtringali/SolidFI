@@ -73,6 +73,13 @@ describe('Path', () => {
         assert.equal(path.traverse('bad', { size: 20 }), null);
     });
 
+    it('propagates intermediate failure through remaining steps to the final result', { todo: true }, () => {
+        // Path should guarantee failure propagation; each step must receive and forward the failure value.
+        // Requires an interior builder that knows each step's failure value.
+        const path = Path.create<string, Rect>(new ParsePoint(), new ExpandToRect(100));
+        assert.equal(path.traverse('bad', {}), null); // ParsePoint returns null; ExpandToRect must propagate it
+    });
+
     it('detects and throws on a step type mismatch (requires interior builder)', { todo: true }, () => {
         const path: Path<string, Rect> = new Path();
         path.append(new ExpandToRect(100)); // wrong: expects Point, gets string
