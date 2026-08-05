@@ -30,7 +30,7 @@ class ExpandToRect implements Converter<Point, Rect> {
 describe('Path', () => {
     it('returns null by default when empty', () => {
         const path: Path<string, Rect> = new Path();
-        assert.equal(path.fetch('10,20', {}), null);
+        assert.equal(path.traverse('10,20', {}), null);
     });
 
     it('walks a multi-step path from string to Rect', () => {
@@ -39,15 +39,15 @@ describe('Path', () => {
 
         // Factory vararg variant to make a Path
         const path = Path.create<string, Rect>(step1, step2);
-        assert.deepEqual(path.fetch('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
-        assert.equal(path.fetch('bad', {}), null);
+        assert.deepEqual(path.traverse('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
+        assert.equal(path.traverse('bad', {}), null);
     });
 
-    it('fetch() and resolve() return the same result', () => {
+    it('traverse() and resolve() return the same result', () => {
         const path: Path<string, Rect> = new Path();
         path.append(new ParsePoint());
         path.append(new ExpandToRect(50));
-        assert.deepEqual(path.fetch('5,10', {}), path.resolve('5,10', {}));
+        assert.deepEqual(path.traverse('5,10', {}), path.resolve('5,10', {}));
     });
 
     it('is assignable to Converter', () => {
@@ -69,8 +69,8 @@ describe('Path', () => {
         const path: Path<string, Rect, SizeParams> = new Path();
         path.append(new ParsePoint());
         path.append(new ExpandToRectParam());
-        assert.deepEqual(path.fetch('3,4', { size: 20 }), { x: 3, y: 4, width: 20, height: 20 });
-        assert.equal(path.fetch('bad', { size: 20 }), null);
+        assert.deepEqual(path.traverse('3,4', { size: 20 }), { x: 3, y: 4, width: 20, height: 20 });
+        assert.equal(path.traverse('bad', { size: 20 }), null);
     });
 
 });

@@ -39,7 +39,7 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
         this.tail = node;
     }
 
-    fetch(value: T, params: P): U {
+    traverse(value: T, params: P): U {
         if (this.head === null) {
             return this.pathFailed.value;
         }
@@ -55,6 +55,6 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
     }
 
     resolve(value: T, params: P): U {
-        return this.fetch(value, params);
+        return this.traverse(value, params);
     }
 }
