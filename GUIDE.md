@@ -204,28 +204,28 @@ We now have our converter types: `FileReader`, `Unzipper`, the `xmlToPage` Chain
 That works, but it's mechanical, just threading output to input, over and over. The types already encode exactly what connects to what. SolidFI has a better answer: `Path`. You declare the same sequence as a construction, and the result IS-A `Converter<Filename, HTML>`. The path exists because you made it.
 
 ```typescript
-  const path = new Path<Filename>()
-    .to(new FileReader())     // Filename -> Blob
-    .to(new Unzipper())       // Blob -> XML
-    .to(xmlToPage)            // XML -> Page  (Chain)
-    .to(new Renderer());      // Page -> HTML
+  const path = new Path<Filename, Blob>()
+    .append(new FileReader())     // Filename -> Blob
+    .append(new Unzipper())       // Blob -> XML
+    .append(xmlToPage)            // XML -> Page  (Chain -- any step can be a Chain)
+    .append(new Renderer());      // Page -> HTML
 
-  const html = path.traverse('document.odt');
+  const html = path.traverse('document.odt', {});
 ```
 
-All the interesting work is in construction. The `to()` function advances the type, and the external shape is always `Converter<Start, End>`.
+All the interesting work is in construction. `append()` advances the type at each step, and the external shape is always `Converter<Start, End>`. Because `Chain` IS-A `Converter`, it slots into any step directly. Each call to `append()` returns a new, independently usable path.
 
-If the Chain is local to this one path and doesn't need a name, we can compress things a bit, and build it in place with `toEither()`. That create a Chain for you of all the converters you give it in order.
+If the Chain is local to this one path and doesn't need a name, `Multipath` removes the ceremony with `toEither()`, which builds the Chain inline:
 
 ```typescript
-  const path = new Path<Filename>()
+  const path = new Multipath<Filename, Blob>()
     .to(new FileReader())
     .to(new Unzipper())
     .toEither(new TextParser(), new ImageParser())   // Chain, inline
     .to(new Renderer());
 ```
 
-Three steps, same result. Most of the code you needed to write was already written.
+`Multipath` IS-A `Path` IS-A `Converter<Filename, HTML>` -- the same external shape. It adds nothing at runtime; the sugar is construction-time only.
 
 ## Parameters
 
@@ -285,10 +285,10 @@ Still, it only should run when needed. Since P flows through the whole path, the
   }
 ```
 
-Since we are using Path to wire everything together, where does it go? Conceptually, the data goes *through* the transformation, so we add it to the Path with `through()`:
+Since we are using Path to wire everything together, where does it go? With `Multipath`, it slots in with `through()`:
 
 ```typescript
-  const path = new Path<Filename>()
+  const path = new Multipath<Filename, Blob>()
     .to(new FileReader())
     .to(new Unzipper())
     .toEither(new TextParser(), new ImageParser())
@@ -320,10 +320,10 @@ Unlike Converters, transforms can never fail, so we run *all* of them — the on
   accessibility.install(2, 'font-size',  new FontSizeTransform());
 ```
 
-`Pipeline` IS-A `Transform<HTML, ViewParams>`, so it slots into a path with `through()` — the same call that added a single transform:
+`Pipeline` IS-A `Transform<HTML, ViewParams>`, so it slots into a Multipath with `through()` — the same call that added a single transform:
 
 ```typescript
-  const path = new Path<Filename>()
+  const path = new Multipath<Filename, Blob>()
     ...
     .to(new Renderer())
     .through(accessibility);
@@ -331,10 +331,10 @@ Unlike Converters, transforms can never fail, so we run *all* of them — the on
 
 The path doesn't know or care that `accessibility` is a Pipeline. The composite rule again: to any caller, a Pipeline is indistinguishable from a single transform.
 
-If the Pipeline is local to this one path and doesn't need a name, `throughAll()` builds it inline — the same relationship `toEither()` has to Chain:
+If the Pipeline is local to this one path and doesn't need a name, `throughAll()` builds it inline:
 
 ```typescript
-  const path = new Path<Filename>()
+  const path = new Multipath<Filename, Blob>()
     ...
     .to(new Renderer())
     .throughAll(new DeuteranopiaFilter(), new FontSizeTransform());
@@ -432,7 +432,7 @@ It does! Here we introduce `Runtime`, which is an *unordered* registry of conver
 
 That's not magic, it's a graph traversal. This is dynamic composition replacing static composition. You don't write the glue code; the system found it and called it for you.
 
-Under the hood, `Router` uses a `Solver` to find a `Path<Filename, HTML>` through the Runtime, then executes that Path. If you want to inspect or cache the path before executing, `Solver` is there — but for the common case, `Router` is the right tool.
+Under the hood, `Router` uses a `Solver` to find a `Path<Filename, HTML>` through the Runtime, then executes it. A Path may include Chains at intermediate steps -- branching is resolved at runtime when the input is known. The actual sequence of steps taken for a given input is a Trace; you cannot know the Trace until you run it. If you want to inspect or cache the Path before executing, `Solver` is there -- but for the common case, `Router` is the right tool.
 
 ## TODO: accepts/rejects/handles
 
