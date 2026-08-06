@@ -29,7 +29,7 @@ class ExpandToRect implements Converter<Point, Rect> {
 
 describe('Path', () => {
     it('returns null by default when empty', () => {
-        const path: Path<string, Rect> = new Path();
+        const path = new Path<string, Rect>();
         assert.equal(path.traverse('10,20', {}), null);
     });
 
@@ -44,17 +44,16 @@ describe('Path', () => {
     });
 
     it('traverse() and resolve() return the same result', () => {
-        const path: Path<string, Rect> = new Path();
+        const path = new Path<string, Rect>();
         path.append(new ParsePoint());
         path.append(new ExpandToRect(50));
         assert.deepEqual(path.traverse('5,10', {}), path.resolve('5,10', {}));
     });
 
     it('is assignable to Converter', () => {
-        const path: Converter<string, Rect> = new Path();
-        path.append(new ParsePoint());
-        path.append(new ExpandToRect(10));
-        assert.deepEqual(path.resolve('1,2', {}), { x: 1, y: 2, width: 10, height: 10 });
+        const path = Path.create<string, Rect>(new ParsePoint(), new ExpandToRect(10));
+        const c: Converter<string, Rect> = path;
+        assert.deepEqual(c.resolve('1,2', {}), { x: 1, y: 2, width: 10, height: 10 });
     });
 
     it('passes params through to each step', () => {
@@ -66,11 +65,26 @@ describe('Path', () => {
             }
         }
 
-        const path: Path<string, Rect, SizeParams> = new Path();
-        path.append(new ParsePoint());
-        path.append(new ExpandToRectParam());
+        const path = Path.create<string, Rect, SizeParams>(new ParsePoint(), new ExpandToRectParam());
         assert.deepEqual(path.traverse('3,4', { size: 20 }), { x: 3, y: 4, width: 20, height: 20 });
         assert.equal(path.traverse('bad', { size: 20 }), null);
+    });
+
+    it('append advances the type; failure at one step propagates through the rest', () => {
+        const path = new Path<string, Point>()
+            .append(new ParsePoint())
+            .append(new ExpandToRect(100));
+        assert.deepEqual(path.traverse('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
+        assert.equal(path.traverse('bad', {}), null);
+    });
+
+    it('append returns an independently usable subpath; extended path can substitute for the full type', () => {
+        const subpath = new Path<string, Point>().append(new ParsePoint());
+        const full: Path<string, Rect> = subpath.append(new ExpandToRect(100));
+        assert.deepEqual(subpath.traverse('10,20', {}), { x: 10, y: 20 });
+        assert.deepEqual(full.traverse('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
+        const converter: Converter<string, Rect> = full;
+        assert.deepEqual(converter.resolve('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
     });
 
     it('propagates intermediate failure through remaining steps to the final result', { todo: true }, () => {
@@ -81,7 +95,7 @@ describe('Path', () => {
     });
 
     it('detects and throws on a step type mismatch (requires interior builder)', { todo: true }, () => {
-        const path: Path<string, Rect> = new Path();
+        const path = new Path<string, Rect> ();
         path.append(new ExpandToRect(100)); // wrong: expects Point, gets string
         assert.throws(() => path.traverse('10,20', {}));
     });
