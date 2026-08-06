@@ -2,6 +2,7 @@
 
 import { Converter } from './Converter';
 import { Parameters } from './Parameters';
+import { Provider } from './Provider';
 
 export interface Failed<U> {
     readonly value: U;
@@ -15,11 +16,12 @@ export namespace Failed {
     export const Null: Failed<any> = { value: null };
 }
 
-export class Chain<T, U, P extends Parameters = Parameters> implements Converter<T, U, P> {
+export class Chain<T, U, P extends Parameters = Parameters> extends Provider<T, U, P> {
     readonly chainFailed: Failed<U>;
     private entries: Chain.Strategy<T, U, P>[] = [];
 
     constructor(failed: Failed<U> = Failed.Null) {
+        super();
         this.chainFailed = failed;
     }
 
@@ -35,7 +37,7 @@ export class Chain<T, U, P extends Parameters = Parameters> implements Converter
         this.install(priority, name, new ctor(...args));
     }
 
-    resolve(value: T, params: P): U {
+    convert(value: T, params: P): U {
         for (const { converter, failed: linkFailed } of this.entries) {
             const { accepts, rejects, handles } = converter;
             if (handles && !handles(params)) {

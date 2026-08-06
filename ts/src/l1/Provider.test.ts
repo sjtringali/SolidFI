@@ -9,7 +9,7 @@ import { Chain } from './Chain';
 import { Parameters } from './Parameters';
 
 class UpperCase extends Provider<string, string> {
-    resolve(value: string, params: Parameters): string {
+    convert(value: string, params: Parameters): string {
         return value.toUpperCase();
     }
 }
@@ -19,7 +19,7 @@ class NonEmptyFilter extends Provider<string, string | null> {
         return value.length > 0;
     }
 
-    resolve(value: string, params: Parameters): string {
+    convert(value: string, params: Parameters): string {
         return value;
     }
 }
@@ -29,15 +29,34 @@ class PrefixedConverter extends Provider<string, string> {
         super();
     }
 
-    resolve(value: string, params: Parameters): string {
+    convert(value: string, params: Parameters): string {
         return `${this.prefix}${value}`;
     }
 }
 
 describe('Provider', () => {
-    it('resolve() delegates to the concrete subclass', () => {
+    it('resolve() delegates to convert() in the concrete subclass', () => {
         const p = new UpperCase();
         assert.equal(p.resolve('hello', {}), 'HELLO');
+    });
+
+    it('prepare Transform runs before convert()', () => {
+        const p = new UpperCase();
+        p.prepare = { apply: (v: string) => v.trim() };
+        assert.equal(p.resolve('  hello  ', {}), 'HELLO');
+    });
+
+    it('finalize Transform runs after convert()', () => {
+        const p = new UpperCase();
+        p.finalize = { apply: (v: string) => `${v}!` };
+        assert.equal(p.resolve('hello', {}), 'HELLO!');
+    });
+
+    it('prepare and finalize both run when set', () => {
+        const p = new UpperCase();
+        p.prepare  = { apply: (v: string) => v.trim() };
+        p.finalize = { apply: (v: string) => `${v}!` };
+        assert.equal(p.resolve('  hello  ', {}), 'HELLO!');
     });
 
     it('is assignable to Converter', () => {
