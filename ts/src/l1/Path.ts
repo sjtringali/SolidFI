@@ -4,18 +4,13 @@ import { Converter } from './Converter';
 import { Parameters } from './Parameters';
 import { Failed } from './Chain';
 
-interface PathNode<In, Out, P extends Parameters> {
-    converter: Converter<In, Out, P>;
-    next: PathNode<Out, any, P> | null;
-}
-
 // Not exported: callers use new Path() for the null default, or Failed(value) for an explicit sentinel.
 const NullFailed = Failed<any>(null);
 
 export class Path<T, U, P extends Parameters = Parameters> implements Converter<T, U, P> {
     readonly pathFailed: Failed<U>;
-    private head: PathNode<T, any, P> | null = null;
-    private tail: PathNode<any, U, P> | null = null;
+    private head: Path.Step<T, any, P> | null = null;
+    private tail: Path.Step<any, U, P> | null = null;
 
     constructor(failed: Failed<U> = NullFailed) {
         this.pathFailed = failed;
@@ -29,7 +24,11 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
     }
 
     // TODO: type mismatches between steps are undetected; requires an interior builder to catch at append time.
-    append<I>(converter: Converter<U, I, P>): Path<T, I, P> {
+    append(converter: Converter<U, any, P>): void {
+        this.addNode(converter);
+    }
+
+    to<I>(converter: Converter<U, I, P>): Path<T, I, P> {
         const next = new Path<T, I, P>();
         let node = this.head;
         while (node !== null) {
@@ -40,8 +39,17 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
         return next;
     }
 
-    private addNode(converter: Converter<any, any, any>): this {
-        const node: PathNode<any, any, P> = { converter, next: null };
+    protected copyTo<M extends Path<T, any, P>>(target: M): M {
+        let node = this.head;
+        while (node !== null) {
+            target.addNode(node.converter);
+            node = node.next;
+        }
+        return target;
+    }
+
+    protected addNode(converter: Converter<any, any, any>): this {
+        const node: Path.Step<any, any, P> = { converter, next: null };
         if (this.tail) {
             this.tail.next = node;
         } else {
@@ -55,10 +63,8 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
         if (this.head === null) {
             return this.pathFailed.value;
         }
-        // Type-safe at the boundary, but the cast here is for simplicity.
-        // We could replace this with a hidden builder inside, for completeness.
         let current: any = value;
-        let node: PathNode<any, any, P> | null = this.head;
+        let node: Path.Step<any, any, P> | null = this.head;
         while (node !== null) {
             current = node.converter.resolve(current, params);
             node = node.next;
@@ -68,5 +74,12 @@ export class Path<T, U, P extends Parameters = Parameters> implements Converter<
 
     resolve(value: T, params: P): U {
         return this.traverse(value, params);
+    }
+}
+
+export namespace Path {
+    export interface Step<In, Out, P extends Parameters> {
+        converter: Converter<In, Out, P>;
+        next: Step<Out, any, P> | null;
     }
 }

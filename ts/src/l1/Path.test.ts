@@ -70,17 +70,17 @@ describe('Path', () => {
         assert.equal(path.traverse('bad', { size: 20 }), null);
     });
 
-    it('append advances the type; failure at one step propagates through the rest', () => {
+    it('to() advances the type; failure at one step propagates through the rest', () => {
         const path = new Path<string, Point>()
-            .append(new ParsePoint())
-            .append(new ExpandToRect(100));
+            .to(new ParsePoint())
+            .to(new ExpandToRect(100));
         assert.deepEqual(path.traverse('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
         assert.equal(path.traverse('bad', {}), null);
     });
 
-    it('append returns an independently usable subpath; extended path can substitute for the full type', () => {
-        const subpath = new Path<string, Point>().append(new ParsePoint());
-        const full: Path<string, Rect> = subpath.append(new ExpandToRect(100));
+    it('to() returns an independently usable subpath; extended path can substitute for the full type', () => {
+        const subpath: Path<string, Point> = new Path<string, Point>().to(new ParsePoint());
+        const full: Path<string, Rect> = subpath.to(new ExpandToRect(100));
         assert.deepEqual(subpath.traverse('10,20', {}), { x: 10, y: 20 });
         assert.deepEqual(full.traverse('10,20', {}), { x: 10, y: 20, width: 100, height: 100 });
         const converter: Converter<string, Rect> = full;
