@@ -13,7 +13,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @proposed
+/// @proposed{8/3/26}
 /// @brief Concrete composition of a Selector with an optional Transform, usable as either.
 ///
 /// Lens<T, U, P> is the concrete counterpart to Selector, in the same way that

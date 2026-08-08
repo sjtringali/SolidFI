@@ -13,7 +13,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
-/// @accepted
+/// @accepted{8/4/26}
 /// @brief Failure policy for Chain: holds the sentinel value returned when no converter succeeds.
 ///
 /// Chain accepts a `Failed<U>` rather than a raw U so that the sentinel can be provided
@@ -30,7 +30,7 @@ struct Failed {
 };
 
 /// @ingroup solidfi_l1_structural
-/// @accepted
+/// @accepted{5/24/26}
 /// @brief An ordered composition of Converter instances. Is itself a Converter<T,U,P>.
 ///
 /// To any caller holding a Converter<T,U,P> reference, a Chain is indistinguishable from

@@ -12,7 +12,8 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @accepted
+/// @history{Proposed 7/18/26}
+/// @accepted{7/29/26}
 /// @brief A sequential, type-advancing composition of Converters. IS-A Converter<T,U,P>.
 ///
 /// Path is the heterogeneous composite over Converter: each step may advance the type

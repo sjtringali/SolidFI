@@ -12,7 +12,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @proposed
+/// @proposed{7/19/26}
 /// @brief Untyped path finder. Domain-bound; one instance, any T->U query.
 ///
 /// Pathfinder is the dynamic complement to Solver<T,U,P>. Where Solver fixes T and U

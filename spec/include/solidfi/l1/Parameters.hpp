@@ -10,7 +10,7 @@ namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
 
-/// @accepted
+/// @accepted{5/24/26}
 /// @brief Named marker type for user-defined contextual data passed into Converter::resolve.
 ///
 /// Parameters is the default type for the P template parameter across all SolidFI primitives

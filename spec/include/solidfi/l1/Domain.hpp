@@ -12,7 +12,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @proposed
+/// @proposed{5/24/26}
 /// @brief An unordered, potentially cyclic registry of Converter edges. L0: Graph.
 ///
 /// Domain is a passive data structure — a bag of converter edges. Nodes are implied by

@@ -10,7 +10,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
-/// @reserved
+/// @reserved{7/26/26}
 /// @brief Runs all installed converters concurrently; the first to succeed wins.
 ///
 /// Race is the concurrent sibling of Chain. Where Chain attempts

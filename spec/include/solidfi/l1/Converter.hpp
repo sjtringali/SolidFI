@@ -12,7 +12,7 @@ namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
 
-/// @accepted
+/// @accepted{5/24/26}
 /// @brief Takes a value of type T and produces a value of type U.
 ///
 /// T and U are typically different types — this is a genuine conversion, not a

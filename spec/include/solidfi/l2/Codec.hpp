@@ -11,7 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l2
-/// @proposed
+/// @proposed{7/22/26}
 /// @brief A Serializer that also decodes: encode and decode as a matched pair.
 ///
 /// Codec is an Inverter<T,U> — forward() encodes, reverse() decodes. Because Inverter<T,U>

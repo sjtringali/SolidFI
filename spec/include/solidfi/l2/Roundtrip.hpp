@@ -10,7 +10,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l2
-/// @proposed
+/// @proposed{7/22/26}
 /// @brief Guarantees bidirectional communication between two endpoints.
 ///
 /// Roundtrip is an Inverter<T,U> at the protocol level: forward() sends and awaits a

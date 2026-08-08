@@ -10,7 +10,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @proposed
+/// @proposed{7/18/26}
 /// @brief A named concrete base for Converter.
 ///
 /// Provider adds no behavior -- it is a named abstract base that subclasses implement.

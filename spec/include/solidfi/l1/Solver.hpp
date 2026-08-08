@@ -12,7 +12,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @proposed
+/// @proposed{5/24/26}
 /// @brief Typed path finder. IS-A Converter<Domain, Path<T,U,P>, P>.
 ///
 /// Solver is the engine of Parameterized Traversal (level 2 of 3). It is one of three

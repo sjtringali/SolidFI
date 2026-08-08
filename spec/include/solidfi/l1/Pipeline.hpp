@@ -13,7 +13,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_structural
-/// @accepted
+/// @accepted{5/24/26}
 /// @brief An ordered composition of Transform<T,P> instances. Is itself a Transform<T,P>.
 ///
 /// To any caller holding a Transform<T,P> reference, a Pipeline is indistinguishable from

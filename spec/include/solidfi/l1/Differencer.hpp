@@ -11,7 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_state
-/// @reserved
+/// @reserved{7/18/26}
 /// @brief Given a current state T and a previous state T (as P), produces a Delta<T>.
 ///
 /// Differencer is Converter<T, Delta<T>, T> — the previous state flows in as the

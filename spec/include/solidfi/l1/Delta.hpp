@@ -8,7 +8,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_state
-/// @reserved
+/// @reserved{7/18/26}
 /// @brief Represents the change between two states of T.
 ///
 /// Delta is a named, first-class concept for the transition between states — not the

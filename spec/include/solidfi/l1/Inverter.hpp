@@ -10,7 +10,8 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @proposed
+/// @history{Reserved 7/18/26}
+/// @proposed{7/22/26}
 /// @brief A pair of converters that roundtrip T and U, implementing both interfaces.
 ///
 /// Inverter implements both Converter<T,U> and Converter<U,T> directly. The Composite/

@@ -13,7 +13,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @proposed
+/// @proposed{8/4/26}
 /// @brief Construction helper that builds a Path with inline Chain and Pipeline sugar.
 ///        IS-A Path<T,U,P> and therefore IS-A Converter<T,U,P>.
 ///

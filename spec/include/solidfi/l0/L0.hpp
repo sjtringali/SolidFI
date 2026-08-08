@@ -122,7 +122,7 @@ public:
 };
 
 /// @ingroup solidfi_l0
-/// @reserved
+/// @reserved{7/29/26}
 /// @brief May or may not hold a value of type T.
 /// @tparam T source type; free generic, owned by the user.
 /// @note L1 mapping: Optional<T> -- concretized as std::optional<T> in forward.hpp.
@@ -201,7 +201,7 @@ public:
 };
 
 /// @ingroup solidfi_l0
-/// @reserved
+/// @reserved{8/3/26}
 /// @brief Produces zero or more U values from a single T.
 ///
 /// Fanout is the heterogeneous complement to Expand: where Expand produces T[]

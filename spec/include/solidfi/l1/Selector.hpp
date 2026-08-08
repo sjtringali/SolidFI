@@ -11,7 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @proposed
+/// @proposed{8/3/26}
 /// @brief Extracts zero or more sub-values of type U from a containing value of type T.
 ///
 /// Selector is a Converter<T, std::vector<U>, P> intended for use with Transform.

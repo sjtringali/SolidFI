@@ -11,7 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_compositions
-/// @reserved
+/// @reserved{7/18/26}
 /// @brief An algorithm that accepts a Domain and produces a result of type U.
 ///
 /// Traversal is Converter<Domain, U, P> — the Domain is the input type, and the

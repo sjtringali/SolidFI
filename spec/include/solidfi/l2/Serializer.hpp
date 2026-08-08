@@ -10,7 +10,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l2
-/// @proposed
+/// @proposed{7/22/26}
 /// @brief Converts an in-memory representation to a serialized form. One-way.
 ///
 /// Serializer<T,U> is a named boundary marker for Converter<T,U> — the "in-memory to wire

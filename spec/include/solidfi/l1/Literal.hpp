@@ -11,7 +11,7 @@
 namespace solidfi {
 
 /// @ingroup solidfi_l1_extras
-/// @proposed
+/// @proposed{7/18/26}
 /// @brief Captures a value of type T and produces it regardless of input.
 ///
 /// Literal simultaneously satisfies both Transform<T> and Converter<InputT,T> — it is

@@ -65,6 +65,10 @@ ENUM_VALUES_PER_LINE   = 1
 ALIASES += proposed="@par Status: Proposed^^ Shape is defined; under review."
 ALIASES += accepted="@par Status: Accepted^^ Spec is settled and stable."
 ALIASES += reserved="@par Status: Reserved^^ Name is claimed; spec deliberately deferred."
+ALIASES += proposed{1}="@par Status: Proposed (\1)^^ Shape is defined; under review."
+ALIASES += accepted{1}="@par Status: Accepted (\1)^^ Spec is settled and stable."
+ALIASES += reserved{1}="@par Status: Reserved (\1)^^ Name is claimed; spec deliberately deferred."
+ALIASES += history{1}="@par History:^^ \1"
 
 #---------------------------------------------------------------------------
 # No LaTeX, no other formats
