@@ -18,6 +18,8 @@ namespace solidfi {
 /// with explicit linked-list wiring in Multipath and Path, a separate marker base class
 /// may not be necessary. Status: proposed pending implementation experience.
 ///
+/// @implements Converter<T, U, P>
+///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.

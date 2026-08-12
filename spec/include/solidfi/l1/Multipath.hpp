@@ -28,6 +28,8 @@ namespace solidfi {
 /// steps. Use Path directly when steps are already constructed or branching is
 /// not needed.
 ///
+/// @extends Path<T, U, P>
+///
 /// @tparam T source (start) type.
 /// @tparam U destination (end) type.
 /// @tparam P parameters type. Defaults to Parameters.

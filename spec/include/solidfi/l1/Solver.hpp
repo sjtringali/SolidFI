@@ -42,13 +42,14 @@ namespace solidfi {
 ///
 /// Use Pathfinder when T and U are only known at runtime.
 ///
-/// **Invariants:**
-/// - Solver is responsible for cycle avoidance during traversal.
-/// - Solver MUST NOT modify the Domain passed to resolve().
-/// - P flows into individual converters along the path, consistent with Converter semantics.
+/// @invariant Solver is responsible for cycle avoidance during traversal.
+/// @invariant Solver MUST NOT modify the Domain passed to resolve().
+/// @invariant P flows into individual converters along the path, consistent with Converter semantics.
 ///   The Domain itself is not inspected with P.
-/// - Solver carries its own failed value (see the constructor), returned when no
+/// @invariant Solver carries its own failed value (see the constructor), returned when no
 ///   route T->U exists in the Domain.
+///
+/// @implements Converter<Domain, Path<T, U, P>, P>
 ///
 /// @tparam T source type; the start of the path being sought.
 /// @tparam U destination type; the end of the path being sought.
@@ -71,6 +72,7 @@ public:
     /// To find-and-execute in one step, use Router<T,U,P>.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
+    /// @retval failed Solver's own configured failed value, if no route T->U exists.
     Path<T, U, P> resolve(Domain domain, P params) noexcept override;
 
 private:

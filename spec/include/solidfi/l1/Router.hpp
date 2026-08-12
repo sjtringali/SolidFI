@@ -30,10 +30,11 @@ namespace solidfi {
 /// Chain, in a Multipath step, or as a direct dependency. The dynamic graph search is hidden
 /// behind the same interface as a single hand-written converter.
 ///
-/// **Invariants:**
-/// - Router MUST NOT modify the Solver or Domain it holds.
-/// - Router carries its own failed value (see the constructor), returned when
+/// @invariant Router MUST NOT modify the Solver or Domain it holds.
+/// @invariant Router carries its own failed value (see the constructor), returned when
 ///   Solver finds no path at all, or when the resulting Path's traversal fails.
+///
+/// @implements Converter<T, U, P>
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -62,6 +63,7 @@ public:
     /// traversal fails), returns Router's own failed value.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
+    /// @retval failed Router's own configured failed value, if Solver finds no path or traversal fails.
     U resolve(T value, P params) noexcept override;
 
 private:

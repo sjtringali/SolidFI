@@ -31,9 +31,8 @@ namespace solidfi {
 ///
 /// The Domain is bound at construction time. Pathfinder MUST NOT modify the Domain it holds.
 ///
-/// **Invariants:**
-/// - Pathfinder is responsible for cycle avoidance during traversal.
-/// - P flows into individual converters along the path, consistent with Converter semantics.
+/// @invariant Pathfinder is responsible for cycle avoidance during traversal.
+/// @invariant P flows into individual converters along the path, consistent with Converter semantics.
 ///   The Domain itself is not inspected with P.
 class Pathfinder {
 public:

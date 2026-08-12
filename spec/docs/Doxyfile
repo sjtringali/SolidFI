@@ -42,7 +42,6 @@ ALPHABETICAL_INDEX     = NO
 SHOW_FILES             = NO
 SHOW_NAMESPACES        = NO
 BUILTIN_STL_SUPPORT    = YES
-INLINE_INHERITED_MEMB  = YES
 
 #---------------------------------------------------------------------------
 # HTML — doxygen-awesome-css theme

@@ -54,7 +54,7 @@ struct Failed {
 /// A converter with none overridden is always attempted.
 /// Selection is only final when resolve() succeeds.
 ///
-/// Chain has its own prepare Transform<T> and finalize Transform<U> by definition
+/// Chain has its own prepare `Transform<T>` and finalize `Transform<U>` by definition
 /// (inherited from Converter, not redeclared here), conditioning the input and output
 /// of the whole chain. Either may be a Pipeline<T> or `Pipeline<U>`, as the composite rule
 /// ensures any Transform<T> satisfies the slot.
@@ -74,17 +74,18 @@ struct Failed {
 /// For dynamic interception of a converter from the outside, injecting behavior without
 /// modifying the Graph, see Proxy (L2).
 ///
-/// **Invariants:**
-/// - Priority determines execution order. Duplicate priorities are rejected: install() MUST
+/// @invariant Priority determines execution order. Duplicate priorities are rejected: install() MUST
 ///   fail (throw or return an error) rather than silently produce undefined ordering.
-/// - Names are group keys: multiple entries may share a name. remove(name) removes all.
-/// - If no converter succeeds, the chain fails and returns its own configured
+/// @invariant Names are group keys: multiple entries may share a name. remove(name) removes all.
+/// @invariant If no converter succeeds, the chain fails and returns its own configured
 ///   failed value (see the `failed` constructor parameter).
-/// - A link's failure value, if given at install(), is what that link's resolve()
+/// @invariant A link's failure value, if given at install(), is what that link's resolve()
 ///   is compared against. Omitted means the chain's own failed value applies.
-/// - prepare and finalize (Chain's own, inherited from Converter, and each link's own)
+/// @invariant prepare and finalize (Chain's own, inherited from Converter, and each link's own)
 ///   are optional; null means no change, not "stop dispatch": resolve() still runs,
 ///   only the missing conditioning step is skipped.
+///
+/// @implements Converter<T, U, P>
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -100,15 +101,6 @@ public:
     /// structurally (Provider, Literal, Generator, etc.). No explicit relationship required.
     Chain(Failed<U> failed = Failed<U>{});
 
-    /// @brief Construct a Chain with optional prepare and finalize transforms.
-    ///
-    /// Sets the prepare and finalize members inherited from Converter.
-    ///
-    /// @param prepare  Transform that conditions the input. May be nullptr.
-    /// @param finalize Transform that conditions the result. May be nullptr.
-    /// @accepted
-    explicit Chain(Transform<T>* prepare, Transform<U>* finalize = nullptr);
-
     bool accepts(T value) const noexcept override;
     bool rejects(T value) const noexcept override;
 
@@ -120,6 +112,7 @@ public:
     /// @brief Try each installed converter in priority order until one succeeds.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
+    /// @retval failed The chain's own configured failed value, if no installed converter succeeds.
     U resolve(T value, P params) noexcept override;
 
     /// @brief Install a converter at the given priority under the given name.

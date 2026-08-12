@@ -35,6 +35,8 @@ namespace solidfi {
 ///   writeToDisk(codec, order, params);  // codec IS-A Serializer<Order,Bytes>, via Inverter
 /// @endcode
 ///
+/// @extends Inverter<T, U>
+///
 /// @tparam T in-memory representation.
 /// @tparam U serialized form.
 template<typename T, typename U>

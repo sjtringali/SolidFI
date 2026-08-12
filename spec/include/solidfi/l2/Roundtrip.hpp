@@ -17,6 +17,8 @@ namespace solidfi {
 /// reply, reverse() replies in turn. Distinct from Codec — Codec pairs encode/decode of a
 /// representation; Roundtrip pairs the two halves of a communication exchange.
 ///
+/// @extends Inverter<T, U>
+///
 /// @tparam T request type.
 /// @tparam U response type.
 ///

@@ -27,7 +27,8 @@ namespace solidfi {
 /// Selector returns std::vector<U> (zero-or-more) to express that selection
 /// may match any number of sub-values, including none.
 ///
-/// @note IS-A: Converter<T, std::vector<U>, P>
+/// @implements Converter<T, std::vector<U>, P>
+///
 /// @note Traversal maps naturally onto a Selector paired with a Transform<U, P>.
 ///
 /// @tparam T the containing type; owns or holds one or more U values.

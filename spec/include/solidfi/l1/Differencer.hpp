@@ -17,6 +17,8 @@ namespace solidfi {
 /// Differencer is Converter<T, Delta<T>, T> — the previous state flows in as the
 /// parameter P. The result is the named, first-class change between the two states.
 ///
+/// @implements Converter<T, Delta<T>, T>
+///
 /// @tparam T source type; free generic, owned by the user. Both the current and
 ///   previous state are of type T.
 template<typename T>

@@ -30,12 +30,11 @@ namespace solidfi {
 /// @endcode
 /// All three must pass; evaluation order is unspecified and implementation-defined.
 ///
-/// **Invariants:**
-/// - accepts(), rejects(), and handles() are stateless, synchronous, and side-effect-free.
-/// - accepts() and rejects() MUST NOT depend on P.
-/// - handles() MUST NOT depend on T.
-/// - apply() MUST return a value of type T.
-/// - A transform that does not accept its input MUST return the original value unchanged.
+/// @invariant accepts(), rejects(), and handles() are stateless, synchronous, and side-effect-free.
+/// @invariant accepts() and rejects() MUST NOT depend on P.
+/// @invariant handles() MUST NOT depend on T.
+/// @invariant apply() MUST return a value of type T.
+/// @invariant A transform that does not accept its input MUST return the original value unchanged.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.

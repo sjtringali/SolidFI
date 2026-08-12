@@ -17,6 +17,8 @@ namespace solidfi {
 /// Applicator is Converter<T, T, Delta<T>> — the delta flows in as the parameter P.
 /// The result is the new state after applying the change.
 ///
+/// @implements Converter<T, T, Delta<T>>
+///
 /// @tparam T source type; free generic, owned by the user. Both input and output are T.
 template<typename T>
 class Applicator : public Converter<T, T, Delta<T>> {

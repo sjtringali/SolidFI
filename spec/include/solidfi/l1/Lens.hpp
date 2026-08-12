@@ -37,8 +37,8 @@ namespace solidfi {
 /// Lens is concrete: construct it with the pieces, use it anywhere a
 /// Converter<T, std::vector<U>, P> or Transform<T, P> is expected.
 ///
-/// @note IS-A: Converter<T, std::vector<U>, P>
-/// @note IS-A: Transform<T, P> when constructed with an inner Transform<U, P>.
+/// @implements Converter<T, std::vector<U>, P>
+/// @implements Transform<T, P>
 ///
 /// @tparam T the containing type.
 /// @tparam U the sub-value type; a structural part of T, not a projection.

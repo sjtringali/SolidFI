@@ -23,13 +23,14 @@ namespace solidfi {
 /// forwarded unchanged to the next transform in priority order. Skipping is not failure;
 /// it is abstention. Pipeline MUST degrade to identity if no transform runs.
 ///
-/// **Invariants:**
-/// - A Pipeline MUST degrade to identity if no installed transform accepts the input.
-/// - A skipped transform passes its input unchanged to the next in priority order.
-/// - Names are group keys: multiple entries may share a name and are treated as a group.
+/// @invariant A Pipeline MUST degrade to identity if no installed transform accepts the input.
+/// @invariant A skipped transform passes its input unchanged to the next in priority order.
+/// @invariant Names are group keys: multiple entries may share a name and are treated as a group.
 ///   remove(name) removes all entries with that name.
-/// - Duplicate priorities are rejected — install() MUST fail (throw or return an error)
+/// @invariant Duplicate priorities are rejected — install() MUST fail (throw or return an error)
 ///   rather than silently produce undefined ordering.
+///
+/// @implements Transform<T, P>
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
@@ -49,6 +50,7 @@ public:
     ///
     /// Skipped transforms pass their input through unchanged.
     /// Degrades to identity if no transform runs.
+    /// @retval value (unchanged) If no installed transform accepts the input.
     T apply(T value, P params) noexcept override;
 
     /// @brief Install a transform at the given priority under the given name.

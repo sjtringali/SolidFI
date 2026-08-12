@@ -34,13 +34,12 @@ namespace solidfi {
 /// A converter with none overridden is always attempted. Each method has one concern:
 /// accepts() and rejects() MUST NOT depend on P; handles() MUST NOT depend on T.
 ///
-/// **Invariants:**
-/// - accepts(), rejects(), and handles() MUST be stateless and synchronous.
-/// - accepts() and rejects() MUST NOT depend on P.
-/// - handles() MUST NOT depend on T.
-/// - resolve() MAY fail; the composing context (e.g. Chain) defines which value of
+/// @invariant accepts(), rejects(), and handles() MUST be stateless and synchronous.
+/// @invariant accepts() and rejects() MUST NOT depend on P.
+/// @invariant handles() MUST NOT depend on T.
+/// @invariant resolve() MAY fail; the composing context (e.g. Chain) defines which value of
 ///   U represents failure.
-/// - prepare and finalize are optional; null means no change, not "stop dispatch":
+/// @invariant prepare and finalize are optional; null means no change, not "stop dispatch":
 ///   resolve() is still attempted normally, only the missing conditioning step is skipped.
 ///   Converter itself never calls them; the composing context (e.g. Chain) does.
 ///

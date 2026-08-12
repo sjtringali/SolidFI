@@ -20,6 +20,8 @@ namespace solidfi {
 /// @todo Specification pending: install/remove/replace shape, and how Race, Chain, and
 ///   a future Parallel (concurrent, waits for all) share a common composition API.
 ///
+/// @implements Converter<T, U, P>
+///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.

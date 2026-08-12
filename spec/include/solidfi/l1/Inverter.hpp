@@ -33,6 +33,9 @@ namespace solidfi {
 ///
 /// This bidirectionality is the basis for L2 Roundtrip.
 ///
+/// @implements Converter<T, U>
+/// @implements Converter<U, T>
+///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 template<typename T, typename U>

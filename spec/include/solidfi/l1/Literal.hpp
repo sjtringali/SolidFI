@@ -24,10 +24,12 @@ namespace solidfi {
 /// - Adapt an existing value into a composition that expects a transform or converter.
 /// - Stand-in during development before a real implementation exists.
 ///
-/// **Invariants:**
-/// - MUST always produce a T.
-/// - resolve() and apply() MUST NOT depend on the input value.
-/// - accepts() returns true, rejects() returns false.
+/// @invariant MUST always produce a T.
+/// @invariant resolve() and apply() MUST NOT depend on the input value.
+/// @invariant accepts() returns true, rejects() returns false.
+///
+/// @implements Transform<T, P>
+/// @implements Converter<InputT, T, P>
 ///
 /// @tparam T The captured and produced type; free generic, owned by the user.
 /// @tparam InputT The input type for the Converter interface. Defaults to T.
@@ -41,7 +43,10 @@ public:
     /// @brief Retrieve the captured value.
     T get() const;
 
+    /// @retval true Always. A Literal accepts any input; the value is ignored.
     bool accepts(T value) const noexcept override { return true; }
+
+    /// @retval false Always. A Literal never rejects.
     bool rejects(T value) const noexcept override { return false; }
 
     /// @brief Return the captured value. The input and parameters are ignored.

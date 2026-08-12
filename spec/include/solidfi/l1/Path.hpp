@@ -47,11 +47,12 @@ namespace solidfi {
 /// MUST propagate failure: if step N returns a failure value, step N+1 must accept
 /// it and return a failure value in turn.
 ///
-/// **Invariants:**
-/// - Steps run in append order. The output of step N is the input to step N+1.
-/// - An empty Path returns its failed value immediately.
-/// - Each step MUST propagate failure from the previous step.
-/// - Path MUST NOT modify any Converter it holds.
+/// @invariant Steps run in append order. The output of step N is the input to step N+1.
+/// @invariant An empty Path returns its failed value immediately.
+/// @invariant Each step MUST propagate failure from the previous step.
+/// @invariant Path MUST NOT modify any Converter it holds.
+///
+/// @implements Converter<T, U, P>
 ///
 /// @tparam T source (start) type; input type of the first step.
 /// @tparam U destination (end) type; output type of the last step.
@@ -89,6 +90,7 @@ public:
     U traverse(T value, P params) noexcept;
 
     /// @note Async-capable. Concrete implementations may execute asynchronously.
+    /// @retval failed The Path's own failed value, if any step fails or the Path is empty.
     U resolve(T value, P params) noexcept override;
 
 private:

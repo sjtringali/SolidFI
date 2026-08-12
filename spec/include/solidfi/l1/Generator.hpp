@@ -17,6 +17,8 @@ namespace solidfi {
 /// Because void is not a valid C++ template type argument, the input type is modeled as
 /// Void, a tag type carrying no data. Callers pass Void{} as the input value.
 ///
+/// @implements Converter<Void, T, P>
+///
 /// @tparam T destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
 template<typename T, typename P = Parameters>

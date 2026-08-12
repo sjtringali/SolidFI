@@ -22,6 +22,8 @@ namespace solidfi {
 /// Because Traversal IS a Converter, traversals compose transparently wherever a
 /// Converter is expected. Multiple traversal strategies can be installed in a Chain.
 ///
+/// @implements Converter<Domain, U, P>
+///
 /// @tparam U destination type; the result type produced by this traversal.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
 ///

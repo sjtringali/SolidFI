@@ -26,12 +26,11 @@ namespace solidfi {
 /// patterns like codecs or plugins. It is the initial state of the system: install your
 /// converters, hand it to a Router, and dynamic composition takes over.
 ///
-/// **Invariants:**
-/// - Installed converters are unordered. No priority applies at the Domain level.
-/// - The graph MAY contain cycles. Cycle detection and avoidance is Solver's responsibility.
-/// - A Domain SHOULD be assembled at startup and treated as stable. It is not designed for
+/// @invariant Installed converters are unordered. No priority applies at the Domain level.
+/// @invariant The graph MAY contain cycles. Cycle detection and avoidance is Solver's responsibility.
+/// @invariant A Domain SHOULD be assembled at startup and treated as stable. It is not designed for
 ///   high-frequency mutation. Deployment-specific enrichment is L2's concern: see Runtime.
-/// - Domain MUST NOT execute any converter.
+/// @invariant Domain MUST NOT execute any converter.
 ///
 /// @note L0 mapping: Graph — the abstract directed graph structure Domain is built on.
 /// @note L2 mapping: Runtime — a Domain realized for a specific deployment context.
