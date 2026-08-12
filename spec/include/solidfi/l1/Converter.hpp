@@ -7,6 +7,7 @@
 
 
 #include "solidfi/l1/Parameters.hpp"
+#include "solidfi/l1/Transform.hpp"
 
 namespace solidfi {
 
@@ -15,7 +16,7 @@ namespace solidfi {
 /// @accepted{5/24/26}
 /// @brief Takes a value of type T and produces a value of type U.
 ///
-/// T and U are typically different types — this is a genuine conversion, not a
+/// T and U are typically different types: this is a genuine conversion, not a
 /// transformation. Because T and U are distinct, failure is possible: there is no
 /// identity fallback. Converter does not mandate a single failure representation,
 /// resolve() returns a plain value of U, and what counts as failure is defined by
@@ -39,14 +40,35 @@ namespace solidfi {
 /// - handles() MUST NOT depend on T.
 /// - resolve() MAY fail; the composing context (e.g. Chain) defines which value of
 ///   U represents failure.
+/// - prepare and finalize are optional; null means no change, not "stop dispatch":
+///   resolve() is still attempted normally, only the missing conditioning step is skipped.
+///   Converter itself never calls them; the composing context (e.g. Chain) does.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
 /// @tparam P parameters type; named marker, mostly user-owned. Defaults to Parameters.
-///   Passed by value — use `P = MyParams*` or `P = Shared<MyParams>` (L0) if sharing is needed.
+///   Passed by value. Use `P = MyParams*` or `P = Shared<MyParams>` (L0) if sharing is needed.
 template<typename T, typename U, typename P = Parameters>
 class Converter {
 public:
+    /// @brief Optional transform that conditions the input before resolve() is attempted.
+    /// @accepted
+    ///
+    /// May be a Pipeline<T,P>; the composite rule ensures any Transform<T,P> satisfies
+    /// this slot. Null means no change: resolve() is attempted on the input unmodified.
+    /// Converter never calls this itself; it is the composing context holding this
+    /// Converter (e.g. Chain) that applies it.
+    Transform<T, P>* prepare = nullptr;
+
+    /// @brief Optional transform that conditions the result after resolve() is attempted.
+    /// @accepted
+    ///
+    /// May be a Pipeline<U,P>; the composite rule ensures any Transform<U,P> satisfies
+    /// this slot. Null means no change: the result of resolve() is used unmodified.
+    /// Converter never calls this itself; it is the composing context holding this
+    /// Converter (e.g. Chain) that applies it.
+    Transform<U, P>* finalize = nullptr;
+
     /// @brief Returns true if this converter claims the input. Default: true.
     virtual bool accepts(T value) const noexcept { return true; }
 
@@ -58,14 +80,14 @@ public:
     /// @brief Returns true if this converter can handle these parameters. Default: true.
     ///
     /// A converter that does not handle the parameters is
-    /// never attempted via resolve(). MUST NOT depend on T — that belongs in accepts().
+    /// never attempted via resolve(). MUST NOT depend on T; that belongs in accepts().
     virtual bool handles(P params) const noexcept { return true; }
 
     /// @brief Perform the conversion. On failure, returns whichever value of U the
     /// composing context has defined to mean failure.
     ///
     /// @note Async-capable. Concrete implementations may execute asynchronously.
-    /// @note Failure is state, not control flow — it is the returned value described above.
+    /// @note Failure is state, not control flow; it is the returned value described above.
     virtual U resolve(T value, P params) = 0;
 
     // For use by Deferred

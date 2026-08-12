@@ -54,28 +54,37 @@ struct Failed {
 /// A converter with none overridden is always attempted.
 /// Selection is only final when resolve() succeeds.
 ///
-/// A Chain may optionally have a prepare Transform<T> that conditions the input, and a
-/// finalize `Transform<U>` that conditions the output. Either may be a Pipeline<T>
-/// or `Pipeline<U>`, as the composite rule ensures any Transform<T> satisfies the slot.
+/// Chain has its own prepare Transform<T> and finalize Transform<U> by definition
+/// (inherited from Converter, not redeclared here), conditioning the input and output
+/// of the whole chain. Either may be a Pipeline<T> or `Pipeline<U>`, as the composite rule
+/// ensures any Transform<T> satisfies the slot.
 ///
-/// prepare and finalize are normalization: they condition the input and output
-/// unconditionally. They are not routing, the Solver
+/// Because every installed link is itself a Converter, a link may carry its own prepare
+/// and finalize too. Chain calls them: a link's prepare (if set) conditions the value
+/// immediately before that link's resolve() is attempted, and its finalize (if set)
+/// conditions the value immediately after. A null prepare or finalize, whether Chain's
+/// own or a link's, means no change, not "stop dispatch": resolve() is still attempted
+/// normally, only the missing conditioning step is skipped.
+///
+/// prepare and finalize are normalization, not routing: the Solver
 /// does not see them, P does not select them, and they apply on every traversal of this
 /// Chain regardless of path. Normalization that belongs to this Chain lives here;
 /// normalization that should be visible across the Graph goes in via Graph::install(Transform<T>).
 ///
-/// For dynamic interception of a converter from the outside — injecting behavior without
-/// modifying the Graph — see Proxy (L2).
+/// For dynamic interception of a converter from the outside, injecting behavior without
+/// modifying the Graph, see Proxy (L2).
 ///
 /// **Invariants:**
-/// - Priority determines execution order. Duplicate priorities are rejected — install() MUST
+/// - Priority determines execution order. Duplicate priorities are rejected: install() MUST
 ///   fail (throw or return an error) rather than silently produce undefined ordering.
 /// - Names are group keys: multiple entries may share a name. remove(name) removes all.
 /// - If no converter succeeds, the chain fails and returns its own configured
 ///   failed value (see the `failed` constructor parameter).
 /// - A link's failure value, if given at install(), is what that link's resolve()
 ///   is compared against. Omitted means the chain's own failed value applies.
-/// - prepare and finalize are optional; absent means no transform applied.
+/// - prepare and finalize (Chain's own, inherited from Converter, and each link's own)
+///   are optional; null means no change, not "stop dispatch": resolve() still runs,
+///   only the missing conditioning step is skipped.
 ///
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
@@ -88,29 +97,17 @@ public:
     ///   Defaults to `Failed<U>{}`, which zero-initializes value (null for pointer and nullable types).
     ///
     /// Any U-producing concept that exposes a `value` member satisfies this parameter
-    /// structurally — Provider, Literal, Generator, etc. No explicit relationship required.
+    /// structurally (Provider, Literal, Generator, etc.). No explicit relationship required.
     Chain(Failed<U> failed = Failed<U>{});
 
     /// @brief Construct a Chain with optional prepare and finalize transforms.
     ///
+    /// Sets the prepare and finalize members inherited from Converter.
+    ///
     /// @param prepare  Transform that conditions the input. May be nullptr.
     /// @param finalize Transform that conditions the result. May be nullptr.
-    /// @proposed
+    /// @accepted
     explicit Chain(Transform<T>* prepare, Transform<U>* finalize = nullptr);
-
-    /// @brief Optional transform that conditions the input.
-    /// @proposed
-    ///
-    /// May be a Pipeline<T,P> — the composite rule ensures any Transform<T,P> satisfies this slot.
-    /// Null means no prepare transform is applied.
-    Transform<T, P>* prepare = nullptr;
-
-    /// @brief Optional transform that conditions the result.
-    /// @proposed
-    ///
-    /// May be a Pipeline<U,P>, the composite rule ensures any Transform<U,P> satisfies this slot.
-    /// Null means no finalize transform is applied.
-    Transform<U, P>* finalize = nullptr;
 
     bool accepts(T value) const noexcept override;
     bool rejects(T value) const noexcept override;

@@ -1,6 +1,6 @@
 # SolidFI Guide
 
-This guide walks through SolidFI from first principles using a running example. The code is illustrative TypeScript — close to real, but not a working program.
+This guide walks through SolidFI from first principles using a running example. The code is illustrative TypeScript, close to real, but not a working program.
 
 ## Contents
 
@@ -125,7 +125,7 @@ The obvious first move is a delegate, a `PageParser` that holds both and tries t
 
 This does work. And notice: `PageParser` IS-A `Converter<XML, Page>`, so it slots in anywhere `Parser` was. That's why we implemented the `Converter` interface, way back when, even though it looked like nothing. To any caller, `PageParser` is indistinguishable from `TextParser` or `ImageParser`. You can always swap one for the other.
 
-But `PageParser` is still mechanical. It's just a hardcoded dispatch — the kind of code that grows a new `if` every time a new page type appears. Each converter already knows what it can handle. `PageParser` adds nothing except repetition.
+But `PageParser` is still mechanical. It's just a hardcoded dispatch: the kind of code that grows a new `if` every time a new page type appears. Each converter already knows what it can handle. `PageParser` adds nothing except repetition.
 
 `Chain` (from "Chain of Responsibility") removes this repetition. It's an ordered composition of converters, each declaring what it handles, tried in priority order until one succeeds:
 
@@ -135,7 +135,7 @@ But `PageParser` is still mechanical. It's just a hardcoded dispatch — the kin
   xmlToPage.install(2, 'image', new ImageParser());
 ```
 
-`Chain` IS-A `Converter<XML, Page>`, so it satisfies the same rule: anywhere you'd put `PageParser`, you can put `xmlToPage`. Chain is indistinguishable from a single converter to any caller. Adding a new page type is now just `xmlToPage.install(3, 'table', new TableParser())` — no delegate to update.
+`Chain` IS-A `Converter<XML, Page>`, so it satisfies the same rule: anywhere you'd put `PageParser`, you can put `xmlToPage`. Chain is indistinguishable from a single converter to any caller. Adding a new page type is now just `xmlToPage.install(3, 'table', new TableParser())`: no delegate to update.
 
 ## Handling Failure
 
@@ -152,15 +152,15 @@ up the desired result, getting the page, with how we get there.
 What we need is a way to represent the failure, without committing to a single 
 solution for everything.
 
-Chain holds the failure policy in a `Failed<U>` — a small wrapper with a single 
+Chain holds the failure policy in a `Failed<U>`, a small wrapper with a single 
 `value` member. The reason it isn't built in is flexibility across large sets of 
 disparately developed types that already exist. Forcing a single representation 
 would mean either restricting which types can participate in a Chain, or wrapping 
 every return value in a container you didn't choose.
 
 For object types, `null` is the obvious default, and Chain uses it automatically 
-when you don't pass a `Failed<U>`. For non-nullable types — numbers, symbols, your 
-own sentinel objects — you pass one explicitly:
+when you don't pass a `Failed<U>`. For non-nullable types (numbers, symbols, your 
+own sentinel objects), you pass one explicitly:
 
 ```typescript
   const xmlToPage = new Chain<XML, Page>();             // null by default
@@ -178,13 +178,13 @@ own `Failed.value`:
 ```
 
 Chain sees `ImageParser.ERROR` come back from `ImageParser`, recognizes it as that 
-link's failure, and moves on. If both links fail, Chain returns `null` — its own 
+link's failure, and moves on. If both links fail, Chain returns `null`, its own 
 failure value.
 
-`null`, `undefined`, a `Symbol`, a blank object, `-1` — any value works as a 
+`null`, `undefined`, a `Symbol`, a blank object, `-1`: any value works as a 
 sentinel. SolidFI just needs to be able to tell success from failure, and you 
 define what failure looks like. The `Failed<U>` wrapper also means any U-producing 
-concept that exposes a `value` — a Provider, a Literal, a Generator — can serve 
+concept that exposes a `value` (a Provider, a Literal, a Generator) can serve 
 as a Chain's failure policy directly, with no adapter needed.
 
 Each link, by the way, is a type `Strategy` that you can define constants of, pass
@@ -302,7 +302,7 @@ Hooray for interfaces! The caller still only holds a `Converter<Filename, HTML>`
 
 What if we need more than one transform? We want to also increase font size for visual acuity. That's another `Transform<HTML, ViewParams>`, obviously independent of colorblindness correction.
 
-Unlike Converters, transforms can never fail, so we run *all* of them — the ones that don't apply just return the original value unchanged.
+Unlike Converters, transforms can never fail, so we run *all* of them: the ones that don't apply just return the original value unchanged.
 
 `Pipeline` is the named composition for transforms, playing the same role `Chain` plays for converters. It's an ordered composition of transforms that is itself a `Transform<T,P>`:
 
@@ -320,7 +320,7 @@ Unlike Converters, transforms can never fail, so we run *all* of them — the on
   accessibility.install(2, 'font-size',  new FontSizeTransform());
 ```
 
-`Pipeline` IS-A `Transform<HTML, ViewParams>`, so it slots into a Multipath with `through()` — the same call that added a single transform:
+`Pipeline` IS-A `Transform<HTML, ViewParams>`, so it slots into a Multipath with `through()`, the same call that added a single transform:
 
 ```typescript
   const path = new Multipath<Filename, Blob>()
@@ -340,7 +340,7 @@ If the Pipeline is local to this one path and doesn't need a name, `throughAll()
     .throughAll(new DeuteranopiaFilter(), new FontSizeTransform());
 ```
 
-Transforms aren't limited to the output end of a path. A `Transform<XML>` could normalize whitespace before parsing; a `Transform<Blob>` could strip a header before unzipping. They can live at any stage — `through()` works wherever the type matches.
+Transforms aren't limited to the output end of a path. A `Transform<XML>` could normalize whitespace before parsing; a `Transform<Blob>` could strip a header before unzipping. They can live at any stage: `through()` works wherever the type matches.
 
 ```
 ================================================================
@@ -414,7 +414,7 @@ END DRAFT
 
 Back to Path. As clear as it is, is still kind of annoying and mechanical. Aside from the Transforms, why do we have to tell which types fit together *at all*? Doesn't the type system already know which ones fit together? We should just be able to create them, toss them into a virtual salad bowl, and have the computer figure it out.
 
-It does! Here we introduce `Runtime`, which is an *unordered* registry of converters, and `Router`, which searches the Runtime and executes the route it finds — as a single `Converter<Filename, HTML>`.
+It does! Here we introduce `Runtime`, which is an *unordered* registry of converters, and `Router`, which searches the Runtime and executes the route it finds, as a single `Converter<Filename, HTML>`.
 
 ```typescript
   // Register known conversions. Order doesn't matter.
@@ -456,7 +456,7 @@ We now have a Factory! You've already written the code.
 
 ### Bringing It Back Home
 
-Here's the magic trick revealed. `Router<T,U>` IS-A `Converter<T,U>` — the same interface as that very first test object we wrote. Since they're both Converters, they can be substituted at any time.
+Here's the magic trick revealed. `Router<T,U>` IS-A `Converter<T,U>`, the same interface as that very first test object we wrote. Since they're both Converters, they can be substituted at any time.
 
 ```typescript
   function displayODF(filename: string, magic: Converter<Filename, HTML>) {
