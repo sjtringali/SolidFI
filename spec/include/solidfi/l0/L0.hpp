@@ -3,20 +3,20 @@
 #pragma once
 
 /// @file L0.hpp
-/// @brief SolidFI Level 0 — substrate concepts. Named stubs only; not implemented here.
+/// @brief SolidFI Level 0: substrate concepts. Named stubs only; not implemented here.
 ///
 /// L0 defines the foundational primitives that inform L1. Each concept is declared as a
-/// stub with a note describing its relationship to L1. L0 and L1 are independent — L1
+/// stub with a note describing its relationship to L1. L0 and L1 are independent: L1
 /// does not include or depend on L0. Do not include this alongside L1 headers.
 
 #include <string>
 #include <vector>
 
 /// @defgroup solidfi_l0 L0
-/// @brief The substrate — named abstract concepts that underlie L1.
+/// @brief The substrate: named abstract concepts that underlie L1.
 /// L0 defines the vocabulary of the spec without prescribing implementation. Each concept
 /// is a stub: it claims an identity and notes its relationship to L1, but imposes no
-/// structure on how it is realized. L0 is for implementers — a reference layer that names
+/// structure on how it is realized. L0 is for implementers, a reference layer that names
 /// what L1 concretizes. L0 and L1 are independent.
 
 namespace solidfi {  // NOLINT: intentional overlap with L1; include L0 standalone only
@@ -24,7 +24,7 @@ namespace solidfi {  // NOLINT: intentional overlap with L1; include L0 standalo
 /// @ingroup solidfi_l0
 /// @brief A unit of executable work over a value of type T.
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: Operation<T> — the core of Transform::apply and Converter::resolve.
+/// @note L1 mapping: Operation<T>, the core of Transform::apply and Converter::resolve.
 template<typename T>
 class Operation {
 public:
@@ -34,7 +34,7 @@ public:
 /// @ingroup solidfi_l0
 /// @brief A single binary decision over a value of type T.
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: Predicate<T> — splits into accepts() and rejects() in L1, each
+/// @note L1 mapping: Predicate<T>, which splits into accepts() and rejects() in L1, each
 ///   declared inline on Transform and Converter with default bodies.
 template<typename T>
 class Predicate {
@@ -45,7 +45,7 @@ public:
 /// @ingroup solidfi_l0
 /// @brief A pair of filtering decisions over T: acceptance and explicit rejection.
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: Filter<T> — becomes the inline accepts()/rejects() methods declared
+/// @note L1 mapping: Filter<T>, which becomes the inline accepts()/rejects() methods declared
 ///   directly on Transform<T> and Converter<T,U,P>.
 template<typename T>
 class Filter {
@@ -58,7 +58,7 @@ public:
 /// @brief An ordered composition mechanism that dispatches T to produce U.
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
-/// @note L1 mapping: Composite<T,U> — substrate for Pipeline<T> and Chain<T,U,P>.
+/// @note L1 mapping: Composite<T,U>, substrate for Pipeline<T> and Chain<T,U,P>.
 template<typename T, typename U>
 class Composite {
 public:
@@ -69,7 +69,7 @@ public:
 /// @brief A named, prioritized entry held inside a Composite.
 /// @tparam T source type; free generic, owned by the user.
 /// @tparam U destination type; free generic, owned by the user.
-/// @note L1 mapping: Strategy<T,U> — the entry type inside Pipeline and Chain
+/// @note L1 mapping: Strategy<T,U>, the entry type inside Pipeline and Chain
 ///   (priority + name + impl). May be elevated to a named L1 concept in a future revision.
 template<typename T, typename U>
 class Strategy {
@@ -112,13 +112,35 @@ public:
 /// @ingroup solidfi_l0
 /// @brief Captures a value of type T and produces it regardless of input.
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: Closed<T> — L1 names this Literal<T>. The alias Closed<T> is preserved
+/// @note L1 mapping: Closed<T>, which L1 names Literal<T>. The alias Closed<T> is preserved
 ///   in the spec.
 template<typename T>
 class Closed {
 public:
     explicit Closed(const T& value);
     virtual T get() const = 0;
+};
+
+/// @ingroup solidfi_l0
+/// @proposed{8/12/26}
+/// @brief The identity Transform: returns T unchanged.
+///
+/// Identity claims every input (accepts() is always true), refuses none
+/// (rejects() is always false), and applies regardless of parameters
+/// (handles() is always true). apply() returns the input value unmodified.
+/// There is nothing to override, so the type is final.
+///
+/// @tparam T source type; free generic, owned by the user.
+/// @tparam P parameters type; free generic, owned by the user.
+/// @note L1 mapping: Transform<T,P>. Identity<T,P> is the trivial instance,
+///   the degradation floor every Transform falls back to.
+template<typename T, typename P>
+class Identity final {
+public:
+    bool accepts(T value) const noexcept { return true; }
+    bool rejects(T value) const noexcept { return false; }
+    bool handles(P params) const noexcept { return true; }
+    T apply(T value, P params) const noexcept { return value; }
 };
 
 /// @ingroup solidfi_l0
@@ -134,7 +156,7 @@ public:
 /// @ingroup solidfi_l0
 /// @brief Shared ownership of a value of type T.
 /// @tparam T the owned type; free generic, owned by the user.
-/// @note L1 mapping: — L1 implementations may use std::shared_ptr<T> or equivalent.
+/// @note L1 mapping: none. L1 implementations may use std::shared_ptr<T> or equivalent.
 ///   Use Shared<T> in the spec to express that multiple holders own the same instance.
 template<typename T>
 class Shared {
@@ -150,7 +172,7 @@ public:
 /// language live in their respective adapter layers.
 ///
 /// @tparam T the underlying type; free generic, owned by the user.
-/// @note L2 usage: Handshake::request is Readonly<R> — the original caller intent,
+/// @note L2 usage: Handshake::request is Readonly<R>, the original caller intent,
 ///   frozen at call time and never modified during traversal.
 template<typename T>
 using Readonly = const T;
@@ -158,16 +180,16 @@ using Readonly = const T;
 /// @ingroup solidfi_l0
 /// @brief A directed graph: typed nodes (types) and typed edges (converters).
 ///
-/// In SolidFI, objects are types and arrows are `Converter<T,U>` instances — morphisms
+/// In SolidFI, objects are types and arrows are `Converter<T,U>` instances: morphisms
 /// between types. Graph is the concrete CS structure realizing that: nodes are types,
 /// edges are Converter instances between them. Graph carries no SolidFI-specific
-/// semantics — it is the raw structural substrate. The L1 projection (Domain) adds the
+/// semantics; it is the raw structural substrate. The L1 projection (Domain) adds the
 /// converter-aware install/remove API and the SolidFI identity.
 ///
-/// @note Category theory provides the theoretical grounding, not the implementation —
+/// @note Category theory provides the theoretical grounding, not the implementation:
 ///   there is nothing to Category beyond the CS structure Graph already names, so it is
 ///   an alias rather than a distinct type. See Category below.
-/// @note L1 mapping: Domain — the SolidFI converter registry. Domain IS-A Graph.
+/// @note L1 mapping: Domain, the SolidFI converter registry. Domain IS-A Graph.
 class Graph {
 public:
 };
@@ -176,14 +198,14 @@ public:
 /// @brief Category theory's name for Graph: objects (types) and arrows (converters).
 ///
 /// Category is the mathematical vocabulary; Graph is its concrete CS realization. They
-/// name the same structure, so Category is a plain alias — theoretical grounding, not a
+/// name the same structure, so Category is a plain alias: theoretical grounding, not a
 /// second implementation.
 using Category = Graph;
 
 /// @ingroup solidfi_l0
 /// @brief Reduces a collection of T to a single T (fold).
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: — no direct L1 counterpart yet.
+/// @note L1 mapping: none yet.
 template<typename T>
 class Reduce {
 public:
@@ -193,7 +215,7 @@ public:
 /// @ingroup solidfi_l0
 /// @brief Expands a single T to a collection of T (unfold).
 /// @tparam T source type; free generic, owned by the user.
-/// @note L1 mapping: — no direct L1 counterpart yet.
+/// @note L1 mapping: none yet.
 template<typename T>
 class Expand {
 public:
@@ -210,7 +232,7 @@ public:
 ///
 /// @tparam T source type.
 /// @tparam U derived type; any value producible from T.
-/// @note L1 mapping: — reserved for future L1 promotion.
+/// @note L1 mapping: reserved for future L1 promotion.
 template<typename T, typename U>
 class Fanout {
 public:
